@@ -1,0 +1,34 @@
+{
+    "name": "ronas/laravel-project-initializator",
+    "description": "Wrapper for Ronas laravel-project-initializator",
+    "keywords": [
+        "ronas",
+        "laravel-project-initializator"
+    ],
+    "homepage": "https://github.com/RonasIT/laravel-project-initializator",
+    "license": "MIT",
+    "type": "library",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Mher Shahinyan",
+            "email": "mshahinyan@ronasit.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">8.1"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0",
+        "phpunit/phpunit": "^9.0"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
