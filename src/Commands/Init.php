@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Ronas\LaravelProjectInitializator\Commands;
 
 use App\Models\Role;
 use Illuminate\Console\Command;
@@ -37,7 +37,7 @@ class Init extends Command
         'nova',
     ];
 
-    protected $signature = 'init {application-name : The application name }';
+    protected $signature = 'ronas-init-app {application-name : The application name }';
 
     protected $description = 'Initialize required project parameters to run DEV environment';
 
@@ -64,11 +64,12 @@ class Init extends Command
             'APP_NAME' => $appName,
         ]);
 
-        $this->updateConfigFile('.env.development', '=', [
-            'APP_NAME' => $appName,
-            'APP_URL' => $this->appUrl,
-        ]);
-
+        if ($this->confirm('Do you have .env.development', true)) {
+            $this->updateConfigFile('.env.development', '=', [
+                'APP_NAME' => $appName,
+                'APP_URL' => $this->appUrl,
+            ]);
+        }
         $this->info('Project initialized successfully!');
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {

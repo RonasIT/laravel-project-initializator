@@ -1,14 +1,13 @@
 {
     "name": "ronas/laravel-project-initializator",
-    "description": "Wrapper for Ronas laravel-project-initializator",
+    "description": "Create new Laravel Application",
     "keywords": [
         "ronas",
         "laravel-project-initializator"
     ],
-    "homepage": "https://github.com/RonasIT/laravel-project-initializator",
+    "homepage": "https://github.com/ronas/laravel-project-initializator",
     "license": "MIT",
     "type": "library",
-    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Mher Shahinyan",
@@ -23,6 +22,16 @@
         "orchestra/testbench": "^6.0",
         "phpunit/phpunit": "^9.0"
     },
+    "autoload": {
+        "psr-4": {
+            "Ronas\\LaravelProjectInitializator\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ronas\\LaravelProjectInitializator\\Tests\\": "tests"
+        }
+    },
     "scripts": {
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
@@ -30,5 +39,15 @@
     },
     "config": {
         "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ronas\\LaravelProjectInitializator\\LaravelProjectInitializatorServiceProvider"
+            ],
+            "aliases": {
+                "LaravelProjectInitializator": "Ronas\\LaravelProjectInitializator\\LaravelProjectInitializatorFacade"
+            }
+        }
     }
 }
