@@ -2,7 +2,7 @@
 
 namespace Ronas\LaravelProjectInitializator\Commands;
 
-use App\Models\Role;
+use Ronas\LaravelProjectInitializator\Enums\Role;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 
 class Init extends Command
 {
-    public const TEMPLATES_PATH = '.templates';
 
     public const RESOURCES_ITEMS = [
         'issue_tracker' => 'Issue Tracker',
@@ -64,12 +63,11 @@ class Init extends Command
             'APP_NAME' => $appName,
         ]);
 
-        if ($this->confirm('Do you have .env.development', true)) {
-            $this->updateConfigFile('.env.development', '=', [
-                'APP_NAME' => $appName,
-                'APP_URL' => $this->appUrl,
-            ]);
-        }
+        $this->updateConfigFile(base_path('.env.development'), '=', [
+            'APP_NAME' => $appName,
+            'APP_URL' => $this->appUrl,
+        ]);
+
         $this->info('Project initialized successfully!');
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -283,6 +281,8 @@ class Init extends Command
 
     protected function updateConfigFile($fileName, $separator, $data): void
     {
+        file_exists($fileName) ?: fopen($fileName, 'w');
+
         $parsed = file_get_contents($fileName);
 
         $lines = explode("\n", $parsed);
@@ -305,7 +305,8 @@ class Init extends Command
 
     protected function loadReadmePart(string $fileName): string
     {
-        return file_get_contents(self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
+        file_exists($fileName) ?: fopen($fileName, 'w');
+        return file_get_contents($fileName);
     }
 
     protected function updateReadmeFile(string $filePart): void
