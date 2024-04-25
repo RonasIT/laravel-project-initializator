@@ -3,6 +3,7 @@
 namespace Ronas\LaravelProjectInitializator;
 
 use Ronas\LaravelProjectInitializator\Commands\Init;
+use Ronas\LaravelProjectInitializator\Commands\GenerateDefaultUserMigration;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelProjectInitializatorServiceProvider extends ServiceProvider
@@ -41,7 +42,7 @@ class LaravelProjectInitializatorServiceProvider extends ServiceProvider
             ], 'lang');*/
 
             // Registering package commands.
-             $this->commands([Init::class]);
+             $this->commands([Init::class, GenerateDefaultUserMigration::class]);
         }
     }
 
@@ -61,6 +62,7 @@ class LaravelProjectInitializatorServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Init::class,
+                GenerateDefaultUserMigration::class,
             ]);
         }
     }

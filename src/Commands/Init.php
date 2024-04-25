@@ -2,6 +2,7 @@
 
 namespace Ronas\LaravelProjectInitializator\Commands;
 
+use Illuminate\Support\Facades\Artisan;
 use Ronas\LaravelProjectInitializator\Enums\Role;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 
 class Init extends Command
 {
+
+    public const TEMPLATES_PATH = '.templates';
 
     public const RESOURCES_ITEMS = [
         'issue_tracker' => 'Issue Tracker',
@@ -63,7 +66,7 @@ class Init extends Command
             'APP_NAME' => $appName,
         ]);
 
-        $this->updateConfigFile(base_path('.env.development'), '=', [
+        $this->updateConfigFile('.env.development', '=', [
             'APP_NAME' => $appName,
             'APP_URL' => $this->appUrl,
         ]);
@@ -248,7 +251,7 @@ class Init extends Command
                 continue;
             }
 
-            if ($this->confirm("Is {$title}'s admin the same as default one?", true)) {
+            if ($this->confirm("Is {$title}'s admin the same as default one?", true) && count($this->adminCredentials) > 0) {
                 $email = $this->adminCredentials['email'];
                 $password = $this->adminCredentials['password'];
             } else {
@@ -273,14 +276,13 @@ class Init extends Command
 
     protected function publishMigration(): void
     {
-        $data = view('add_default_user')->with($this->adminCredentials)->render();
-        $fileName = Carbon::now()->format('Y_m_d_His') . '_add_default_user.php';
-
-        file_put_contents("database/migrations/{$fileName}", "<?php\n\n{$data}");
+        $credentials = json_encode($this->adminCredentials);
+        Artisan::call('generate:default-user-migration', ['--credentials' => $credentials]);
     }
 
     protected function updateConfigFile($fileName, $separator, $data): void
     {
+        $fileName = base_path($fileName);
         file_exists($fileName) ?: fopen($fileName, 'w');
 
         $parsed = file_get_contents($fileName);
@@ -305,6 +307,10 @@ class Init extends Command
 
     protected function loadReadmePart(string $fileName): string
     {
+        $dir = base_path(self::TEMPLATES_PATH);
+        $fileName = $dir . DIRECTORY_SEPARATOR . $fileName;
+        if (!is_dir($dir))
+            mkdir($dir);
         file_exists($fileName) ?: fopen($fileName, 'w');
         return file_get_contents($fileName);
     }
@@ -332,6 +338,6 @@ class Init extends Command
 
     protected function saveReadme(): void
     {
-        file_put_contents('README.md', $this->readmeContent);
+        file_put_contents(base_path(self::TEMPLATES_PATH) . DIRECTORY_SEPARATOR . 'README.md', $this->readmeContent);
     }
 }
