@@ -1,9 +1,9 @@
 <?php
 
-namespace Ronas\LaravelProjectInitializator;
+namespace RonasIT\LaravelProjectInitializator;
 
-use Ronas\LaravelProjectInitializator\Commands\Init;
-use Ronas\LaravelProjectInitializator\Commands\GenerateDefaultUserMigration;
+use RonasIT\LaravelProjectInitializator\Commands\Init;
+use RonasIT\LaravelProjectInitializator\Commands\GenerateDefaultUserMigration;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelProjectInitializatorServiceProvider extends ServiceProvider

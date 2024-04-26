@@ -1,6 +1,6 @@
 <?php
 
-namespace Ronas\LaravelProjectInitializator\Commands;
+namespace RonasIT\LaravelProjectInitializator\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;

@@ -1,9 +1,9 @@
 <?php
 
-namespace Ronas\LaravelProjectInitializator\Commands;
+namespace RonasIT\LaravelProjectInitializator\Commands;
 
 use Illuminate\Support\Facades\Artisan;
-use Ronas\LaravelProjectInitializator\Enums\Role;
+use RonasIT\LaravelProjectInitializator\Enums\Role;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;

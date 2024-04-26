@@ -1,5 +1,5 @@
 <?php
-namespace Ronas\LaravelProjectInitializator\Enums;
+namespace RonasIT\LaravelProjectInitializator\Enums;
 
 class Role
 {

@@ -1,11 +1,11 @@
 {
-    "name": "ronas/laravel-project-initializator",
-    "description": "Create new Laravel Application",
+    "name": "ronasit/laravel-project-initializator",
+    "description": "Provided console command for generating readme",
     "keywords": [
-        "ronas",
+        "ronasit",
         "laravel-project-initializator"
     ],
-    "homepage": "https://github.com/ronas/laravel-project-initializator",
+    "homepage": "https://github.com/ronasit/laravel-project-initializator",
     "license": "MIT",
     "type": "library",
     "authors": [
@@ -24,12 +24,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Ronas\\LaravelProjectInitializator\\": "src"
+            "RonasIT\\LaravelProjectInitializator\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Ronas\\LaravelProjectInitializator\\Tests\\": "tests"
+            "RonasIT\\LaravelProjectInitializator\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -43,10 +43,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Ronas\\LaravelProjectInitializator\\LaravelProjectInitializatorServiceProvider"
+                "RonasIT\\LaravelProjectInitializator\\LaravelProjectInitializatorServiceProvider"
             ],
             "aliases": {
-                "LaravelProjectInitializator": "Ronas\\LaravelProjectInitializator\\LaravelProjectInitializatorFacade"
+                "LaravelProjectInitializator": "RonasIT\\LaravelProjectInitializator\\LaravelProjectInitializatorFacade"
             }
         }
     }

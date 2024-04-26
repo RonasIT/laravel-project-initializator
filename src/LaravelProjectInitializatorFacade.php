@@ -1,11 +1,11 @@
 <?php
 
-namespace Ronas\LaravelProjectInitializator;
+namespace RonasIT\LaravelProjectInitializator;
 
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Ronas\LaravelProjectInitializator\Skeleton\SkeletonClass
+ * @see \RonasIT\LaravelProjectInitializator\Skeleton\SkeletonClass
  */
 class LaravelProjectInitializatorFacade extends Facade
 {
