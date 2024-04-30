@@ -1,0 +1,53 @@
+{
+    "name": "ronasit/laravel-project-initializator",
+    "description": "Provided console command for generating readme",
+    "keywords": [
+        "ronasit",
+        "laravel-project-initializator"
+    ],
+    "homepage": "https://github.com/ronasit/laravel-project-initializator",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Mher Shahinyan",
+            "email": "mshahinyan@ronasit.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">8.1"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0",
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "RonasIT\\LaravelProjectInitializator\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "RonasIT\\LaravelProjectInitializator\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "RonasIT\\LaravelProjectInitializator\\LaravelProjectInitializatorServiceProvider"
+            ],
+            "aliases": {
+                "LaravelProjectInitializator": "RonasIT\\LaravelProjectInitializator\\LaravelProjectInitializatorFacade"
+            }
+        }
+    }
+}
