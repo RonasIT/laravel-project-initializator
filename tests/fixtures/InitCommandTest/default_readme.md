@@ -1,11 +1,13 @@
 # My App
 
 This project implements an API for the My App Multiplatform app.
+
 ## Project Resources & Contacts
 
 This section provides quick links to various resources and contacts associated
 with this project. It's here to streamline your navigation and communication
 process, so you can efficiently find what you need or reach out to who you need.
+
 ### Resources
 
 Below are links to tools and services used in this project:
@@ -17,6 +19,7 @@ Below are links to tools and services used in this project:
 - [Laravel Telescope](): This is debug assistant for the Laravel framework. (will be added later)
 - [Laravel Nova](): This is admin panel for the Laravel framework. (will be added later)
 - [API Documentation](https://mysite.com)
+
 ### Contacts
 
 Should you need assistance or have questions, feel free to connect with the following individuals:
@@ -24,12 +27,14 @@ Should you need assistance or have questions, feel free to connect with the foll
 - Code Owner/Team Lead: For specific questions about the codebase or technical aspects, reach out to our team lead. [Connect with Team Lead](mailto::team_lead_link)
 
 Please be mindful of each individual's preferred contact method and office hours.
+
 ## Prerequisites
 
 To work with this repository, you will need to have the following
 installed:
 
 - [Docker](https://www.docker.com)
+
 ## Getting Started
 
 To get started with this repository, follow these steps:
@@ -51,6 +56,7 @@ Build and start containers, it may takes some time:
 ```sh
 docker compose up -d
 ```
+
 ## Environments
 
 This repository by default supports three environments: `local`, `development`,
@@ -61,6 +67,7 @@ and `testing`. Each environment is represented by an appropriate environment fil
 | local | .env | [http://localhost](http://localhost) |
 | testing | .env.testing | -                                    |
 | development | .env.development | [https://mysite.com](https://mysite.com)               |
+
 ## Credentials and Access
 
 Default admin access:
