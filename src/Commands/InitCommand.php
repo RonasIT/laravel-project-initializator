@@ -7,6 +7,7 @@ use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use RonasIT\ProjectInitializator\Enums\RoleEnum;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -122,7 +123,7 @@ class InitCommand extends Command implements Isolatable
             'name' => $this->ask('Please enter an admin name', 'Admin'),
             'email' => $this->ask('Please enter an admin email', "admin@{$kebabName}.com"),
             'password' => $this->ask('Please enter an admin password', $defaultPassword),
-            'role_id' => $this->ask('Please enter an admin role id', 1),
+            'role_id' => $this->ask('Please enter an admin role id', RoleEnum::Admin->value),
         ];
 
         $this->publishMigration();

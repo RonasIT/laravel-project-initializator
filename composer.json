@@ -2,11 +2,23 @@
     "name": "ronasit/laravel-project-initializator",
     "description": "Provided tools for project initialization.",
     "license": "MIT",
+    "keywords": [
+        "laravel",
+        "project-initializator",
+        "readme",
+        "init"
+    ],
     "autoload": {
         "psr-4": {
             "RonasIT\\ProjectInitializator\\": "src/"
         }
     },
+    "authors": [
+        {
+            "name": "Ronas IT",
+            "homepage": "https://github.com/RonasIT/laravel-project-initializator/graphs/contributors"
+        }
+    ],
     "autoload-dev": {
         "psr-4": {
             "RonasIT\\ProjectInitializator\\Tests\\": "tests/",
