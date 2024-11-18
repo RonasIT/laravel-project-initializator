@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support\Commands;
+namespace RonasIT\ProjectInitializator\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class InitCommand extends Command implements Isolatable
 {
-    public const string TEMPLATES_PATH = '.templates';
+    public const string TEMPLATES_PATH = 'resources/md/readme';
 
     public const array RESOURCES_ITEMS = [
         'issue_tracker' => 'Issue Tracker',
@@ -122,7 +122,7 @@ class InitCommand extends Command implements Isolatable
             'name' => $this->ask('Please enter an admin name', 'Admin'),
             'email' => $this->ask('Please enter an admin email', "admin@{$kebabName}.com"),
             'password' => $this->ask('Please enter an admin password', $defaultPassword),
-            'role_id' => $this->ask('Please enter an role id', 1),
+            'role_id' => $this->ask('Please enter an admin role id', 1),
         ];
 
         $this->publishMigration();
@@ -304,7 +304,9 @@ class InitCommand extends Command implements Isolatable
 
     protected function loadReadmePart(string $fileName): string
     {
-        return file_get_contents(self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
+        $file = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName;
+
+        return file_get_contents($file);
     }
 
     protected function updateReadmeFile(string $filePart): void

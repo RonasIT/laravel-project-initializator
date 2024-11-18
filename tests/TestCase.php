@@ -1,9 +1,9 @@
 <?php
 
-namespace RonasIT\Support\Tests;
+namespace RonasIT\ProjectInitializator\Tests;
 
 use Carbon\Carbon;
-use RonasIT\Support\ProjectInitializatorServiceProvider;
+use RonasIT\ProjectInitializator\ProjectInitializatorServiceProvider;
 use RonasIT\Support\Traits\FixturesTrait;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 

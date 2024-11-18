@@ -1,9 +1,9 @@
 <?php
 
-namespace RonasIT\Support;
+namespace RonasIT\ProjectInitializator;
 
 use Illuminate\Support\ServiceProvider;
-use RonasIT\Support\Commands\InitCommand;
+use RonasIT\ProjectInitializator\Commands\InitCommand;
 
 class ProjectInitializatorServiceProvider extends ServiceProvider
 {

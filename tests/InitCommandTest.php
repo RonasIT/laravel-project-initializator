@@ -1,8 +1,8 @@
 <?php
 
-namespace RonasIT\Support\Tests;
+namespace RonasIT\ProjectInitializator\Tests;
 
-use RonasIT\Support\Tests\Support\Traits\InitCommandMockTrait;
+use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
 {
@@ -10,6 +10,17 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
+        $this->mockFileGetContent(
+            [
+                'arguments' => ['.env.example'],
+                'result' => $this->getFixture('env.example.yml'),
+            ],
+            [
+                'arguments' => ['.env.development'],
+                'result' => $this->getFixture('env.development.yml'),
+            ],
+        );
+
         $this->mockFilePutContent();
 
         $this
@@ -23,6 +34,17 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
+        $this->mockFileGetContent(
+            [
+                'arguments' => ['.env.example'],
+                'result' => $this->getFixture('env.example.yml'),
+            ],
+            [
+                'arguments' => ['.env.development'],
+                'result' => $this->getFixture('env.development.yml'),
+            ],
+        );
+
         $this->mockFilePutContent(
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
@@ -40,7 +62,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter an admin password', '123456')
-            ->expectsQuestion('Please enter an role id', 1)
+            ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?')
             ->assertExitCode(0);
     }
@@ -48,6 +70,49 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
         $this->mockShellExec();
+
+        $this->mockFileGetContent(
+            [
+                'arguments' => ['.env.example'],
+                'result' => $this->getFixture('env.example.yml'),
+            ],
+            [
+                'arguments' => ['.env.development'],
+                'result' => $this->getFixture('env.development.yml'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/README.md'],
+                'result' => $this->getTemplate('README.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/RESOURCES_AND_CONTACTS.md'],
+                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/RESOURCES.md'],
+                'result' => $this->getTemplate('RESOURCES.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/CONTACTS.md'],
+                'result' => $this->getTemplate('CONTACTS.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/PREREQUISITES.md'],
+                'result' => $this->getTemplate('PREREQUISITES.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/GETTING_STARTED.md'],
+                'result' => $this->getTemplate('GETTING_STARTED.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/ENVIRONMENTS.md'],
+                'result' => $this->getTemplate('ENVIRONMENTS.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
+                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+            ],
+        );
 
         $this->mockFilePutContent(
             [
@@ -72,7 +137,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter an admin password', '123456')
-            ->expectsQuestion('Please enter an role id', 1)
+            ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
@@ -133,6 +198,41 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndPartialReadmeCreation()
     {
+        $this->mockFileGetContent(
+            [
+                'arguments' => ['.env.example'],
+                'result' => $this->getFixture('env.example.yml'),
+            ],
+            [
+                'arguments' => ['.env.development'],
+                'result' => $this->getFixture('env.development.yml'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/README.md'],
+                'result' => $this->getTemplate('README.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/RESOURCES_AND_CONTACTS.md'],
+                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/RESOURCES.md'],
+                'result' => $this->getTemplate('RESOURCES.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/CONTACTS.md'],
+                'result' => $this->getTemplate('CONTACTS.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/ENVIRONMENTS.md'],
+                'result' => $this->getTemplate('ENVIRONMENTS.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
+                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+            ],
+        );
+
         $this->mockFilePutContent(
             [
                 'README.md',
@@ -202,6 +302,49 @@ class InitCommandTest extends TestCase
     {
         $this->mockShellExec();
 
+        $this->mockFileGetContent(
+            [
+                'arguments' => ['.env.example'],
+                'result' => $this->getFixture('env.example.yml'),
+            ],
+            [
+                'arguments' => ['.env.development'],
+                'result' => $this->getFixture('env.development.yml'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/README.md'],
+                'result' => $this->getTemplate('README.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/RESOURCES_AND_CONTACTS.md'],
+                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/RESOURCES.md'],
+                'result' => $this->getTemplate('RESOURCES.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/CONTACTS.md'],
+                'result' => $this->getTemplate('CONTACTS.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/PREREQUISITES.md'],
+                'result' => $this->getTemplate('PREREQUISITES.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/GETTING_STARTED.md'],
+                'result' => $this->getTemplate('GETTING_STARTED.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/ENVIRONMENTS.md'],
+                'result' => $this->getTemplate('ENVIRONMENTS.md'),
+            ],
+            [
+                'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
+                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+            ],
+        );
+
         $this->mockFilePutContent(
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
@@ -225,6 +368,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter an admin password', '123456')
+            ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')

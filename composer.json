@@ -4,19 +4,19 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "RonasIT\\Support\\": "src/"
+            "RonasIT\\ProjectInitializator\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "RonasIT\\Support\\Tests\\": "tests/",
-            "RonasIT\\Support\\Tests\\Support\\": "tests/Support/"
+            "RonasIT\\ProjectInitializator\\Tests\\": "tests/",
+            "RonasIT\\ProjectInitializator\\Tests\\Support\\": "tests/Support/"
         }
     },
     "minimum-stability": "alpha",
     "require": {
         "php": ">=8.3",
-        "laravel/framework": "^11.20",
+        "laravel/framework": "^11.30",
         "php-mock/php-mock-phpunit": "^2.10",
         "ext-json": "*",
         "ronasit/laravel-helpers": "^3.0.0-beta"
@@ -33,7 +33,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "RonasIT\\Support\\ProjectInitializatorServiceProvider"
+                "RonasIT\\ProjectInitializator\\ProjectInitializatorServiceProvider"
             ]
         }
     }
