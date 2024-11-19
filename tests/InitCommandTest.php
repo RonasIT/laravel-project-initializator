@@ -23,12 +23,19 @@ class InitCommandTest extends TestCase
 
         $this->mockFilePutContent();
 
+        $this->mockShellExec(
+            ['arguments' => 'cd /app/tests/.. && composer require ronasit/laravel-helpers'],
+            ['arguments' => 'cd /app/tests/.. && composer require --dev ronasit/laravel-swagger'],
+            ['arguments' => 'cd /app/tests/.. && composer require --dev ronasit/laravel-entity-generator'],
+        );
+
         $this
             ->artisan('init "My App"')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -55,6 +62,12 @@ class InitCommandTest extends TestCase
             ]
         );
 
+        $this->mockShellExec(
+            ['arguments' => 'cd /app/tests/.. && composer require ronasit/laravel-helpers'],
+            ['arguments' => 'cd /app/tests/.. && composer require --dev ronasit/laravel-swagger'],
+            ['arguments' => 'cd /app/tests/.. && composer require --dev ronasit/laravel-entity-generator'],
+        );
+
         $this
             ->artisan('init "My App"')
             ->expectsOutput('Project initialized successfully!')
@@ -65,14 +78,13 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an admin password', '123456')
             ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
-        $this->mockShellExec();
-
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -129,6 +141,13 @@ class InitCommandTest extends TestCase
                 'optionalParameter',
                 'optionalParameter',
             ]
+        );
+
+        $this->mockShellExec(
+            ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
+            ['arguments' => 'cd /app/tests/.. && composer require ronasit/laravel-helpers'],
+            ['arguments' => 'cd /app/tests/.. && composer require --dev ronasit/laravel-swagger'],
+            ['arguments' => 'cd /app/tests/.. && composer require --dev ronasit/laravel-entity-generator'],
         );
 
         $this
@@ -195,6 +214,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsOutput('- Code Owner/Team Lead\'s email')
+            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -243,6 +263,12 @@ class InitCommandTest extends TestCase
                 'optionalParameter',
                 'optionalParameter',
             ]
+        );
+
+        $this->mockShellExec(
+            ['arguments' => 'cd /app/tests/.. && composer require ronasit/laravel-helpers'],
+            ['arguments' => 'cd /app/tests/.. && composer require --dev ronasit/laravel-swagger'],
+            ['arguments' => 'cd /app/tests/.. && composer require --dev ronasit/laravel-entity-generator'],
         );
 
         $this
@@ -298,14 +324,13 @@ class InitCommandTest extends TestCase
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
             ->expectsOutput('- Code Owner/Team Lead\'s email')
+            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
 
-    public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializator()
+    public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
-        $this->mockShellExec();
-
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -364,13 +389,14 @@ class InitCommandTest extends TestCase
             ]
         );
 
-        $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands', [
-            $this->functionCall('exec', [
-                'cd /app/tests/.. && composer remove ronasit/laravel-project-initializator',
-                'optionalParameter',
-                'optionalParameter',
-            ], 'success'),
-        ]);
+        $this->mockShellExec(
+            ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
+            ['arguments' => 'cd /app/tests/.. && composer require ronasit/laravel-helpers'],
+            ['arguments' => 'cd /app/tests/.. && composer require --dev ronasit/laravel-swagger'],
+            ['arguments' => 'cd /app/tests/.. && composer require --dev ronasit/laravel-entity-generator'],
+            ['arguments' => 'cd /app/tests/.. && composer require ronasit/laravel-media'],
+            ['arguments' => 'cd /app/tests/.. && composer remove ronasit/laravel-project-initializator'],
+        );
 
         $this
             ->artisan('init "My App"')
@@ -430,6 +456,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'nova_mail@mail.com')
             ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '654321')
             ->expectsOutput('README generated successfully!')
+            ->expectsConfirmation('Do you want to install media package?', 'yes')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->assertExitCode(0);
     }
