@@ -364,20 +364,13 @@ class InitCommandTest extends TestCase
             ]
         );
 
-        $this->mockNativeFunction(
-            namespace: 'RonasIT\ProjectInitializator\Commands',
-            callChain: [
-                [
-                    'function' => 'exec',
-                    'arguments' => [
-                        'cd /app/tests/.. && composer remove ronasit/laravel-project-initializator',
-                        'optionalParameter',
-                        'optionalParameter',
-                    ],
-                    'result' => 'success',
-                ],
-            ],
-        );
+        $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands', [
+            $this->functionCall('exec', [
+                'cd /app/tests/.. && composer remove ronasit/laravel-project-initializator',
+                'optionalParameter',
+                'optionalParameter',
+            ], 'success'),
+        ]);
 
         $this
             ->artisan('init "My App"')
