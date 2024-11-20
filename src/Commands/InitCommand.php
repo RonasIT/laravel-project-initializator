@@ -128,10 +128,8 @@ class InitCommand extends Command implements Isolatable
             $this->composerCommands[] = 'composer remove ronasit/laravel-project-initializator';
         }
 
-        $path = base_path();
-
         foreach ($this->composerCommands as $composerCommand) {
-            shell_exec("cd {$path} && {$composerCommand}");
+            shell_exec($composerCommand);
         }
     }
 
