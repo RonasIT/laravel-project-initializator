@@ -26,27 +26,27 @@ trait InitCommandMockTrait
         );
     }
 
-    public function mockShellExec(): void
+    public function mockShellExec(array ...$rawCallChain): void
     {
-        $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands', [
-            $this->functionCall(
-                name: 'shell_exec',
-                arguments: ['git ls-remote --get-url origin'],
-                result: 'https://github.com/ronasit/laravel-helpers.git',
-            ),
-        ]);
+        $callChain = array_map(fn ($call) => $this->functionCall(
+            name: 'shell_exec',
+            arguments: Arr::wrap($call['arguments']),
+            result: Arr::get($call, 'result', 'success'),
+        ), $rawCallChain);
+
+        $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands', $callChain);
     }
 
-    public function mockFileGetContent(...$rawCallChain): void
+    public function mockFileGetContent(array ...$rawCallChain): void
     {
-        $callChain = array_map(fn ($call) => [
-            'function' => 'file_get_contents',
-            'arguments' => array_merge(
-                Arr::get($call, 'arguments', []),
+        $callChain = array_map(fn ($call) => $this->functionCall(
+            name: 'file_get_contents',
+            arguments: array_merge(
+                $call['arguments'],
                 ['optionalParameter', 'optionalParameter', 'optionalParameter', 'optionalParameter'],
             ),
-            'result' => $call['result'],
-        ], $rawCallChain);
+            result: $call['result'],
+        ), $rawCallChain);
 
         $this->mockNativeFunction(
             namespace: 'RonasIT\ProjectInitializator\Commands',
