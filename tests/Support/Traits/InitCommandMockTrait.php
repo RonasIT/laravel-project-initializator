@@ -43,7 +43,7 @@ trait InitCommandMockTrait
             name: 'file_get_contents',
             arguments: array_merge(
                 $call['arguments'],
-                array_fill(0, 4, 'optionalParameter'),
+                array_fill(0, 5 - count($call['arguments']), 'optionalParameter'),
             ),
             result: $call['result'],
         ), $rawCallChain);
