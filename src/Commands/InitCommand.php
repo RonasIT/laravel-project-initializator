@@ -52,6 +52,12 @@ class InitCommand extends Command implements Isolatable
 
     protected string $readmeContent = '';
 
+    protected array $composerCommands = [
+        'composer require ronasit/laravel-helpers',
+        'composer require ronasit/laravel-swagger',
+        'composer require --dev ronasit/laravel-entity-generator',
+    ];
+
     public function handle(): void
     {
         $appName = $this->argument('application-name');
@@ -114,11 +120,16 @@ class InitCommand extends Command implements Isolatable
             }
         }
 
-        if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
-            $command = 'composer remove ronasit/laravel-project-initializator';
-            $path = base_path();
+        if ($this->confirm('Do you want to install media package?')) {
+            $this->composerCommands[] = 'composer require ronasit/laravel-media';
+        }
 
-            exec("cd {$path} && {$command}");
+        if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
+            $this->composerCommands[] = 'composer remove ronasit/laravel-project-initializator';
+        }
+
+        foreach ($this->composerCommands as $composerCommand) {
+            shell_exec($composerCommand);
         }
     }
 
