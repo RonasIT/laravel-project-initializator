@@ -125,7 +125,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
-            $this->composerCommands[] = 'composer remove ronasit/laravel-project-initializator';
+            $this->composerCommands[] = 'composer remove --dev ronasit/laravel-project-initializator';
         }
 
         foreach ($this->composerCommands as $composerCommand) {
