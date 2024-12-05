@@ -129,7 +129,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         foreach ($this->composerCommands as $composerCommand) {
-            shell_exec($composerCommand);
+            shell_exec("{$composerCommand} --ansi");
         }
     }
 
