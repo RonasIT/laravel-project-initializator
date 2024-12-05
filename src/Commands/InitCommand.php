@@ -56,6 +56,8 @@ class InitCommand extends Command implements Isolatable
         'composer require ronasit/laravel-helpers',
         'composer require ronasit/laravel-swagger',
         'composer require --dev ronasit/laravel-entity-generator',
+        'composer require laravel/telescope',
+        'composer require muhammadhuzaifa/telescope-guzzle-watcher',
     ];
 
     public function handle(): void
