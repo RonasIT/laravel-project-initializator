@@ -24,9 +24,9 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent();
 
         $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers'],
-            ['arguments' => 'composer require ronasit/laravel-swagger'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator'],
+            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
         );
 
         $this
@@ -63,9 +63,9 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers'],
-            ['arguments' => 'composer require ronasit/laravel-swagger'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator'],
+            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
         );
 
         $this
@@ -145,9 +145,9 @@ class InitCommandTest extends TestCase
 
         $this->mockShellExec(
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
-            ['arguments' => 'composer require ronasit/laravel-helpers'],
-            ['arguments' => 'composer require ronasit/laravel-swagger'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator'],
+            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
         );
 
         $this
@@ -266,9 +266,9 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers'],
-            ['arguments' => 'composer require ronasit/laravel-swagger'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator'],
+            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
         );
 
         $this
@@ -391,11 +391,11 @@ class InitCommandTest extends TestCase
 
         $this->mockShellExec(
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
-            ['arguments' => 'composer require ronasit/laravel-helpers'],
-            ['arguments' => 'composer require ronasit/laravel-swagger'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator'],
-            ['arguments' => 'composer require ronasit/laravel-media'],
-            ['arguments' => 'composer remove ronasit/laravel-project-initializator'],
+            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-media --ansi'],
+            ['arguments' => 'composer remove --dev ronasit/laravel-project-initializator --ansi'],
         );
 
         $this
