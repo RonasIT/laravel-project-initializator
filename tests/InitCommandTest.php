@@ -28,7 +28,6 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator'],
             ['arguments' => 'composer require laravel/telescope'],
-            ['arguments' => 'composer require muhammadhuzaifa/telescope-guzzle-watcher'],
         );
 
         $this
@@ -69,7 +68,6 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator'],
             ['arguments' => 'composer require laravel/telescope'],
-            ['arguments' => 'composer require muhammadhuzaifa/telescope-guzzle-watcher'],
         );
 
         $this
@@ -153,7 +151,6 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator'],
             ['arguments' => 'composer require laravel/telescope'],
-            ['arguments' => 'composer require muhammadhuzaifa/telescope-guzzle-watcher'],
         );
 
         $this
@@ -276,7 +273,6 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator'],
             ['arguments' => 'composer require laravel/telescope'],
-            ['arguments' => 'composer require muhammadhuzaifa/telescope-guzzle-watcher'],
         );
 
         $this
@@ -403,7 +399,6 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator'],
             ['arguments' => 'composer require laravel/telescope'],
-            ['arguments' => 'composer require muhammadhuzaifa/telescope-guzzle-watcher'],
             ['arguments' => 'composer require ronasit/laravel-media'],
             ['arguments' => 'composer remove --dev ronasit/laravel-project-initializator'],
         );
