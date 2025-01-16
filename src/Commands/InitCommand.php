@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
+use Illuminate\Support\Facades\Artisan;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -133,8 +134,8 @@ class InitCommand extends Command implements Isolatable
             shell_exec("{$composerCommand} --ansi");
         }
 
-        $this->call('telescope:install');
-        $this->call('migrate');
+        Artisan::call('telescope:install');
+        Artisan::call('migrate');
     }
 
     protected function createAdminUser(string $kebabName): void
