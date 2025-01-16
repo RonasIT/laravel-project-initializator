@@ -2,11 +2,20 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use Illuminate\Support\Facades\Artisan;
+use RonasIT\ProjectInitializator\Tests\Support\TelescopeInstallCommand;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
 {
     use InitCommandMockTrait;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Artisan::registerCommand(new TelescopeInstallCommand());
+    }
 
     public function testRunWithoutAdminAndReadmeCreation()
     {

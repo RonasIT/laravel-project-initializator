@@ -132,6 +132,9 @@ class InitCommand extends Command implements Isolatable
         foreach ($this->composerCommands as $composerCommand) {
             shell_exec($composerCommand);
         }
+
+        $this->call('telescope:install');
+        $this->call('migrate');
     }
 
     protected function createAdminUser(string $kebabName): void
