@@ -56,6 +56,7 @@ class InitCommand extends Command implements Isolatable
         'composer require ronasit/laravel-helpers',
         'composer require ronasit/laravel-swagger',
         'composer require --dev ronasit/laravel-entity-generator',
+        'composer require laravel/telescope',
     ];
 
     public function handle(): void
@@ -131,6 +132,9 @@ class InitCommand extends Command implements Isolatable
         foreach ($this->composerCommands as $composerCommand) {
             shell_exec("{$composerCommand} --ansi");
         }
+
+        $this->call('telescope:install');
+        $this->call('migrate');
     }
 
     protected function createAdminUser(string $kebabName): void
