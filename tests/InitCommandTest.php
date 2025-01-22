@@ -35,8 +35,8 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
         );
 
         $this
@@ -75,8 +75,8 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
         );
 
         $this
@@ -158,8 +158,8 @@ class InitCommandTest extends TestCase
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
         );
 
         $this
@@ -280,8 +280,8 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
         );
 
         $this
@@ -406,8 +406,8 @@ class InitCommandTest extends TestCase
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-media --ansi'],
             ['arguments' => 'composer remove --dev ronasit/laravel-project-initializator --ansi'],
         );
