@@ -53,11 +53,12 @@ class InitCommand extends Command implements Isolatable
 
     protected string $readmeContent = '';
 
-    protected array $composerCommands = [
+    protected array $shellCommands = [
         'composer require ronasit/laravel-helpers',
         'composer require ronasit/laravel-swagger',
-        'composer require laravel/telescope',
         'composer require --dev ronasit/laravel-entity-generator',
+        'composer require laravel/telescope',
+        'php artisan telescope:install',
     ];
 
     public function handle(): void
@@ -123,18 +124,17 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($this->confirm('Do you want to install media package?')) {
-            $this->composerCommands[] = 'composer require ronasit/laravel-media';
+            $this->shellCommands[] = 'composer require ronasit/laravel-media';
         }
 
         if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
-            $this->composerCommands[] = 'composer remove --dev ronasit/laravel-project-initializator';
+            $this->shellCommands[] = 'composer remove --dev ronasit/laravel-project-initializator';
         }
 
-        foreach ($this->composerCommands as $composerCommand) {
-            shell_exec("{$composerCommand} --ansi");
+        foreach ($this->shellCommands as $shellCommand) {
+            shell_exec("{$shellCommand} --ansi");
         }
 
-        Artisan::call('telescope:install');
         Artisan::call('migrate');
     }
 

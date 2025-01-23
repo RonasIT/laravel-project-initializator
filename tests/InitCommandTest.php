@@ -2,20 +2,11 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
-use Illuminate\Support\Facades\Artisan;
-use RonasIT\ProjectInitializator\Tests\Support\TelescopeInstallCommand;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
 {
     use InitCommandMockTrait;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        Artisan::registerCommand(new TelescopeInstallCommand());
-    }
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
@@ -35,8 +26,9 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'composer require laravel/telescope --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'php artisan telescope:install --ansi'],
         );
 
         $this
@@ -75,8 +67,9 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'composer require laravel/telescope --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'php artisan telescope:install --ansi'],
         );
 
         $this
@@ -158,8 +151,9 @@ class InitCommandTest extends TestCase
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'composer require laravel/telescope --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'php artisan telescope:install --ansi'],
         );
 
         $this
@@ -280,8 +274,9 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'composer require laravel/telescope --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'php artisan telescope:install --ansi'],
         );
 
         $this
@@ -406,8 +401,9 @@ class InitCommandTest extends TestCase
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'composer require laravel/telescope --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'php artisan telescope:install --ansi'],
             ['arguments' => 'composer require ronasit/laravel-media --ansi'],
             ['arguments' => 'composer remove --dev ronasit/laravel-project-initializator --ansi'],
         );
