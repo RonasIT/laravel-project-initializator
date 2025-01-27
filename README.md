@@ -16,7 +16,7 @@ Upon completion:
  - This package will be automatically removed
 
 ## Contributing
-Thank you for considering contributing to Laravel Swagger plugin! The contribution guide
+Thank you for considering contributing to Laravel Project initializator package! The contribution guide
 can be found in the [Contributing guide](CONTRIBUTING.md).
 
 ## License
