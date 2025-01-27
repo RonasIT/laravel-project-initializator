@@ -7,7 +7,7 @@
 ```
 
 ## Usage
-To begin the initialization process, `php artisan init {application name}`. 
+To begin the initialization process, run `php artisan init {application name}`. 
 This will prompt you with questions regarding the project and the necessary packages for the initial setup.
 Upon completion:
  - A new README.md file will be created
