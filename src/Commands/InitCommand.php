@@ -61,21 +61,30 @@ class InitCommand extends Command implements Isolatable
         'php artisan telescope:install',
     ];
 
+    protected string $appName;
+
     public function handle(): void
     {
-        $appName = $this->argument('application-name');
-        $kebabName = Str::kebab($appName);
+        $this->appName = $this->argument('application-name');
+
+        $pascalCaseAppName = $this->toPascalCase($this->appName);
+
+        if (!$this->isPascalCase($this->appName) && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}")) {
+            $this->appName = $pascalCaseAppName;
+        }
+
+        $kebabName = Str::kebab($this->appName);
 
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$kebabName}.com");
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
         $this->updateConfigFile($envFile, '=', [
-            'APP_NAME' => $appName,
+            'APP_NAME' => $this->appName,
         ]);
 
         $this->updateConfigFile('.env.development', '=', [
-            'APP_NAME' => $appName,
+            'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
         ]);
 
@@ -154,10 +163,9 @@ class InitCommand extends Command implements Isolatable
 
     protected function fillReadme(): void
     {
-        $appName = $this->argument('application-name');
         $file = $this->loadReadmePart('README.md');
 
-        $this->setReadmeValue($file, 'project_name', $appName);
+        $this->setReadmeValue($file, 'project_name', $this->appName);
 
         $type = $this->choice(
             question: 'What type of application will your API serve?',
@@ -357,5 +365,22 @@ class InitCommand extends Command implements Isolatable
     protected function saveReadme(): void
     {
         file_put_contents('README.md', $this->readmeContent);
+    }
+
+    protected function toPascalCase(string $string): string
+    {
+        // Remove non-alphanumeric characters except underscores
+        $string = preg_replace('/[^a-zA-Z0-9_]/', '', $string);
+
+        // Replace underscores with spaces, then uppercase the first letter of each word
+        $string = ucwords(str_replace('_', ' ', $string));
+
+        // Remove spaces
+        return str_replace(' ', '', $string);
+    }
+
+    protected function isPascalCase(string $string): bool
+    {
+        return preg_match('/^[A-Z][a-zA-Z0-9]*$/', $string);
     }
 }

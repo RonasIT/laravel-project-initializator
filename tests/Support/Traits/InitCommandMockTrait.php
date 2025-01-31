@@ -9,11 +9,14 @@ trait InitCommandMockTrait
 {
     use MockTrait;
 
-    public function mockFilePutContent(...$arguments): void
-    {
+    public function mockFilePutContent(
+        string $exampleEnvFixtureName = 'env.example.yml',
+        string $developmentEnvFixtureName = 'env.development.yml',
+        ...$arguments
+    ): void {
         $callChain = [
-            ['.env.example', $this->getFixture('env.example.yml'), 'optionalParameter', 'optionalParameter'],
-            ['.env.development', $this->getFixture('env.development.yml'), 'optionalParameter', 'optionalParameter'],
+            ['.env.example', $this->getFixture($exampleEnvFixtureName), 'optionalParameter', 'optionalParameter'],
+            ['.env.development', $this->getFixture($developmentEnvFixtureName), 'optionalParameter', 'optionalParameter'],
             ...$arguments,
         ];
 
@@ -22,7 +25,7 @@ trait InitCommandMockTrait
             callChain: array_map(
                 fn ($call) => $this->functionCall('file_put_contents', $call),
                 $callChain,
-            )
+            ),
         );
     }
 

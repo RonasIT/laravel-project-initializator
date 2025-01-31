@@ -33,6 +33,45 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsOutput('Project initialized successfully!')
+            ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsConfirmation('Do you want to generate an admin user?')
+            ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Do you want to install media package?')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->assertExitCode(0);
+    }
+
+    public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCase()
+    {
+        $this->mockFileGetContent(
+            [
+                'arguments' => ['.env.example'],
+                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
+            ],
+            [
+                'arguments' => ['.env.development'],
+                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
+            ],
+        );
+
+        $this->mockFilePutContent(
+            'env.example_app_name_pascal_case.yml',
+            'env.development_app_name_pascal_case.yml',
+        );
+
+        $this->mockShellExec(
+            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require laravel/telescope --ansi'],
+            ['arguments' => 'php artisan telescope:install --ansi'],
+        );
+
+        $this
+            ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsConfirmation('Do you want to generate an admin user?')
@@ -56,12 +95,14 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockFilePutContent(
+            'env.example.yml',
+            'env.development.yml',
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
                 'optionalParameter',
                 'optionalParameter',
-            ]
+            ],
         );
 
         $this->mockShellExec(
@@ -74,6 +115,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
@@ -133,6 +175,8 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockFilePutContent(
+            'env.example.yml',
+            'env.development.yml',
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
@@ -158,6 +202,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
@@ -263,6 +308,8 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockFilePutContent(
+            'env.example.yml',
+            'env.development.yml',
             [
                 'README.md',
                 $this->getFixture('partial_readme.md'),
@@ -281,6 +328,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsConfirmation('Do you want to generate an admin user?')
@@ -383,6 +431,8 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockFilePutContent(
+            'env.example.yml',
+            'env.development.yml',
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
@@ -410,6 +460,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
