@@ -65,13 +65,7 @@ class InitCommand extends Command implements Isolatable
 
     public function handle(): void
     {
-        $this->appName = $this->argument('application-name');
-
-        $pascalCaseAppName = $this->toPascalCase($this->appName);
-
-        if (!$this->isPascalCase($this->appName) && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}")) {
-            $this->appName = $pascalCaseAppName;
-        }
+        $this->prepareAppName();
 
         $kebabName = Str::kebab($this->appName);
 
@@ -367,20 +361,14 @@ class InitCommand extends Command implements Isolatable
         file_put_contents('README.md', $this->readmeContent);
     }
 
-    protected function toPascalCase(string $string): string
+    protected function prepareAppName(): void
     {
-        // Remove non-alphanumeric characters except underscores
-        $string = preg_replace('/[^a-zA-Z0-9_]/', '', $string);
+        $this->appName = $this->argument('application-name');
 
-        // Replace underscores with spaces, then uppercase the first letter of each word
-        $string = ucwords(str_replace('_', ' ', $string));
+        $pascalCaseAppName = ucfirst(Str::camel($this->appName));
 
-        // Remove spaces
-        return str_replace(' ', '', $string);
-    }
-
-    protected function isPascalCase(string $string): bool
-    {
-        return preg_match('/^[A-Z][a-zA-Z0-9]*$/', $string);
+        if ($this->appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}")) {
+            $this->appName = $pascalCaseAppName;
+        }
     }
 }

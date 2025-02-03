@@ -12,7 +12,7 @@ trait InitCommandMockTrait
     public function mockFilePutContent(
         string $exampleEnvFixtureName = 'env.example.yml',
         string $developmentEnvFixtureName = 'env.development.yml',
-        ...$arguments
+        ...$arguments,
     ): void {
         $callChain = [
             ['.env.example', $this->getFixture($exampleEnvFixtureName), 'optionalParameter', 'optionalParameter'],
