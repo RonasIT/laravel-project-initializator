@@ -61,21 +61,24 @@ class InitCommand extends Command implements Isolatable
         'php artisan telescope:install',
     ];
 
+    protected string $appName;
+
     public function handle(): void
     {
-        $appName = $this->argument('application-name');
-        $kebabName = Str::kebab($appName);
+        $this->prepareAppName();
+
+        $kebabName = Str::kebab($this->appName);
 
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$kebabName}.com");
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
         $this->updateConfigFile($envFile, '=', [
-            'APP_NAME' => $appName,
+            'APP_NAME' => $this->appName,
         ]);
 
         $this->updateConfigFile('.env.development', '=', [
-            'APP_NAME' => $appName,
+            'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
         ]);
 
@@ -154,10 +157,9 @@ class InitCommand extends Command implements Isolatable
 
     protected function fillReadme(): void
     {
-        $appName = $this->argument('application-name');
         $file = $this->loadReadmePart('README.md');
 
-        $this->setReadmeValue($file, 'project_name', $appName);
+        $this->setReadmeValue($file, 'project_name', $this->appName);
 
         $type = $this->choice(
             question: 'What type of application will your API serve?',
@@ -357,5 +359,16 @@ class InitCommand extends Command implements Isolatable
     protected function saveReadme(): void
     {
         file_put_contents('README.md', $this->readmeContent);
+    }
+
+    protected function prepareAppName(): void
+    {
+        $this->appName = $this->argument('application-name');
+
+        $pascalCaseAppName = ucfirst(Str::camel($this->appName));
+
+        if ($this->appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}")) {
+            $this->appName = $pascalCaseAppName;
+        }
     }
 }
