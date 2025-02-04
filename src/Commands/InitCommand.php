@@ -367,7 +367,7 @@ class InitCommand extends Command implements Isolatable
 
         $pascalCaseAppName = ucfirst(Str::camel($this->appName));
 
-        if ($this->appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}")) {
+        if ($this->appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
             $this->appName = $pascalCaseAppName;
         }
     }
