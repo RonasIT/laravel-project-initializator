@@ -113,6 +113,10 @@ class InitCommand extends Command implements Isolatable
                 $this->fillCredentialsAndAccess($kebabName);
             }
 
+            if ($this->confirm('Would you use Renovate dependabot?')) {
+                $this->prepareRenovateDependabot();
+            }
+
             $this->saveReadme();
 
             $this->info('README generated successfully!');
@@ -370,5 +374,23 @@ class InitCommand extends Command implements Isolatable
         if ($this->appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
             $this->appName = $pascalCaseAppName;
         }
+    }
+
+    protected function prepareRenovateDependabot(): void
+    {
+        $reviewer = $this->ask('Please type username of the project reviewer');
+
+        $data = [
+            '$schema' => 'https://docs.renovatebot.com/renovate-schema.json',
+            'extends' => ['config:recommended'],
+            'enabledManagers' => ['composer'],
+            'assignees' => ['123']
+        ];
+
+        file_put_contents('renovate.json', json_encode($data));
+
+        $filePart = $this->loadReadmePart('RENOVATE.md');
+
+        $this->updateReadmeFile($filePart);
     }
 }
