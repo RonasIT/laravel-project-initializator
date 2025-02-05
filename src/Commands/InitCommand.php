@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use Illuminate\Support\Facades\Artisan;
@@ -63,6 +64,8 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appName;
 
+    protected string $reviewer = '';
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -88,7 +91,7 @@ class InitCommand extends Command implements Isolatable
             $this->createAdminUser($kebabName);
         }
 
-        if ($this->confirm('Do you want to generate a README file?', true)) {
+        if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
             $this->fillReadme();
 
             if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
@@ -113,10 +116,6 @@ class InitCommand extends Command implements Isolatable
                 $this->fillCredentialsAndAccess($kebabName);
             }
 
-            if ($this->confirm('Would you use Renovate dependabot?')) {
-                $this->prepareRenovateDependabot();
-            }
-
             $this->saveReadme();
 
             $this->info('README generated successfully!');
@@ -127,6 +126,18 @@ class InitCommand extends Command implements Isolatable
                 foreach ($this->emptyValuesList as $value) {
                     $this->warn("- {$value}");
                 }
+            }
+        }
+
+        if ($this->confirm('Would you use Renovate dependabot?')) {
+            $this->saveRenovateJSON();
+
+            if ($shouldGenerateReadme) {
+                $filePart = $this->loadReadmePart('RENOVATE.md');
+
+                $this->updateReadmeFile($filePart);
+
+                $this->saveReadme();
             }
         }
 
@@ -223,6 +234,10 @@ class InitCommand extends Command implements Isolatable
 
         foreach (self::CONTACTS_ITEMS as $key => $title) {
             if ($link = $this->ask("Please enter a {$title}'s email", '')) {
+                if ($key === 'team_lead') {
+                    $this->reviewer = $link;
+                }
+
                 $this->setReadmeValue($filePart, "{$key}_link", $link);
             } else {
                 $this->emptyValuesList[] = "{$title}'s email";
@@ -376,21 +391,50 @@ class InitCommand extends Command implements Isolatable
         }
     }
 
-    protected function prepareRenovateDependabot(): void
+    protected function saveRenovateJSON(): void
     {
-        $reviewer = $this->ask('Please type username of the project reviewer');
+        $reviewer = $this->validateCmd(
+            method: fn () => $this->ask('Please type username of the project reviewer', !empty($this->reviewer) ? $this->reviewer : null),
+            rules: ['reviewer', 'required'],
+        );
 
         $data = [
             '$schema' => 'https://docs.renovatebot.com/renovate-schema.json',
             'extends' => ['config:recommended'],
             'enabledManagers' => ['composer'],
-            'assignees' => ['123']
+            'assignees' => [$reviewer],
         ];
 
-        file_put_contents('renovate.json', json_encode($data));
+        file_put_contents('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
+    }
 
-        $filePart = $this->loadReadmePart('RENOVATE.md');
+    public function validateCmd(callable $method, array $rules): string
+    {
+        $value = $method();
+        $validate = $this->validateInput($rules, $value);
 
-        $this->updateReadmeFile($filePart);
+        if ($validate !== true) {
+            $this->warn($validate);
+
+            $value = $this->validateCmd($method, $rules);
+        }
+
+        return $value;
+    }
+
+    protected function validateInput(array $rules, ?string $value): bool|string
+    {
+        $field = Arr::first($rules);
+        $rule = Arr::last($rules);
+
+        $validator = Validator::make([$field => $value], [$field => $rule]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors();
+
+            return $error->first($field);
+        } else {
+            return true;
+        }
     }
 }

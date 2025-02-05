@@ -24,6 +24,7 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example_app_name_pascal_case.yml',
             'env.development_app_name_pascal_case.yml',
+            ['renovate.json', $this->getFixture('renovate.json'), 'optionalParameter', 'optionalParameter'],
         );
 
         $this->mockShellExec(
@@ -40,6 +41,8 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsQuestion('Please type username of the project reviewer', 'reviewer@mail.ru')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -78,6 +81,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -126,6 +130,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an admin password', '123456')
             ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -174,6 +179,10 @@ class InitCommandTest extends TestCase
                 'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
+            [
+                'arguments' => ['/app/resources/md/readme/RENOVATE.md'],
+                'result' => $this->getTemplate('RENOVATE.md'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -190,7 +199,14 @@ class InitCommandTest extends TestCase
                 $this->getFixture('default_readme.md'),
                 'optionalParameter',
                 'optionalParameter',
-            ]
+            ],
+            ['renovate.json', $this->getFixture('renovate.json'), 'optionalParameter', 'optionalParameter'],
+            [
+                'README.md',
+                $this->getFixture('default_readme_after_using_renovate.md'),
+                'optionalParameter',
+                'optionalParameter',
+            ],
         );
 
         $this->mockShellExec(
@@ -267,6 +283,8 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsOutput('- Code Owner/Team Lead\'s email')
+            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsQuestion('Please type username of the project reviewer', 'reviewer@mail.ru')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -382,6 +400,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
             ->expectsOutput('- Code Owner/Team Lead\'s email')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -430,6 +449,10 @@ class InitCommandTest extends TestCase
                 'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
+            [
+                'arguments' => ['/app/resources/md/readme/RENOVATE.md'],
+                'result' => $this->getTemplate('RENOVATE.md'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -446,7 +469,19 @@ class InitCommandTest extends TestCase
                 $this->getFixture('full_readme.md'),
                 'optionalParameter',
                 'optionalParameter',
-            ]
+            ],
+            [
+                'renovate.json',
+                $this->getFixture('renovate.json'),
+                'optionalParameter',
+                'optionalParameter'
+            ],
+            [
+                'README.md',
+                $this->getFixture('full_readme_after_using_renovate.md'),
+                'optionalParameter',
+                'optionalParameter',
+            ],
         );
 
         $this->mockShellExec(
@@ -519,6 +554,8 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'nova_mail@mail.com')
             ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '654321')
             ->expectsOutput('README generated successfully!')
+            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsQuestion('Please type username of the project reviewer', 'reviewer@mail.ru')
             ->expectsConfirmation('Do you want to install media package?', 'yes')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->assertExitCode(0);
