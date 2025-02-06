@@ -64,7 +64,7 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appName;
 
-    protected string $reviewer = '';
+    protected ?string $reviewer = null;
 
     public function handle(): void
     {
@@ -232,7 +232,7 @@ class InitCommand extends Command implements Isolatable
 
         foreach (self::CONTACTS_ITEMS as $key => $title) {
             if ($link = $this->ask("Please enter a {$title}'s email", '')) {
-                if ($key === 'team_lead') {
+                if (!empty($link) && $key === 'team_lead') {
                     $this->reviewer = $link;
                 }
 
@@ -392,7 +392,7 @@ class InitCommand extends Command implements Isolatable
     protected function saveRenovateJSON(): void
     {
         $this->reviewer = $this->validateInput(
-            method: fn () => $this->ask('Please type username of the project reviewer', !empty($this->reviewer) ? $this->reviewer : null),
+            method: fn () => $this->ask('Please type username of the project reviewer', $this->reviewer),
             field: 'username of the project reviewer',
             rules: 'required',
         );
