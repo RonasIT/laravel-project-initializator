@@ -391,49 +391,35 @@ class InitCommand extends Command implements Isolatable
 
     protected function saveRenovateJSON(): void
     {
-        $reviewer = $this->validateCmd(
+        $this->reviewer = $this->validateInput(
             method: fn () => $this->ask('Please type username of the project reviewer', !empty($this->reviewer) ? $this->reviewer : null),
-            rules: ['reviewer', 'required'],
+            field: 'username of the project reviewer',
+            rules: 'required',
         );
 
         $data = [
             '$schema' => 'https://docs.renovatebot.com/renovate-schema.json',
             'extends' => ['config:recommended'],
             'enabledManagers' => ['composer'],
-            'assignees' => [$reviewer],
+            'assignees' => [$this->reviewer],
         ];
 
         file_put_contents('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
     }
 
-    protected function validateCmd(callable $method, array $rules): string
+    protected function validateInput(callable $method, string $field, string|array $rules): string
     {
         $value = $method();
-        $validate = $this->validateInput($rules, $value);
 
-        if ($validate !== true) {
-            $this->warn($validate);
+        $validator = Validator::make([$field => $value], [$field => $rules]);
 
-            $value = $this->validateCmd($method, $rules);
+        if ($validator->fails()) {
+            $this->warn($validator->errors()->first());
+
+            $value = $this->validateInput($method, $field, $rules);
         }
 
         return $value;
-    }
-
-    protected function validateInput(array $rules, ?string $value): bool|string
-    {
-        $field = Arr::first($rules);
-        $rule = Arr::last($rules);
-
-        $validator = Validator::make([$field => $value], [$field => $rule]);
-
-        if ($validator->fails()) {
-            $error = $validator->errors();
-
-            return $error->first($field);
-        } else {
-            return true;
-        }
     }
 
     protected function fillRenovate(): void
