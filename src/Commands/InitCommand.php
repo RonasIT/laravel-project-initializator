@@ -25,9 +25,11 @@ class InitCommand extends Command implements Isolatable
         'nova' => 'Laravel Nova',
     ];
 
+    public const string CONTACTS_TEAM_LEAD = 'team_lead';
+
     public const array CONTACTS_ITEMS = [
         'manager' => 'Manager',
-        'team_lead' => 'Code Owner/Team Lead',
+        self::CONTACTS_TEAM_LEAD => 'Code Owner/Team Lead',
     ];
 
     public const array CREDENTIALS_ITEMS = [
@@ -129,7 +131,7 @@ class InitCommand extends Command implements Isolatable
             }
         }
 
-        if ($this->confirm('Would you use Renovate depend a bot?')) {
+        if ($this->confirm('Would you use Renovate dependabot?')) {
             $this->saveRenovateJSON();
 
             if ($shouldGenerateReadme) {
@@ -232,7 +234,7 @@ class InitCommand extends Command implements Isolatable
 
         foreach (self::CONTACTS_ITEMS as $key => $title) {
             if ($link = $this->ask("Please enter a {$title}'s email", '')) {
-                if (!empty($link) && $key === 'team_lead') {
+                if (!empty($link) && $key === self::CONTACTS_TEAM_LEAD) {
                     $this->reviewer = $link;
                 }
 
@@ -392,9 +394,9 @@ class InitCommand extends Command implements Isolatable
     protected function saveRenovateJSON(): void
     {
         $this->reviewer = $this->validateInput(
-            method: fn () => $this->ask('Please type username of the project reviewer', $this->reviewer),
+            method: fn () => $this->ask('Please type username of the project reviewer', Str::before($this->reviewer, '@')),
             field: 'username of the project reviewer',
-            rules: 'required',
+            rules: 'required|alpha_dash',
         );
 
         $data = [

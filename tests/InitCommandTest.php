@@ -46,8 +46,8 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
-            ->expectsConfirmation('Would you use Renovate depend a bot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer@mail.ru')
+            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -86,7 +86,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
-            ->expectsConfirmation('Would you use Renovate depend a bot?')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -135,7 +135,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an admin password', '123456')
             ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?')
-            ->expectsConfirmation('Would you use Renovate depend a bot?')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -293,8 +293,8 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsOutput('- Code Owner/Team Lead\'s email')
-            ->expectsConfirmation('Would you use Renovate depend a bot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer@mail.ru')
+            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -410,7 +410,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
             ->expectsOutput('- Code Owner/Team Lead\'s email')
-            ->expectsConfirmation('Would you use Renovate depend a bot?')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -564,8 +564,8 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'nova_mail@mail.com')
             ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '654321')
             ->expectsOutput('README generated successfully!')
-            ->expectsConfirmation('Would you use Renovate depend a bot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer@mail.ru')
+            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?', 'yes')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->assertExitCode(0);
