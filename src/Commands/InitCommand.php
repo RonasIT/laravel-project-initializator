@@ -133,9 +133,7 @@ class InitCommand extends Command implements Isolatable
             $this->saveRenovateJSON();
 
             if ($shouldGenerateReadme) {
-                $filePart = $this->loadReadmePart('RENOVATE.md');
-
-                $this->updateReadmeFile($filePart);
+                $this->fillRenovate();
 
                 $this->saveReadme();
             }
@@ -408,7 +406,7 @@ class InitCommand extends Command implements Isolatable
         file_put_contents('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
     }
 
-    public function validateCmd(callable $method, array $rules): string
+    protected function validateCmd(callable $method, array $rules): string
     {
         $value = $method();
         $validate = $this->validateInput($rules, $value);
@@ -436,5 +434,12 @@ class InitCommand extends Command implements Isolatable
         } else {
             return true;
         }
+    }
+
+    protected function fillRenovate(): void
+    {
+        $filePart = $this->loadReadmePart('RENOVATE.md');
+
+        $this->updateReadmeFile($filePart);
     }
 }

@@ -24,7 +24,12 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example_app_name_pascal_case.yml',
             'env.development_app_name_pascal_case.yml',
-            ['renovate.json', $this->getFixture('renovate.json'), 'optionalParameter', 'optionalParameter'],
+            [
+                'renovate.json',
+                $this->getFixture('renovate.json'),
+                'optionalParameter',
+                'optionalParameter',
+            ],
         );
 
         $this->mockShellExec(
@@ -200,7 +205,12 @@ class InitCommandTest extends TestCase
                 'optionalParameter',
                 'optionalParameter',
             ],
-            ['renovate.json', $this->getFixture('renovate.json'), 'optionalParameter', 'optionalParameter'],
+            [
+                'renovate.json',
+                $this->getFixture('renovate.json'),
+                'optionalParameter',
+                'optionalParameter',
+            ],
             [
                 'README.md',
                 $this->getFixture('default_readme_after_using_renovate.md'),
@@ -474,7 +484,7 @@ class InitCommandTest extends TestCase
                 'renovate.json',
                 $this->getFixture('renovate.json'),
                 'optionalParameter',
-                'optionalParameter'
+                'optionalParameter',
             ],
             [
                 'README.md',
