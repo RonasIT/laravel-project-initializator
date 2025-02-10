@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use Illuminate\Support\Facades\Artisan;
@@ -24,9 +25,11 @@ class InitCommand extends Command implements Isolatable
         'nova' => 'Laravel Nova',
     ];
 
+    public const string CONTACTS_TEAM_LEAD = 'team_lead';
+
     public const array CONTACTS_ITEMS = [
         'manager' => 'Manager',
-        'team_lead' => 'Code Owner/Team Lead',
+        self::CONTACTS_TEAM_LEAD => 'Code Owner/Team Lead',
     ];
 
     public const array CREDENTIALS_ITEMS = [
@@ -63,6 +66,8 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appName;
 
+    protected ?string $reviewer = null;
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -88,7 +93,7 @@ class InitCommand extends Command implements Isolatable
             $this->createAdminUser($kebabName);
         }
 
-        if ($this->confirm('Do you want to generate a README file?', true)) {
+        if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
             $this->fillReadme();
 
             if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
@@ -123,6 +128,16 @@ class InitCommand extends Command implements Isolatable
                 foreach ($this->emptyValuesList as $value) {
                     $this->warn("- {$value}");
                 }
+            }
+        }
+
+        if ($this->confirm('Would you use Renovate dependabot?')) {
+            $this->saveRenovateJSON();
+
+            if ($shouldGenerateReadme) {
+                $this->fillRenovate();
+
+                $this->saveReadme();
             }
         }
 
@@ -219,6 +234,10 @@ class InitCommand extends Command implements Isolatable
 
         foreach (self::CONTACTS_ITEMS as $key => $title) {
             if ($link = $this->ask("Please enter a {$title}'s email", '')) {
+                if (!empty($link) && $key === self::CONTACTS_TEAM_LEAD) {
+                    $this->reviewer = $link;
+                }
+
                 $this->setReadmeValue($filePart, "{$key}_link", $link);
             } else {
                 $this->emptyValuesList[] = "{$title}'s email";
@@ -370,5 +389,45 @@ class InitCommand extends Command implements Isolatable
         if ($this->appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
             $this->appName = $pascalCaseAppName;
         }
+    }
+
+    protected function saveRenovateJSON(): void
+    {
+        $this->reviewer = $this->validateInput(
+            method: fn () => $this->ask('Please type username of the project reviewer', Str::before($this->reviewer, '@')),
+            field: 'username of the project reviewer',
+            rules: 'required|alpha_dash',
+        );
+
+        $data = [
+            '$schema' => 'https://docs.renovatebot.com/renovate-schema.json',
+            'extends' => ['config:recommended'],
+            'enabledManagers' => ['composer'],
+            'assignees' => [$this->reviewer],
+        ];
+
+        file_put_contents('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
+    }
+
+    protected function validateInput(callable $method, string $field, string|array $rules): string
+    {
+        $value = $method();
+
+        $validator = Validator::make([$field => $value], [$field => $rules]);
+
+        if ($validator->fails()) {
+            $this->warn($validator->errors()->first());
+
+            $value = $this->validateInput($method, $field, $rules);
+        }
+
+        return $value;
+    }
+
+    protected function fillRenovate(): void
+    {
+        $filePart = $this->loadReadmePart('RENOVATE.md');
+
+        $this->updateReadmeFile($filePart);
     }
 }
