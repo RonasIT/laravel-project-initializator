@@ -60,7 +60,7 @@ class InitCommand extends Command implements Isolatable
         'composer require ronasit/laravel-helpers',
         'composer require ronasit/laravel-swagger',
         'composer require --dev ronasit/laravel-entity-generator',
-        'composer require laravel/telescope',
+        'composer require ronasit/laravel-telescope-extension',
         'php artisan telescope:install',
     ];
 
