@@ -57,6 +57,17 @@ trait InitCommandMockTrait
         );
     }
 
+    protected function mockClassExists(array ...$rawCallChain): void
+    {
+        $callChain = array_map(fn ($call) => $this->functionCall(
+            name: 'class_exists',
+            arguments: Arr::wrap($call['arguments']),
+            result: Arr::get($call, 'result', true),
+        ), $rawCallChain);
+
+        $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands', $callChain);
+    }
+
     protected function getTemplate(string $template): string
     {
         return file_get_contents(dirname(__DIR__, 3) . "/resources/md/readme/{$template}");
