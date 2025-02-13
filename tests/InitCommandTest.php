@@ -53,7 +53,7 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCase()
+    public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
         $this->mockFileGetContent(
             [
@@ -71,12 +71,19 @@ class InitCommandTest extends TestCase
             'env.development_app_name_pascal_case.yml',
         );
 
+        $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands',
+            callChain: [
+                $this->functionCall(
+                    name: 'class_exists',
+                    arguments: ['Laravel\Telescope\TelescopeServiceProvider', true],
+                ),
+            ],
+        );
+
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
         );
 
         $this

@@ -60,8 +60,6 @@ class InitCommand extends Command implements Isolatable
         'composer require ronasit/laravel-helpers',
         'composer require ronasit/laravel-swagger',
         'composer require --dev ronasit/laravel-entity-generator',
-        'composer require ronasit/laravel-telescope-extension',
-        'php artisan telescope:install',
     ];
 
     protected string $appName;
@@ -139,6 +137,11 @@ class InitCommand extends Command implements Isolatable
 
                 $this->saveReadme();
             }
+        }
+
+        if (!class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+            $this->shellCommands[] = 'composer require ronasit/laravel-telescope-extension';
+            $this->shellCommands[] = 'php artisan telescope:install';
         }
 
         if ($this->confirm('Do you want to install media package?')) {
