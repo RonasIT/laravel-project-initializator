@@ -1,6 +1,6 @@
 /bootstrap export-ignore
 /tests export-ignore
-LICENSE.md export-ignore
+LICENSE export-ignore
 docker-compose.yml export-ignore
 phpunit.xml export-ignore
 composer.lock export-ignore
