@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "93206b61dd50c2a1e1d29cc4ba6fbfb6",
+    "content-hash": "e76530df74bc6331365939b91768edd5",
     "packages": [
         {
             "name": "brick/math",
@@ -4294,26 +4294,25 @@
         },
         {
             "name": "ronasit/laravel-helpers",
-            "version": "3.0.1-beta",
+            "version": "3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RonasIT/laravel-helpers.git",
-                "reference": "5bf2992029c1f71269d0fddd036a102822399925"
+                "reference": "581b1a338c1b1e375f11148ec93323f786406548"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RonasIT/laravel-helpers/zipball/5bf2992029c1f71269d0fddd036a102822399925",
-                "reference": "5bf2992029c1f71269d0fddd036a102822399925",
+                "url": "https://api.github.com/repos/RonasIT/laravel-helpers/zipball/581b1a338c1b1e375f11148ec93323f786406548",
+                "reference": "581b1a338c1b1e375f11148ec93323f786406548",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^7.9.2",
-                "laravel/framework": "^11.20",
+                "laravel/framework": ">=11.20",
                 "maatwebsite/excel": "^3.1.55",
                 "php": ">=8.3",
-                "php-mock/php-mock-phpunit": "^2.10",
-                "tecnickcom/tcpdf": "^6.7.5"
+                "php-mock/php-mock-phpunit": "^2.10"
             },
             "require-dev": {
                 "brainmaestro/composer-git-hooks": "^3.0",
@@ -4327,11 +4326,6 @@
             },
             "type": "library",
             "extra": {
-                "laravel": {
-                    "providers": [
-                        "RonasIT\\Support\\HelpersServiceProvider"
-                    ]
-                },
                 "hooks": {
                     "config": {
                         "stop-on-failure": [
@@ -4341,6 +4335,11 @@
                     "pre-commit": [
                         "docker-compose up -d php && docker-compose exec -T php vendor/bin/php-cs-fixer fix && docker-compose exec -T php vendor/bin/tlint"
                     ]
+                },
+                "laravel": {
+                    "providers": [
+                        "RonasIT\\Support\\HelpersServiceProvider"
+                    ]
                 }
             },
             "autoload": {
@@ -4348,9 +4347,7 @@
                     "src/helpers.php"
                 ],
                 "psr-4": {
-                    "RonasIT\\Support\\": "src/",
-                    "RonasIT\\Support\\Tests\\": "tests/",
-                    "RonasIT\\Support\\Tests\\Support\\": "tests/support/"
+                    "RonasIT\\Support\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -4370,9 +4367,9 @@
             ],
             "support": {
                 "issues": "https://github.com/RonasIT/laravel-helpers/issues",
-                "source": "https://github.com/RonasIT/laravel-helpers/tree/3.0.1-beta"
+                "source": "https://github.com/RonasIT/laravel-helpers/tree/3.3.1"
             },
-            "time": "2024-11-04T10:52:30+00:00"
+            "time": "2025-03-18T16:24:43+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -7517,78 +7514,6 @@
                 }
             ],
             "time": "2024-11-08T15:48:14+00:00"
-        },
-        {
-            "name": "tecnickcom/tcpdf",
-            "version": "6.7.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tecnickcom/TCPDF.git",
-                "reference": "cfbc0028cc23f057f2baf9e73bdc238153c22086"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/cfbc0028cc23f057f2baf9e73bdc238153c22086",
-                "reference": "cfbc0028cc23f057f2baf9e73bdc238153c22086",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "config",
-                    "include",
-                    "tcpdf.php",
-                    "tcpdf_parser.php",
-                    "tcpdf_import.php",
-                    "tcpdf_barcodes_1d.php",
-                    "tcpdf_barcodes_2d.php",
-                    "include/tcpdf_colors.php",
-                    "include/tcpdf_filters.php",
-                    "include/tcpdf_font_data.php",
-                    "include/tcpdf_fonts.php",
-                    "include/tcpdf_images.php",
-                    "include/tcpdf_static.php",
-                    "include/barcodes/datamatrix.php",
-                    "include/barcodes/pdf417.php",
-                    "include/barcodes/qrcode.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Nicola Asuni",
-                    "email": "info@tecnick.com",
-                    "role": "lead"
-                }
-            ],
-            "description": "TCPDF is a PHP class for generating PDF documents and barcodes.",
-            "homepage": "http://www.tcpdf.org/",
-            "keywords": [
-                "PDFD32000-2008",
-                "TCPDF",
-                "barcodes",
-                "datamatrix",
-                "pdf",
-                "pdf417",
-                "qrcode"
-            ],
-            "support": {
-                "issues": "https://github.com/tecnickcom/TCPDF/issues",
-                "source": "https://github.com/tecnickcom/TCPDF/tree/6.7.7"
-            },
-            "funding": [
-                {
-                    "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&currency_code=GBP&business=paypal@tecnick.com&item_name=donation%20for%20tcpdf%20project",
-                    "type": "custom"
-                }
-            ],
-            "time": "2024-10-26T12:15:02+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -11276,13 +11201,13 @@
     ],
     "aliases": [],
     "minimum-stability": "alpha",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.3",
         "ext-json": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

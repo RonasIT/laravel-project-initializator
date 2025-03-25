@@ -68,8 +68,6 @@ class InitCommandTest extends TestCase
             [
                 'renovate.json',
                 $this->getFixture('renovate.json'),
-                'optionalParameter',
-                'optionalParameter',
             ],
         );
 
@@ -113,8 +111,6 @@ class InitCommandTest extends TestCase
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
-                'optionalParameter',
-                'optionalParameter',
             ],
         );
 
@@ -198,26 +194,18 @@ class InitCommandTest extends TestCase
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
-                'optionalParameter',
-                'optionalParameter',
             ],
             [
                 'README.md',
                 $this->getFixture('default_readme.md'),
-                'optionalParameter',
-                'optionalParameter',
             ],
             [
                 'renovate.json',
                 $this->getFixture('renovate.json'),
-                'optionalParameter',
-                'optionalParameter',
             ],
             [
                 'README.md',
                 $this->getFixture('default_readme_after_using_renovate.md'),
-                'optionalParameter',
-                'optionalParameter',
             ],
         );
 
@@ -345,8 +333,6 @@ class InitCommandTest extends TestCase
             [
                 'README.md',
                 $this->getFixture('partial_readme.md'),
-                'optionalParameter',
-                'optionalParameter',
             ]
         );
 
@@ -473,26 +459,18 @@ class InitCommandTest extends TestCase
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
-                'optionalParameter',
-                'optionalParameter',
             ],
             [
                 'README.md',
                 $this->getFixture('full_readme.md'),
-                'optionalParameter',
-                'optionalParameter',
             ],
             [
                 'renovate.json',
                 $this->getFixture('renovate.json'),
-                'optionalParameter',
-                'optionalParameter',
             ],
             [
                 'README.md',
                 $this->getFixture('full_readme_after_using_renovate.md'),
-                'optionalParameter',
-                'optionalParameter',
             ],
         );
 

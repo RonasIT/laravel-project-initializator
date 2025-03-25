@@ -15,8 +15,8 @@ trait InitCommandMockTrait
         ...$arguments,
     ): void {
         $callChain = [
-            ['.env.example', $this->getFixture($exampleEnvFixtureName), 'optionalParameter', 'optionalParameter'],
-            ['.env.development', $this->getFixture($developmentEnvFixtureName), 'optionalParameter', 'optionalParameter'],
+            ['.env.example', $this->getFixture($exampleEnvFixtureName)],
+            ['.env.development', $this->getFixture($developmentEnvFixtureName)],
             ...$arguments,
         ];
 
@@ -44,10 +44,7 @@ trait InitCommandMockTrait
     {
         $callChain = array_map(fn ($call) => $this->functionCall(
             name: 'file_get_contents',
-            arguments: array_merge(
-                $call['arguments'],
-                array_fill(0, 5 - count($call['arguments']), 'optionalParameter'),
-            ),
+            arguments: $call['arguments'],
             result: $call['result'],
         ), $rawCallChain);
 
