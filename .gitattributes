@@ -5,3 +5,4 @@ docker-compose.yml export-ignore
 phpunit.xml export-ignore
 composer.lock export-ignore
 CONTRIBUTING.md export-ignore
+/README.md
