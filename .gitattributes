@@ -1,0 +1,8 @@
+/bootstrap export-ignore
+/tests export-ignore
+LICENSE export-ignore
+docker-compose.yml export-ignore
+phpunit.xml export-ignore
+composer.lock export-ignore
+CONTRIBUTING.md export-ignore
+/README.md export-ignore
