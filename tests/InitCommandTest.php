@@ -76,6 +76,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
 
@@ -119,6 +120,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
 
@@ -215,6 +217,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
 
@@ -341,6 +344,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
 
@@ -480,6 +484,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
             ['arguments' => 'composer require ronasit/laravel-media --ansi'],
             ['arguments' => 'composer remove --dev ronasit/laravel-project-initializator --ansi'],
