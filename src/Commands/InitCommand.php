@@ -129,7 +129,7 @@ class InitCommand extends Command implements Isolatable
             }
         }
 
-        if ($this->confirm('Would you use Renovate dependabot?')) {
+        if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
             if ($shouldGenerateReadme) {
