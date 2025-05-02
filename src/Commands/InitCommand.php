@@ -52,6 +52,8 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appUrl;
 
+    protected string $clerk;
+
     protected array $emptyValuesList = [];
 
     protected string $readmeContent = '';
@@ -76,16 +78,33 @@ class InitCommand extends Command implements Isolatable
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->updateConfigFile($envFile, '=', [
+        $this->addOrUpdateConfigFile($envFile, '=', [
             'APP_NAME' => $this->appName,
         ]);
 
-        $this->updateConfigFile('.env.development', '=', [
+        $this->addOrUpdateConfigFile('.env.development', '=', [
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
         ]);
 
         $this->info('Project initialized successfully!');
+
+        $this->clerk = $this->choice(
+            question: 'Please choose the authentication type',
+            choices: [
+                'clerk',
+                'none',
+            ],
+            default: 'none',
+        );
+
+        if ($this->clerk === 'clerk') {
+            $this->enableClerk();
+
+            $this->addOrUpdateConfigFile($envFile, '=', [
+                'AUTH_GUARD' => 'clerk',
+            ]);
+        }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
             $this->createAdminUser($kebabName);
@@ -315,6 +334,10 @@ class InitCommand extends Command implements Isolatable
             $this->removeTag($filePart, "{$key}_credentials");
         }
 
+        if ($this->clerk === 'clerk') {
+            $filePart = $filePart . $this->loadReadmePart('CLERK.md');
+        }
+
         $this->updateReadmeFile($filePart);
     }
 
@@ -331,7 +354,7 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("database/migrations/{$fileName}", "<?php\n\n{$data}");
     }
 
-    protected function updateConfigFile($fileName, $separator, $data): void
+    protected function addOrUpdateConfigFile($fileName, $separator, $data): void
     {
         $parsed = file_get_contents($fileName);
 
@@ -344,7 +367,17 @@ class InitCommand extends Command implements Isolatable
                     $key = array_shift($exploded);
                     $value = $this->addQuotes($value);
                     $line = "{$key}{$separator}{$value}";
+                    $foundKeys[$key] = true;
                 }
+            }
+        }
+
+        unset($line);
+
+        foreach ($data as $key => $value) {
+            if (!isset($foundKeys[$key])) {
+                $value = $this->addQuotes($value);
+                $lines[] = "\n{$key}{$separator}{$value}";
             }
         }
 
@@ -435,5 +468,42 @@ class InitCommand extends Command implements Isolatable
         $filePart = $this->loadReadmePart('RENOVATE.md');
 
         $this->updateReadmeFile($filePart);
+    }
+
+    protected function enableClerk(): void
+    {
+        array_push(
+            $this->shellCommands,
+            'composer require ronasit/laravel-clerk',
+            'php artisan vendor:publish --provider=RonasIT\\Clerk\\Providers\\ClerkServiceProvider',
+        );
+
+        $this->updateAuthClerkConfig();
+    }
+
+    protected function updateAuthClerkConfig(): void
+    {
+        $file = 'config/auth.php';
+
+        $content = file_get_contents($file);
+
+        $content = preg_replace_callback(
+            pattern: "/('guards'\s*=>\s*\[)(.*?)(^\s{4}],)/sm",
+            callback: $this->addClerkToAuthConfigCallback(),
+            subject: $content,
+        );
+
+        file_put_contents($file, $content);
+    }
+
+    protected function addClerkToAuthConfigCallback(): callable
+    {
+        return function (array $matches): string {
+            $existing = rtrim($matches[2]);
+            $newLine = "\r\n";
+            $clerkGuard = "{$newLine}        'clerk' => [{$newLine}            'driver' => 'clerk_session',{$newLine}            'provider' => 'users',{$newLine}        ],";
+
+            return $matches[1] . $existing . $clerkGuard . $newLine . "    ],";
+        };
     }
 }

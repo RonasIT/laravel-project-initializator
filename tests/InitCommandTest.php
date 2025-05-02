@@ -41,6 +41,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Would you use Renovate dependabot?')
@@ -83,6 +84,7 @@ class InitCommandTest extends TestCase
             ->artisan('init "MyApp"')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
@@ -127,6 +129,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
@@ -149,6 +152,14 @@ class InitCommandTest extends TestCase
             [
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development.yml'),
+            ],
+            [
+                'arguments' => ['config/auth.php'],
+                'result' => $this->getFixture('auth.php'),
+            ],
+            [
+                'arguments' => ['.env.example'],
+                'result' => $this->getFixture('env.example.yml'),
             ],
             [
                 'arguments' => ['/app/resources/md/readme/README.md'],
@@ -183,6 +194,10 @@ class InitCommandTest extends TestCase
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
             [
+                'arguments' => ['/app/resources/md/readme/CLERK.md'],
+                'result' => $this->getTemplate('CLERK.md'),
+            ],
+            [
                 'arguments' => ['/app/resources/md/readme/RENOVATE.md'],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
@@ -191,6 +206,14 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example.yml',
             'env.development.yml',
+            [
+                'config/auth.php',
+                $this->getFixture('auth-modified.php'),
+            ],
+            [
+                '.env.example',
+                $this->getFixture('env.example_clerk_guard_added.yml'),
+            ],
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
@@ -214,6 +237,8 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider=RonasIT\\Clerk\\Providers\\ClerkServiceProvider --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
@@ -223,6 +248,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
@@ -349,6 +375,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
@@ -490,6 +517,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
