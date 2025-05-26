@@ -472,7 +472,7 @@ class InitCommand extends Command implements Isolatable
         array_push(
             $this->shellCommands,
             'composer require ronasit/laravel-clerk',
-            'php artisan vendor:publish --provider=RonasIT\\\\Clerk\\\\Providers\\\\ClerkServiceProvider',
+            'php artisan vendor:publish --provider="RonasIT\\Clerk\\Providers\\ClerkServiceProvider"',
         );
 
         $this->updateAuthClerkConfig();
