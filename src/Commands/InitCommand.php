@@ -53,8 +53,6 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appUrl;
 
-    protected string $authType;
-
     protected array $emptyValuesList = [];
 
     protected string $readmeContent = '';
@@ -90,13 +88,13 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
-        $this->authType = $this->choice(
+        $authType = AuthTypeEnum::from($this->choice(
             question: 'Please choose the authentication type',
             choices: AuthTypeEnum::values(),
             default: AuthTypeEnum::None->value,
-        );
+        ));
 
-        if ($this->authType === AuthTypeEnum::Clerk->value) {
+        if ($authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
             $this->createOrUpdateConfigFile($envFile, '=', [
@@ -132,7 +130,7 @@ class InitCommand extends Command implements Isolatable
             if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
                 $this->fillCredentialsAndAccess($kebabName);
 
-                if ($this->authType === AuthTypeEnum::Clerk->value) {
+                if ($authType === AuthTypeEnum::Clerk) {
                     $this->fillClerkAuthType();
                 }
             }
@@ -363,7 +361,7 @@ class InitCommand extends Command implements Isolatable
     {
         $parsed = file_get_contents($fileName);
 
-        $lines = collect(explode("\n", $parsed));
+        $lines = explode("\n", $parsed);
 
         foreach ($data as $key => $value) {
             $value = $this->addQuotes($value);
@@ -378,7 +376,7 @@ class InitCommand extends Command implements Isolatable
             $lines[] = "\n{$key}{$separator}{$value}";
         }
 
-        $ymlSettings = implode("\n", $lines->toArray());
+        $ymlSettings = implode("\n", $lines);
 
         file_put_contents($fileName, $ymlSettings);
     }

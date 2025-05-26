@@ -238,7 +238,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider=RonasIT\\\\Clerk\\\\Providers\\\\ClerkServiceProvider --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\\Clerk\\Providers\\ClerkServiceProvider" --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
