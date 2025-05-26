@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use Illuminate\Support\Facades\Artisan;
 
@@ -52,7 +53,7 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appUrl;
 
-    protected string $clerk;
+    protected string $authType;
 
     protected array $emptyValuesList = [];
 
@@ -78,30 +79,27 @@ class InitCommand extends Command implements Isolatable
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->addOrUpdateConfigFile($envFile, '=', [
+        $this->createOrUpdateConfigFile($envFile, '=', [
             'APP_NAME' => $this->appName,
         ]);
 
-        $this->addOrUpdateConfigFile('.env.development', '=', [
+        $this->createOrUpdateConfigFile('.env.development', '=', [
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
         ]);
 
         $this->info('Project initialized successfully!');
 
-        $this->clerk = $this->choice(
+        $this->authType = $this->choice(
             question: 'Please choose the authentication type',
-            choices: [
-                'clerk',
-                'none',
-            ],
-            default: 'none',
+            choices: AuthTypeEnum::values(),
+            default: AuthTypeEnum::None->value,
         );
 
-        if ($this->clerk === 'clerk') {
+        if ($this->authType === AuthTypeEnum::Clerk->value) {
             $this->enableClerk();
 
-            $this->addOrUpdateConfigFile($envFile, '=', [
+            $this->createOrUpdateConfigFile($envFile, '=', [
                 'AUTH_GUARD' => 'clerk',
             ]);
         }
@@ -133,6 +131,10 @@ class InitCommand extends Command implements Isolatable
 
             if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
                 $this->fillCredentialsAndAccess($kebabName);
+
+                if ($this->authType === AuthTypeEnum::Clerk->value) {
+                    $this->fillClerkAuthType();
+                }
             }
 
             $this->saveReadme();
@@ -334,9 +336,12 @@ class InitCommand extends Command implements Isolatable
             $this->removeTag($filePart, "{$key}_credentials");
         }
 
-        if ($this->clerk === 'clerk') {
-            $filePart = $filePart . $this->loadReadmePart('CLERK.md');
-        }
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillClerkAuthType(): void
+    {
+        $filePart = $this->loadReadmePart('CLERK.md');
 
         $this->updateReadmeFile($filePart);
     }
@@ -354,34 +359,26 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("database/migrations/{$fileName}", "<?php\n\n{$data}");
     }
 
-    protected function addOrUpdateConfigFile($fileName, $separator, $data): void
+    protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
     {
         $parsed = file_get_contents($fileName);
 
-        $lines = explode("\n", $parsed);
-
-        foreach ($lines as &$line) {
-            foreach ($data as $key => $value) {
-                if (Str::contains($line, "{$key}{$separator}")) {
-                    $exploded = explode($separator, $line);
-                    $key = array_shift($exploded);
-                    $value = $this->addQuotes($value);
-                    $line = "{$key}{$separator}{$value}";
-                    $foundKeys[$key] = true;
-                }
-            }
-        }
-
-        unset($line);
+        $lines = collect(explode("\n", $parsed));
 
         foreach ($data as $key => $value) {
-            if (!isset($foundKeys[$key])) {
-                $value = $this->addQuotes($value);
-                $lines[] = "\n{$key}{$separator}{$value}";
+            $value = $this->addQuotes($value);
+
+            foreach ($lines as &$line) {
+                if (Str::contains($line, $key)) {
+                    $line = "{$key}{$separator}{$value}";
+                    continue 2;
+                }
             }
+
+            $lines[] = "\n{$key}{$separator}{$value}";
         }
 
-        $ymlSettings = implode("\n", $lines);
+        $ymlSettings = implode("\n", $lines->toArray());
 
         file_put_contents($fileName, $ymlSettings);
     }
@@ -481,11 +478,12 @@ class InitCommand extends Command implements Isolatable
         $this->updateAuthClerkConfig();
     }
 
+    // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
     protected function updateAuthClerkConfig(): void
     {
-        $file = 'config/auth.php';
+        $filePath = 'config/auth.php';
 
-        $content = file_get_contents($file);
+        $content = file_get_contents($filePath);
 
         $content = preg_replace_callback(
             pattern: "/('guards'\s*=>\s*\[)(.*?)(^\s{4}],)/sm",
@@ -493,7 +491,7 @@ class InitCommand extends Command implements Isolatable
             subject: $content,
         );
 
-        file_put_contents($file, $content);
+        file_put_contents($filePath, $content);
     }
 
     protected function addClerkToAuthConfigCallback(): callable
