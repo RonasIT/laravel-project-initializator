@@ -369,6 +369,7 @@ class InitCommand extends Command implements Isolatable
             foreach ($lines as &$line) {
                 if (Str::contains($line, $key)) {
                     $line = "{$key}{$separator}{$value}";
+
                     continue 2;
                 }
             }
