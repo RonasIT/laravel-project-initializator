@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use Illuminate\Support\Facades\Artisan;
 
@@ -76,16 +77,30 @@ class InitCommand extends Command implements Isolatable
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->updateConfigFile($envFile, '=', [
+        $this->createOrUpdateConfigFile($envFile, '=', [
             'APP_NAME' => $this->appName,
         ]);
 
-        $this->updateConfigFile('.env.development', '=', [
+        $this->createOrUpdateConfigFile('.env.development', '=', [
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
         ]);
 
         $this->info('Project initialized successfully!');
+
+        $authType = AuthTypeEnum::from($this->choice(
+            question: 'Please choose the authentication type',
+            choices: AuthTypeEnum::values(),
+            default: AuthTypeEnum::None->value,
+        ));
+
+        if ($authType === AuthTypeEnum::Clerk) {
+            $this->enableClerk();
+
+            $this->createOrUpdateConfigFile($envFile, '=', [
+                'AUTH_GUARD' => 'clerk',
+            ]);
+        }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
             $this->createAdminUser($kebabName);
@@ -114,6 +129,10 @@ class InitCommand extends Command implements Isolatable
 
             if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
                 $this->fillCredentialsAndAccess($kebabName);
+
+                if ($authType === AuthTypeEnum::Clerk) {
+                    $this->fillClerkAuthType();
+                }
             }
 
             $this->saveReadme();
@@ -318,6 +337,13 @@ class InitCommand extends Command implements Isolatable
         $this->updateReadmeFile($filePart);
     }
 
+    protected function fillClerkAuthType(): void
+    {
+        $filePart = $this->loadReadmePart('CLERK.md');
+
+        $this->updateReadmeFile($filePart);
+    }
+
     protected function addQuotes($string): string
     {
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
@@ -331,21 +357,24 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("database/migrations/{$fileName}", "<?php\n\n{$data}");
     }
 
-    protected function updateConfigFile($fileName, $separator, $data): void
+    protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
     {
         $parsed = file_get_contents($fileName);
 
         $lines = explode("\n", $parsed);
 
-        foreach ($lines as &$line) {
-            foreach ($data as $key => $value) {
-                if (Str::contains($line, "{$key}{$separator}")) {
-                    $exploded = explode($separator, $line);
-                    $key = array_shift($exploded);
-                    $value = $this->addQuotes($value);
+        foreach ($data as $key => $value) {
+            $value = $this->addQuotes($value);
+
+            foreach ($lines as &$line) {
+                if (Str::contains($line, $key)) {
                     $line = "{$key}{$separator}{$value}";
+
+                    continue 2;
                 }
             }
+
+            $lines[] = "\n{$key}{$separator}{$value}";
         }
 
         $ymlSettings = implode("\n", $lines);
@@ -435,5 +464,43 @@ class InitCommand extends Command implements Isolatable
         $filePart = $this->loadReadmePart('RENOVATE.md');
 
         $this->updateReadmeFile($filePart);
+    }
+
+    protected function enableClerk(): void
+    {
+        array_push(
+            $this->shellCommands,
+            'composer require ronasit/laravel-clerk',
+            'php artisan vendor:publish --provider="RonasIT\\Clerk\\Providers\\ClerkServiceProvider"',
+        );
+
+        $this->updateAuthClerkConfig();
+    }
+
+    // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
+    protected function updateAuthClerkConfig(): void
+    {
+        $filePath = 'config/auth.php';
+
+        $content = file_get_contents($filePath);
+
+        $content = preg_replace_callback(
+            pattern: "/('guards'\s*=>\s*\[)(.*?)(^\s{4}],)/sm",
+            callback: $this->addClerkToAuthConfigCallback(),
+            subject: $content,
+        );
+
+        file_put_contents($filePath, $content);
+    }
+
+    protected function addClerkToAuthConfigCallback(): callable
+    {
+        return function (array $matches): string {
+            $existing = rtrim($matches[2]);
+            $newLine = "\r\n";
+            $clerkGuard = "{$newLine}        'clerk' => [{$newLine}            'driver' => 'clerk_session',{$newLine}            'provider' => 'users',{$newLine}        ],";
+
+            return $matches[1] . $existing . $clerkGuard . $newLine . "    ],";
+        };
     }
 }
