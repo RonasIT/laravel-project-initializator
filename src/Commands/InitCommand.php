@@ -6,11 +6,11 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use Illuminate\Support\Facades\Artisan;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -195,7 +195,7 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->publishMigration(
-                data: view('initializator::add_admins_table')->render,
+                data: view('initializator::add_admins_table')->render(),
                 fileName: 'add_admins_table.php',
             );
             $this->publishMigration(
