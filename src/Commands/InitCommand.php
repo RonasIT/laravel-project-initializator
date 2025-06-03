@@ -51,6 +51,8 @@ class InitCommand extends Command implements Isolatable
 
     protected array $adminCredentials = [];
 
+    protected AuthTypeEnum $authType;
+
     protected string $appUrl;
 
     protected array $emptyValuesList = [];
@@ -88,13 +90,13 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
-        $authType = AuthTypeEnum::from($this->choice(
+        $this->authType = AuthTypeEnum::from($this->choice(
             question: 'Please choose the authentication type',
             choices: AuthTypeEnum::values(),
             default: AuthTypeEnum::None->value,
         ));
 
-        if ($authType === AuthTypeEnum::Clerk) {
+        if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
             $this->createOrUpdateConfigFile($envFile, '=', [
@@ -130,7 +132,7 @@ class InitCommand extends Command implements Isolatable
             if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
                 $this->fillCredentialsAndAccess($kebabName);
 
-                if ($authType === AuthTypeEnum::Clerk) {
+                if ($this->authType === AuthTypeEnum::Clerk) {
                     $this->fillClerkAuthType();
                 }
             }
@@ -189,10 +191,25 @@ class InitCommand extends Command implements Isolatable
             'name' => $this->ask('Please enter an admin name', 'Admin'),
             'email' => $this->ask('Please enter an admin email', "admin@{$kebabName}.com"),
             'password' => $this->ask('Please enter an admin password', $defaultPassword),
-            'role_id' => $this->ask('Please enter an admin role id', RoleEnum::Admin->value),
         ];
 
-        $this->publishMigration();
+        if ($this->authType === AuthTypeEnum::Clerk) {
+            $this->publishMigration(
+                data: view('initializator::add_admins_table')->render,
+                fileName: 'add_admins_table.php',
+            );
+            $this->publishMigration(
+                data: view('initializator::add_admin_user')->with($this->adminCredentials)->render(),
+                fileName: 'add_admin_user.php',
+            );
+        } else {
+            $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
+
+            $this->publishMigration(
+                data: view('initializator::add_default_user')->with($this->adminCredentials)->render(),
+                fileName: 'add_default_user.php'
+            );
+        }
     }
 
     protected function fillReadme(): void
@@ -349,10 +366,9 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
-    protected function publishMigration(): void
+    protected function publishMigration(string $data, string $fileName): void
     {
-        $data = view('initializator::add_default_user')->with($this->adminCredentials)->render();
-        $fileName = Carbon::now()->format('Y_m_d_His') . '_add_default_user.php';
+        $fileName = Carbon::now()->format('Y_m_d_His') . '_' . $fileName;
 
         file_put_contents("database/migrations/{$fileName}", "<?php\n\n{$data}");
     }
@@ -475,6 +491,11 @@ class InitCommand extends Command implements Isolatable
         );
 
         $this->updateAuthClerkConfig();
+
+        $this->publishMigration(
+            data: view('initializator::add_clerk_id_to_users_table')->render,
+            fileName: 'add_clerk_id_to_users_table.php',
+        );
     }
 
     // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
