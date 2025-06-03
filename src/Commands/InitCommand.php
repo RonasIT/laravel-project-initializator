@@ -197,7 +197,7 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->publishMigration(
-                data: view('initializator::add_admins_table')->render(),
+                data: view('initializator::add_admins_table')->with($this->adminCredentials)->render(),
                 fileName: 'add_admins_table.php',
             );
         } else {
