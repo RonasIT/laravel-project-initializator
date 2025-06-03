@@ -219,10 +219,6 @@ class InitCommandTest extends TestCase
                 $this->getFixture('admins_table_migration.php'),
             ],
             [
-                'database/migrations/2018_11_11_111111_add_admin_user.php',
-                $this->getFixture('add_admin_migration.php'),
-            ],
-            [
                 'database/migrations/2018_11_11_111111_add_clerk_id_to_users_table.php',
                 $this->getFixture('add_clerk_id_to_users_table_migration.php'),
             ],

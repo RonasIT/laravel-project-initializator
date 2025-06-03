@@ -69,6 +69,8 @@ class InitCommand extends Command implements Isolatable
 
     protected ?string $reviewer = null;
 
+    protected int $migrationPublishIntervalCount = 0;
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -197,10 +199,6 @@ class InitCommand extends Command implements Isolatable
             $this->publishMigration(
                 data: view('initializator::add_admins_table')->render(),
                 fileName: 'add_admins_table.php',
-            );
-            $this->publishMigration(
-                data: view('initializator::add_admin_user')->with($this->adminCredentials)->render(),
-                fileName: 'add_admin_user.php',
             );
         } else {
             $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
@@ -368,7 +366,9 @@ class InitCommand extends Command implements Isolatable
 
     protected function publishMigration(string $data, string $fileName): void
     {
-        $fileName = Carbon::now()->format('Y_m_d_His') . '_' . $fileName;
+        $this->migrationPublishIntervalCount++;
+
+        $fileName = Carbon::now()->addSeconds($this->migrationPublishIntervalCount)->format('Y_m_d_His') . '_' . $fileName;
 
         file_put_contents("database/migrations/{$fileName}", "<?php\n\n{$data}");
     }

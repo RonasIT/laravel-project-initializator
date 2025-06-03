@@ -18,7 +18,7 @@ class AddClerkIdToUsersTable extends Migration
 
     public function down()
     {
-        if(config('app.env') !== 'testing') {
+        if (config('app.env') !== 'testing') {
             Schema::table('users', function (Blueprint $table) {
                 $table->dropColumn('clerk_id');
             });
