@@ -215,12 +215,12 @@ class InitCommandTest extends TestCase
                 $this->getFixture('env.example_clerk_guard_added.yml'),
             ],
             [
-                'database/migrations/2018_11_11_111111_add_admins_table.php',
-                $this->getFixture('admins_table_migration.php'),
-            ],
-            [
                 'database/migrations/2018_11_11_111111_add_clerk_id_to_users_table.php',
                 $this->getFixture('add_clerk_id_to_users_table_migration.php'),
+            ],
+            [
+                'database/migrations/2018_11_11_111112_add_admins_table.php',
+                $this->getFixture('admins_table_migration.php'),
             ],
             [
                 'README.md',
