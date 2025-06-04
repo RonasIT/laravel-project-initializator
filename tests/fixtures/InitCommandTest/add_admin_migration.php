@@ -13,7 +13,6 @@ class AddAdmin extends Migration
     {
         if (config('app.env') !== 'testing') {
             DB::table('admins')->insert([
-                'name' => 'TestAdmin',
                 'email' => 'mail@mail.com',
                 'password' => Hash::make('123456'),
             ]);

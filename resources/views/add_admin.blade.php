@@ -11,7 +11,6 @@ class AddAdmin extends Migration
     {
         if (config('app.env') !== 'testing') {
             DB::table('admins')->insert([
-                'name' => '{{ $name }}',
                 'email' => '{{ $email }}',
                 'password' => Hash::make('{{ $password }}'),
             ]);

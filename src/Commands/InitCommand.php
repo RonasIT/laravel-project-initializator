@@ -190,7 +190,6 @@ class InitCommand extends Command implements Isolatable
         $defaultPassword = substr(md5(uniqid()), 0, 8);
 
         $this->adminCredentials = [
-            'name' => $this->ask('Please enter an admin name', 'Admin'),
             'email' => $this->ask('Please enter an admin email', "admin@{$kebabName}.com"),
             'password' => $this->ask('Please enter an admin password', $defaultPassword),
         ];
@@ -207,6 +206,7 @@ class InitCommand extends Command implements Isolatable
             );
         } else {
             $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
+            $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
 
             $this->publishMigration(
                 data: view('initializator::add_default_user')->with($this->adminCredentials)->render(),

@@ -258,7 +258,6 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
-            ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter an admin password', '123456')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
