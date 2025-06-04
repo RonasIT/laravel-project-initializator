@@ -202,7 +202,7 @@ class InitCommand extends Command implements Isolatable
             );
 
             $this->publishMigration(
-                data: view('initializator::add_admin_user')->with($this->adminCredentials)->render(),
+                data: view('initializator::add_admin')->with($this->adminCredentials)->render(),
                 fileName: 'add_admin.php',
             );
         } else {

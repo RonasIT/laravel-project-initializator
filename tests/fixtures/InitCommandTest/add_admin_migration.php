@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use RonasIT\Support\Traits\MigrationTrait;
 
-class AddAdminUser extends Migration
+class AddAdmin extends Migration
 {
     use MigrationTrait;
 
