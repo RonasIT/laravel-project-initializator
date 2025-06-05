@@ -2,8 +2,10 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use RonasIT\Support\Traits\MigrationTrait;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use RonasIT\Support\Traits\MigrationTrait;
 
 class AddAdminsTable extends Migration
 {
@@ -17,6 +19,11 @@ class AddAdminsTable extends Migration
                 $table->string('email')->unique();
                 $table->string('password');
             });
+
+            DB::table('admins')->insert([
+                'email' => 'mail@mail.com',
+                'password' => Hash::make('123456'),
+            ]);
         }
     }
 
@@ -24,6 +31,10 @@ class AddAdminsTable extends Migration
     {
         if (config('app.env') !== 'testing') {
             Schema::dropIfExists('admins');
+            
+            DB::table('admins')
+                ->where('email', 'mail@mail.com')
+                ->delete();
         }
     }
 }

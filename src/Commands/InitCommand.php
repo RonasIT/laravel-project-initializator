@@ -196,13 +196,8 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->publishMigration(
-                data: view('initializator::add_admins_table')->render(),
+                data: view('initializator::add_admins_table')->with($this->adminCredentials)->render(),
                 fileName: 'add_admins_table.php',
-            );
-
-            $this->publishMigration(
-                data: view('initializator::add_admin')->with($this->adminCredentials)->render(),
-                fileName: 'add_admin.php',
             );
         } else {
             $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
