@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 
@@ -68,8 +69,6 @@ class InitCommand extends Command implements Isolatable
     protected string $appName;
 
     protected ?string $reviewer = null;
-
-    protected int $migrationPublishIntervalCount = 0;
 
     public function handle(): void
     {
@@ -196,16 +195,16 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->publishMigration(
-                data: view('initializator::add_admins_table')->with($this->adminCredentials)->render(),
-                fileName: 'add_admins_table.php',
+                view: view('initializator::add_admins_table')->with($this->adminCredentials),
+                migrationName: 'add_admins_table.php',
             );
         } else {
             $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
             $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
 
             $this->publishMigration(
-                data: view('initializator::add_default_user')->with($this->adminCredentials)->render(),
-                fileName: 'add_default_user.php'
+                view: view('initializator::add_default_user')->with($this->adminCredentials),
+                migrationName: 'add_default_user.php'
             );
         }
     }
@@ -364,13 +363,15 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
-    protected function publishMigration(string $data, string $fileName): void
+    protected function publishMigration(View $view, string $migrationName): void
     {
-        $this->migrationPublishIntervalCount++;
+        $time = Carbon::now()->format('Y_m_d_His');
 
-        $fileName = Carbon::now()->addSeconds($this->migrationPublishIntervalCount)->format('Y_m_d_His') . '_' . $fileName;
+        $migrationName = "{$time}_{$migrationName}.php";
 
-        file_put_contents("database/migrations/{$fileName}", "<?php\n\n{$data}");
+        $data = $view->render();
+
+        file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
     }
 
     protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
@@ -493,8 +494,8 @@ class InitCommand extends Command implements Isolatable
         $this->updateAuthClerkConfig();
 
         $this->publishMigration(
-            data: view('initializator::add_clerk_id_to_users_table')->render(),
-            fileName: 'add_clerk_id_to_users_table.php',
+            view: view('initializator::add_clerk_id_to_users_table'),
+            migrationName: 'add_clerk_id_to_users_table.php',
         );
     }
 

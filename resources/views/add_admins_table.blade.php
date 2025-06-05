@@ -19,7 +19,6 @@ class AddAdminsTable extends Migration
             });
 
             DB::table('admins')->insert([
-                'name' => '{{ $name }}',
                 'email' => '{{ $email }}',
                 'password' => Hash::make('{{ $password }}'),
             ]);
