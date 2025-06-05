@@ -4,12 +4,12 @@ namespace RonasIT\ProjectInitializator\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 
@@ -196,15 +196,15 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->publishMigration(
                 view: view('initializator::add_admins_table')->with($this->adminCredentials),
-                migrationName: 'add_admins_table.php',
+                migrationName: 'add_admins_table',
             );
         } else {
-            $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
             $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
+            $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
 
             $this->publishMigration(
                 view: view('initializator::add_default_user')->with($this->adminCredentials),
-                migrationName: 'add_default_user.php'
+                migrationName: 'add_default_user'
             );
         }
     }
@@ -370,7 +370,7 @@ class InitCommand extends Command implements Isolatable
         $migrationName = "{$time}_{$migrationName}.php";
 
         $data = $view->render();
-
+        
         file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
     }
 
@@ -495,7 +495,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->publishMigration(
             view: view('initializator::add_clerk_id_to_users_table'),
-            migrationName: 'add_clerk_id_to_users_table.php',
+            migrationName: 'add_clerk_id_to_users_table',
         );
     }
 
@@ -519,7 +519,7 @@ class InitCommand extends Command implements Isolatable
     {
         return function (array $matches): string {
             $existing = rtrim($matches[2]);
-            $newLine = "\r\n";
+            $newLine = "\n";
             $clerkGuard = "{$newLine}        'clerk' => [{$newLine}            'driver' => 'clerk_session',{$newLine}            'provider' => 'users',{$newLine}        ],";
 
             return $matches[1] . $existing . $clerkGuard . $newLine . "    ],";

@@ -13,13 +13,13 @@ class AddAdminsTable extends Migration
 
     public function up()
     {
-        if (config('app.env') !== 'testing') {
-            Schema::create('admins', function (Blueprint $table) {
-                $table->increments('id');
-                $table->string('email')->unique();
-                $table->string('password');
-            });
+        Schema::create('admins', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('email')->unique();
+            $table->string('password');
+        });
 
+        if (config('app.env') !== 'testing'){
             DB::table('admins')->insert([
                 'email' => 'mail@mail.com',
                 'password' => Hash::make('123456'),
@@ -29,9 +29,9 @@ class AddAdminsTable extends Migration
 
     public function down()
     {
+        Schema::dropIfExists('admins');
+
         if (config('app.env') !== 'testing') {
-            Schema::dropIfExists('admins');
-            
             DB::table('admins')
                 ->where('email', 'mail@mail.com')
                 ->delete();
