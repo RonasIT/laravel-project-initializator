@@ -1,24 +1,16 @@
 name: Run tests with coverage
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 jobs:
   tests-with-coverage:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: [ "8.3", "8.4" ]
-    steps:
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          coverage: xdebug, pcov
-          tools: composer:v2
+    container:
+      image: ghcr.io/ronasit/php-nginx-dev:8.3
 
+    steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
