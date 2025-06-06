@@ -16,7 +16,9 @@ jobs:
           fetch-depth: 0
 
       - name: Install Dependencies
-        run: cd /app && composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: |
+          container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3) 
+          docker exec -w /app $container_id composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Execute unit tests via PHPUnit with coverage
         run: /app/vendor/bin/phpunit --coverage-clover build/logs/clover.xml
