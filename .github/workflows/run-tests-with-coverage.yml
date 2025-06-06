@@ -16,8 +16,9 @@ jobs:
             -   uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php-version }}
-                    coverage: xdebug, pcov
+                    coverage: pcov
                     tools: composer:v2
+                    ini-values: pcov.directory=app
 
             -   uses: actions/checkout@v4
                 with:
