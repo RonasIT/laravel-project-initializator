@@ -20,20 +20,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up PHP with Composer
+      - name: Install Dependencies
         run: |
-          docker exec $(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3) composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+          container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3)
+          docker exec $container_id composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Execute unit tests via PHPUnit with coverage
         run: |
-          docker exec $(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3) vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+          container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3)
+          docker exec $container_id vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
       - name: Upload coverage results to Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          docker exec $(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3) composer global require php-coveralls/php-coveralls
-          docker exec $(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3) php-coveralls --coverage_clover=build/logs/clover.xml -v
+          container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3)
+          docker exec $container_id composer global require php-coveralls/php-coveralls
+          docker exec $container_id php-coveralls --coverage_clover=build/logs/clover.xml -v
 
       - name: Coverage Check
         uses: ericsizemore/phpunit-coverage-check-action@2.0.0
