@@ -33,7 +33,7 @@ jobs:
       - name: Execute unit tests via PHPUnit with coverage
         run: |
           container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3)
-          docker exec $container_id vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+          docker exec $container_id /app/vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
       - name: Upload coverage results to Coveralls
         env:
