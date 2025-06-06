@@ -26,6 +26,11 @@ jobs:
       - name: Ensure container is running
         run: docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3
 
+      - name: Debug inside container
+        run: |
+          container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3)
+          docker exec -it $container_id /bin/sh -c "ls /app && composer --version"
+
       - name: Install Dependencies
         run: |
           container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3) 
