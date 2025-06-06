@@ -24,7 +24,7 @@ jobs:
         run: docker ps -a
 
       - name: Wait for container to be ready
-        run: sleep 10
+        run: sleep 50
 
       - name: Ensure container is running
         run: docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3
