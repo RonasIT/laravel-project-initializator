@@ -32,7 +32,7 @@ jobs:
       - name: Install Dependencies
         run: |
           container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3)
-          docker exec $container_id cd /app; composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+          docker exec $container_id cd /app && composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Execute unit tests via PHPUnit with coverage
         run: |
