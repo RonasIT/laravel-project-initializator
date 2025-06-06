@@ -19,7 +19,7 @@ jobs:
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Execute unit tests via PHPUnit with coverage
-        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml /app/tests
+        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
       - name: Adjust file paths in coverage report
         run: |
