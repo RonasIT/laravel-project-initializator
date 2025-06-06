@@ -18,7 +18,6 @@ jobs:
             php-version: ${{ matrix.php-version }}
             coverage: pcov
             tools: composer:v2
-            ini-values: pcov.directory=app
 
       -   uses: actions/checkout@v4
           with:
