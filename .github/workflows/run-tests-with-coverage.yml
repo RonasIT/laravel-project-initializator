@@ -1,51 +1,36 @@
 name: Run tests with coverage
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 jobs:
   tests-with-coverage:
     runs-on: ubuntu-latest
-
-    services:
-      php:
-        image: ghcr.io/ronasit/php-nginx-dev:8.3
+    container:
+      image: ghcr.io/ronasit/php-nginx-dev:8.3
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: List running Docker containers
-        run: docker ps -a
-
-      - name: Wait for container to be ready
-        run: sleep 20
-
-      - name: Ensure container is running
-        run: docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3
-
       - name: Install Dependencies
-        run: |
-          container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3)
-          docker exec $container_id cd /app && composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: cd /app && composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Execute unit tests via PHPUnit with coverage
+        run: /app/vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+
+      - name: Adjust file paths in coverage report
         run: |
-          container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3)
-          docker exec $container_id /app/vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+          sed -i 's|/home/runner/work/laravel-project-initializator/laravel-project-initializator/|/app/|g' build/logs/clover.xml
 
       - name: Upload coverage results to Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3)
-          docker exec $container_id composer global require php-coveralls/php-coveralls
-          docker exec $container_id php-coveralls --coverage_clover=build/logs/clover.xml -v
+          composer global require php-coveralls/php-coveralls
+          php-coveralls --coverage_clover=build/logs/clover.xml -v
 
       - name: Coverage Check
         uses: ericsizemore/phpunit-coverage-check-action@2.0.0
