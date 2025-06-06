@@ -1,45 +1,47 @@
 name: Run tests with coverage
 
 on:
-    push:
-        branches: [ "main" ]
-    pull_request:
-        branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-    tests-with-coverage:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                php-version: [ "8.3", "8.4" ]
-        steps:
-            -   uses: shivammathur/setup-php@v2
-                with:
-                    php-version: ${{ matrix.php-version }}
-                    coverage: xdebug, pcov
-                    tools: composer:v2
-                    ini-values: pcov.directory=app
+  tests-with-coverage:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: [ "8.3", "8.4" ]
+    steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: xdebug, pcov
+          tools: composer:v2
 
-            -   uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-            -   name: Install Dependencies
-                working-directory: ./app
-                run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-            -   name: Execute unit tests via PHPUnit with coverage
-                working-directory: ./app
-                run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+      - name: Execute unit tests via PHPUnit with coverage
+        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml /app/tests
 
-            -   name: Upload coverage results to Coveralls
-                env:
-                    COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                working-directory: ./app
-                run: |
-                    composer global require php-coveralls/php-coveralls
-                    php-coveralls --coverage_clover=build/logs/clover.xml -v
+      - name: Adjust file paths in coverage report
+        run: |
+          sed -i 's|/home/runner/work/laravel-project-initializator/laravel-project-initializator/|/app/|g' build/logs/clover.xml
 
-            -   name: Coverage Check
-                uses: ericsizemore/phpunit-coverage-check-action@2.0.0
-                with:
-                    threshold: 70
-                    clover_file: 'build/logs/clover.xml'
+      - name: Upload coverage results to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require php-coveralls/php-coveralls
+          php-coveralls --coverage_clover=build/logs/clover.xml -v
+
+      - name: Coverage Check
+        uses: ericsizemore/phpunit-coverage-check-action@2.0.0
+        with:
+          threshold: 70
+          clover_file: 'build/logs/clover.xml'
