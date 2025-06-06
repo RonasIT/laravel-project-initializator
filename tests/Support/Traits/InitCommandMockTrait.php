@@ -67,6 +67,6 @@ trait InitCommandMockTrait
 
     protected function getTemplate(string $template): string
     {
-        return file_get_contents(dirname(__DIR__, 3) . "/resources/md/readme/{$template}");
+        return file_get_contents(__DIR__ . "/../../../resources/md/readme/{$template}");
     }
 }
