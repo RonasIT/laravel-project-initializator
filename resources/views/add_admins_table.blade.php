@@ -1,28 +1,36 @@
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use RonasIT\Support\Traits\MigrationTrait;
 
-class AddDefaultUser extends Migration
+class AddAdminsTable extends Migration
 {
     use MigrationTrait;
 
     public function up()
     {
-        if (config('app.env') !== 'testing') {
-            DB::table('users')->insert([
-                'name' => '{{ $name }}',
+        Schema::create('admins', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('email')->unique();
+            $table->string('password');
+        });
+
+        if (config('app.env') !== 'testing'){
+            DB::table('admins')->insert([
                 'email' => '{{ $email }}',
                 'password' => Hash::make('{{ $password }}'),
-                'role_id' => {{ $role_id }},
             ]);
         }
     }
 
     public function down()
     {
+        Schema::dropIfExists('admins');
+
         if (config('app.env') !== 'testing') {
-            DB::table('users')
+            DB::table('admins')
                 ->where('email', '{{ $email }}')
                 ->delete();
         }
