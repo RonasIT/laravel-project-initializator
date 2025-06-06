@@ -7,8 +7,10 @@ on:
 jobs:
   tests-with-coverage:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/ronasit/php-nginx-dev:8.3
+
+    services:
+      php:
+        image: ghcr.io/ronasit/php-nginx-dev:8.3
 
     steps:
       - uses: actions/checkout@v4
