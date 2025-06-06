@@ -497,7 +497,7 @@ class InitCommand extends Command implements Isolatable
     {
         return function (array $matches): string {
             $existing = rtrim($matches[2]);
-            $newLine = "\r\n";
+            $newLine = "\n";
             $clerkGuard = "{$newLine}        'clerk' => [{$newLine}            'driver' => 'clerk_session',{$newLine}            'provider' => 'users',{$newLine}        ],";
 
             return $matches[1] . $existing . $clerkGuard . $newLine . "    ],";
