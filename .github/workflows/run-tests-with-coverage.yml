@@ -15,6 +15,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: List running Docker containers
+        run: docker ps -a
+
+      - name: Wait for container to be ready
+        run: sleep 10
+
+      - name: Ensure container is running
+        run: docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3
+
       - name: Install Dependencies
         run: |
           container_id=$(docker ps -q --filter ancestor=ghcr.io/ronasit/php-nginx-dev:8.3) 
