@@ -19,7 +19,6 @@ class AddClerkIdToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropUnique('users_clerk_id_unique');
             $table->dropColumn('clerk_id');
         });
     }
