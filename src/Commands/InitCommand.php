@@ -384,7 +384,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function loadReadmePart(string $fileName): string
     {
-        $file = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName;
+        $file = base_path(DIRECTORY_SEPARATOR . self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
 
         return file_get_contents($file);
     }
@@ -497,7 +497,7 @@ class InitCommand extends Command implements Isolatable
     {
         return function (array $matches): string {
             $existing = rtrim($matches[2]);
-            $newLine = "\r\n";
+            $newLine = "\n";
             $clerkGuard = "{$newLine}        'clerk' => [{$newLine}            'driver' => 'clerk_session',{$newLine}            'provider' => 'users',{$newLine}        ],";
 
             return $matches[1] . $existing . $clerkGuard . $newLine . "    ],";
