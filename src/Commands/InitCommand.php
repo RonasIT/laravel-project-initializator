@@ -195,8 +195,8 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->publishMigration(
-                view: view('initializator::add_admins_table')->with($this->adminCredentials),
-                migrationName: 'add_admins_table',
+                view: view('initializator::admins_create_table')->with($this->adminCredentials),
+                migrationName: 'admins_create_table',
             );
         } else {
             $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
@@ -370,7 +370,7 @@ class InitCommand extends Command implements Isolatable
         $migrationName = "{$time}_{$migrationName}.php";
 
         $data = $view->render();
-        
+
         file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
     }
 
@@ -494,8 +494,8 @@ class InitCommand extends Command implements Isolatable
         $this->updateAuthClerkConfig();
 
         $this->publishMigration(
-            view: view('initializator::add_clerk_id_to_users_table'),
-            migrationName: 'add_clerk_id_to_users_table',
+            view: view('initializator::users_add_clerk_id_field'),
+            migrationName: 'users_add_clerk_id_field',
         );
     }
 
