@@ -30,11 +30,5 @@ class AdminsCreateTable extends Migration
     public function down()
     {
         Schema::dropIfExists('admins');
-
-        if (config('app.env') !== 'testing') {
-            DB::table('admins')
-                ->where('email', 'mail@mail.com')
-                ->delete();
-        }
     }
 }
