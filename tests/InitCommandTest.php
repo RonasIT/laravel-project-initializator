@@ -131,9 +131,9 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
-            ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter an admin password', '123456')
+            ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Would you use Renovate dependabot?')
@@ -162,7 +162,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.example.yml'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/README.md')],
+                'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
                 'result' => $this->getTemplate('README.md'),
             ],
             [
@@ -211,12 +211,16 @@ class InitCommandTest extends TestCase
                 $this->getFixture('auth-modified.php'),
             ],
             [
+                'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
+                $this->getFixture('users_add_clerk_id_field_migration.php'),
+            ],
+            [
                 '.env.example',
                 $this->getFixture('env.example_clerk_guard_added.yml'),
             ],
             [
-                'database/migrations/2018_11_11_111111_add_default_user.php',
-                $this->getFixture('migration.php'),
+                'database/migrations/2018_11_11_111111_admins_create_table.php',
+                $this->getFixture('admins_table_migration.php'),
             ],
             [
                 'README.md',
@@ -250,10 +254,8 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
-            ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter an admin password', '123456')
-            ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
@@ -328,7 +330,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/README.md')],
+                'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
                 'result' => $this->getTemplate('README.md'),
             ],
             [
@@ -443,7 +445,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-               'arguments' => [base_path('/resources/md/readme/README.md')],
+               'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
                 'result' => $this->getTemplate('README.md'),
             ],
             [
@@ -519,9 +521,9 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
-            ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter an admin password', '123456')
+            ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
