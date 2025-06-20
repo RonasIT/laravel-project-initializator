@@ -162,7 +162,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.example.yml'),
             ],
             [
-                'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
+                'arguments' => [base_path('/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
             [
@@ -330,7 +330,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
+                'arguments' => [base_path('/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
             [
@@ -445,7 +445,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-               'arguments' => ['/app/resources/md/readme/CREDENTIALS_AND_ACCESS.md'],
+               'arguments' => [base_path('/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
             [

@@ -15,7 +15,7 @@ use RonasIT\ProjectInitializator\Enums\RoleEnum;
 
 class InitCommand extends Command implements Isolatable
 {
-    public const string TEMPLATES_PATH = 'resources/md/readme';
+    public const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
 
     public const array RESOURCES_ITEMS = [
         'issue_tracker' => 'Issue Tracker',
@@ -401,7 +401,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function loadReadmePart(string $fileName): string
     {
-        $file = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName;
+        $file = base_path(DIRECTORY_SEPARATOR . self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
 
         return file_get_contents($file);
     }
