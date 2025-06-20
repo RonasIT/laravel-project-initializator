@@ -67,6 +67,6 @@ trait InitCommandMockTrait
 
     protected function getTemplate(string $template): string
     {
-        return file_get_contents(base_path("/vendor/ronasit/laravel-project-initializator/resources/md/readme/{$template}"));
+        return file_get_contents(base_path("/resources/md/readme/{$template}"));
     }
 }
