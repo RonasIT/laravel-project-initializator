@@ -162,43 +162,43 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.example.yml'),
             ],
             [
-                'arguments' => [base_path('vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
             [
-                'arguments' => [base_path('vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
                 'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
             ],
             [
-                'arguments' => [base_path('vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
                 'result' => $this->getTemplate('RESOURCES.md'),
             ],
             [
-                'arguments' => [base_path('vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
                 'result' => $this->getTemplate('CONTACTS.md'),
             ],
             [
-                'arguments' => [base_path('vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
                 'result' => $this->getTemplate('PREREQUISITES.md'),
             ],
             [
-                'arguments' => [base_path('vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
                 'result' => $this->getTemplate('GETTING_STARTED.md'),
             ],
             [
-                'arguments' => [base_path('vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
                 'result' => $this->getTemplate('ENVIRONMENTS.md'),
             ],
             [
-                'arguments' => [base_path('vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
             [
-                'arguments' => [base_path('vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md')],
                 'result' => $this->getTemplate('CLERK.md'),
             ],
             [
-                'arguments' => [base_path('vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
         );
@@ -330,27 +330,27 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/README.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
                 'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/RESOURCES.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
                 'result' => $this->getTemplate('RESOURCES.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/CONTACTS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
                 'result' => $this->getTemplate('CONTACTS.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/ENVIRONMENTS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
                 'result' => $this->getTemplate('ENVIRONMENTS.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
         );
@@ -445,39 +445,39 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-               'arguments' => [base_path('/resources/md/readme/README.md')],
+               'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
                 'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/RESOURCES.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
                 'result' => $this->getTemplate('RESOURCES.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/CONTACTS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
                 'result' => $this->getTemplate('CONTACTS.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/PREREQUISITES.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
                 'result' => $this->getTemplate('PREREQUISITES.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/GETTING_STARTED.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
                 'result' => $this->getTemplate('GETTING_STARTED.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/ENVIRONMENTS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
                 'result' => $this->getTemplate('ENVIRONMENTS.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
             [
-                'arguments' => [base_path('/resources/md/readme/RENOVATE.md')],
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
         );
