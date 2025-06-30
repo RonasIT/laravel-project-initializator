@@ -4,17 +4,18 @@ namespace RonasIT\ProjectInitializator\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use Illuminate\Support\Facades\Artisan;
 
 class InitCommand extends Command implements Isolatable
 {
-    public const string TEMPLATES_PATH = 'resources/md/readme';
+    public const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
 
     public const array RESOURCES_ITEMS = [
         'issue_tracker' => 'Issue Tracker',
@@ -50,6 +51,8 @@ class InitCommand extends Command implements Isolatable
     protected array $resources = [];
 
     protected array $adminCredentials = [];
+
+    protected AuthTypeEnum $authType;
 
     protected string $appUrl;
 
@@ -88,13 +91,13 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
-        $authType = AuthTypeEnum::from($this->choice(
+        $this->authType = AuthTypeEnum::from($this->choice(
             question: 'Please choose the authentication type',
             choices: AuthTypeEnum::values(),
             default: AuthTypeEnum::None->value,
         ));
 
-        if ($authType === AuthTypeEnum::Clerk) {
+        if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
             $this->createOrUpdateConfigFile($envFile, '=', [
@@ -130,7 +133,7 @@ class InitCommand extends Command implements Isolatable
             if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
                 $this->fillCredentialsAndAccess($kebabName);
 
-                if ($authType === AuthTypeEnum::Clerk) {
+                if ($this->authType === AuthTypeEnum::Clerk) {
                     $this->fillClerkAuthType();
                 }
             }
@@ -186,13 +189,24 @@ class InitCommand extends Command implements Isolatable
         $defaultPassword = substr(md5(uniqid()), 0, 8);
 
         $this->adminCredentials = [
-            'name' => $this->ask('Please enter an admin name', 'Admin'),
             'email' => $this->ask('Please enter an admin email', "admin@{$kebabName}.com"),
             'password' => $this->ask('Please enter an admin password', $defaultPassword),
-            'role_id' => $this->ask('Please enter an admin role id', RoleEnum::Admin->value),
         ];
 
-        $this->publishMigration();
+        if ($this->authType === AuthTypeEnum::Clerk) {
+            $this->publishMigration(
+                view: view('initializator::admins_create_table')->with($this->adminCredentials),
+                migrationName: 'admins_create_table',
+            );
+        } else {
+            $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
+            $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
+
+            $this->publishMigration(
+                view: view('initializator::add_default_user')->with($this->adminCredentials),
+                migrationName: 'add_default_user'
+            );
+        }
     }
 
     protected function fillReadme(): void
@@ -349,12 +363,15 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
-    protected function publishMigration(): void
+    protected function publishMigration(View $view, string $migrationName): void
     {
-        $data = view('initializator::add_default_user')->with($this->adminCredentials)->render();
-        $fileName = Carbon::now()->format('Y_m_d_His') . '_add_default_user.php';
+        $time = Carbon::now()->format('Y_m_d_His');
 
-        file_put_contents("database/migrations/{$fileName}", "<?php\n\n{$data}");
+        $migrationName = "{$time}_{$migrationName}.php";
+
+        $data = $view->render();
+
+        file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
     }
 
     protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
@@ -475,6 +492,11 @@ class InitCommand extends Command implements Isolatable
         );
 
         $this->updateAuthClerkConfig();
+
+        $this->publishMigration(
+            view: view('initializator::users_add_clerk_id_field'),
+            migrationName: 'users_add_clerk_id_field',
+        );
     }
 
     // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
