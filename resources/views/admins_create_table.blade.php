@@ -1,5 +1,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +18,7 @@ class AdminsCreateTable extends Migration
             $table->string('password');
         });
 
-        if (config('app.env') !== 'testing'){
+        if (!App::environment('testing')) {
             DB::table('admins')->insert([
                 'email' => '{{ $email }}',
                 'password' => Hash::make('{{ $password }}'),
