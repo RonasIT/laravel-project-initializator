@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use Winter\LaravelConfigWriter\ArrayFile;
+use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -69,6 +69,10 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appName;
 
+    protected ?string $reviewer = null;
+
+    protected AppTypeEnum $appType;
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -80,7 +84,7 @@ class InitCommand extends Command implements Isolatable
             field: 'email of code owner / team lead',
             rules: 'required|email',
         );
-        
+
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$kebabName}.com");
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
@@ -95,6 +99,14 @@ class InitCommand extends Command implements Isolatable
         ]);
 
         $this->info('Project initialized successfully!');
+
+        $this->appType = AppTypeEnum::from(
+            $this->choice(
+                question: 'What type of application will your API serve?',
+                choices: AppTypeEnum::values(),
+                default: AppTypeEnum::Multiplatform->value
+            )
+        );
 
         $this->authType = AuthTypeEnum::from($this->choice(
             question: 'Please choose the authentication type',
@@ -112,6 +124,20 @@ class InitCommand extends Command implements Isolatable
             $this->createOrUpdateConfigFile($envFile, '=', [
                 'AUTH_GUARD' => 'clerk',
             ]);
+
+            $data = [
+                'CLERK_ALLOWED_ISSUER' => '',
+                'CLERK_SECRET_KEY' => '',
+                'CLERK_SIGNER_KEY_PATH' => '',
+            ];
+
+            if ($this->appType !== AppTypeEnum::Mobile) {
+                $data['CLERK_ALLOWED_ORIGINS'] = '';
+            }
+
+            $this->createOrUpdateConfigFile($envFile, '=', $data);
+            $this->createOrUpdateConfigFile('.env.development', '=', $data);
+            $this->createOrUpdateConfigFile('.env.example', '=', $data);
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -198,7 +224,7 @@ class InitCommand extends Command implements Isolatable
     protected function setAutoDocContactEmail(string $email): void
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
-        
+
         $config->set('info.contact.email', $email);
 
         $config->write();
@@ -235,13 +261,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->setReadmeValue($file, 'project_name', $this->appName);
 
-        $type = $this->choice(
-            question: 'What type of application will your API serve?',
-            choices: ['Mobile', 'Web', 'Multiplatform'],
-            default: 'Multiplatform'
-        );
-
-        $this->setReadmeValue($file, 'type', $type);
+        $this->setReadmeValue($file, 'type', $this->appType->value);
 
         $this->readmeContent = $file;
     }
@@ -300,9 +320,9 @@ class InitCommand extends Command implements Isolatable
 
             $this->removeTag($filePart, $key);
         }
-        
+
         $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
-                
+
         $this->updateReadmeFile($filePart);
     }
 
