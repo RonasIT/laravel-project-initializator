@@ -23,6 +23,7 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
+use Illuminate\Support\Facades\Storage;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -249,7 +250,7 @@ class InitCommand extends Command implements Isolatable
             $this->publishView(
                 view: view('initializator::admins_create_table')->with($this->adminCredentials),
                 viewName: Carbon::now()->format('Y_m_d_His') . '_admins_create_table',
-                path: 'database/migration',
+                path: 'database/migrations',
             );
         } else {
             $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
@@ -258,7 +259,7 @@ class InitCommand extends Command implements Isolatable
             $this->publishView(
                 view: view('initializator::add_default_user')->with($this->adminCredentials),
                 viewName: Carbon::now()->format('Y_m_d_His') . '_add_default_user',
-                path: 'database/migration',
+                path: 'database/migrations',
             );
         }
     }
@@ -269,7 +270,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->setReadmeValue($file, 'project_name', $this->appName);
 
-        $this->setReadmeValue($file, 'type', $this->appType);
+        $this->setReadmeValue($file, 'type', $this->appType->values);
 
         $this->readmeContent = $file;
     }
@@ -546,6 +547,8 @@ class InitCommand extends Command implements Isolatable
             viewName: Carbon::now()->format('Y_m_d_His') . '_users_add_clerk_id_field',
             path: 'database/migrations',
         );
+
+        Storage::disk('local')->makeDirectory('app/Support/Clerk');
 
         $this->publishView(
             view: view('initializator::clerk_user_repository'),
