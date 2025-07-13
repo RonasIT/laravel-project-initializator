@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use Winter\LaravelConfigWriter\ArrayFile;
+use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -69,6 +70,8 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appName;
 
+    protected AppTypeEnum $appType;
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -80,7 +83,7 @@ class InitCommand extends Command implements Isolatable
             field: 'email of code owner / team lead',
             rules: 'required|email',
         );
-        
+
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$kebabName}.com");
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
@@ -95,6 +98,14 @@ class InitCommand extends Command implements Isolatable
         ]);
 
         $this->info('Project initialized successfully!');
+
+        $this->appType = AppTypeEnum::from(
+            $this->choice(
+                question: 'What type of application will your API serve?',
+                choices: AppTypeEnum::values(),
+                default: AppTypeEnum::Multiplatform->value
+            )
+        );
 
         $this->authType = AuthTypeEnum::from($this->choice(
             question: 'Please choose the authentication type',
@@ -198,7 +209,7 @@ class InitCommand extends Command implements Isolatable
     protected function setAutoDocContactEmail(string $email): void
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
-        
+
         $config->set('info.contact.email', $email);
 
         $config->write();
@@ -214,17 +225,19 @@ class InitCommand extends Command implements Isolatable
         ];
 
         if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->publishMigration(
+            $this->publishView(
                 view: view('initializator::admins_create_table')->with($this->adminCredentials),
-                migrationName: 'admins_create_table',
+                viewName: Carbon::now()->format('Y_m_d_His') . '_admins_create_table',
+                path: 'database/migration',
             );
         } else {
             $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
             $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
 
-            $this->publishMigration(
+            $this->publishView(
                 view: view('initializator::add_default_user')->with($this->adminCredentials),
-                migrationName: 'add_default_user'
+                viewName: Carbon::now()->format('Y_m_d_His') . '_add_default_user',
+                path: 'database/migration',
             );
         }
     }
@@ -235,13 +248,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->setReadmeValue($file, 'project_name', $this->appName);
 
-        $type = $this->choice(
-            question: 'What type of application will your API serve?',
-            choices: ['Mobile', 'Web', 'Multiplatform'],
-            default: 'Multiplatform'
-        );
-
-        $this->setReadmeValue($file, 'type', $type);
+        $this->setReadmeValue($file, 'type', $this->appType);
 
         $this->readmeContent = $file;
     }
@@ -300,9 +307,9 @@ class InitCommand extends Command implements Isolatable
 
             $this->removeTag($filePart, $key);
         }
-        
+
         $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
-                
+
         $this->updateReadmeFile($filePart);
     }
 
@@ -381,15 +388,13 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
-    protected function publishMigration(View $view, string $migrationName): void
+    protected function publishView(View $view, string $viewName, string $path): void
     {
-        $time = Carbon::now()->format('Y_m_d_His');
-
-        $migrationName = "{$time}_{$migrationName}.php";
+        $viewName = "{$viewName}.php";
 
         $data = $view->render();
 
-        file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
+        file_put_contents("{$path}/{$viewName}", "<?php\n\n{$data}");
     }
 
     protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
@@ -511,10 +516,19 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateAuthClerkConfig();
 
-        $this->publishMigration(
+        $this->publishView(
             view: view('initializator::users_add_clerk_id_field'),
-            migrationName: 'users_add_clerk_id_field',
+            viewName: Carbon::now()->format('Y_m_d_His') . '_users_add_clerk_id_field',
+            path: 'database/migrations',
         );
+
+        $this->publishView(
+            view: view('initializator::clerk_user_repository'),
+            viewName: 'ClerkUserRepository',
+            path: 'app/Support/Clerk',
+        );
+
+        $this->addClerkRepositoryBind();
     }
 
     // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
