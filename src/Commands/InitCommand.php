@@ -625,7 +625,7 @@ class InitCommand extends Command implements Isolatable
 
                 public function enterNode(Node $node)
                 {
-                    if ($node instanceof Node\Stmt\ClassMethod && $node->name->toString() === 'register') {
+                    if ($node instanceof Node\Stmt\ClassMethod && $node->name->toString() === 'boot') {
                         $node->stmts[] = $this->stmtToAdd;
                     }
                 }
