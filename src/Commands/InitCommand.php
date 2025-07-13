@@ -12,6 +12,17 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
+use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
+use PhpParser\ParserFactory;
+use PhpParser\Node;
+use PhpParser\Node\Stmt\Expression;
+use PhpParser\Node\Expr\PropertyFetch;
+use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr\ClassConstFetch;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitorAbstract;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -70,6 +81,8 @@ class InitCommand extends Command implements Isolatable
 
     protected ?string $reviewer = null;
 
+    protected AppTypeEnum $appType;
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -80,16 +93,32 @@ class InitCommand extends Command implements Isolatable
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->createOrUpdateConfigFile($envFile, '=', [
-            'APP_NAME' => $this->appName,
-        ]);
+        $this->createOrUpdateConfigFile(
+            separator: '=',
+            data: [
+                'APP_NAME' => $this->appName,
+            ],
+            env: $envFile
+        );
 
-        $this->createOrUpdateConfigFile('.env.development', '=', [
-            'APP_NAME' => $this->appName,
-            'APP_URL' => $this->appUrl,
-        ]);
+        $this->createOrUpdateConfigFile(
+            separator: '=',
+            data: [
+                'APP_NAME' => $this->appName,
+                'APP_URL' => $this->appUrl,
+            ],
+            envDevelopment: '.env.development'
+        );
 
         $this->info('Project initialized successfully!');
+
+        $this->appType = AppTypeEnum::from(
+            $this->choice(
+                question: 'What type of application will your API serve?',
+                choices: AppTypeEnum::values(),
+                default: AppTypeEnum::Multiplatform->value
+            )
+        );
 
         $this->authType = AuthTypeEnum::from($this->choice(
             question: 'Please choose the authentication type',
@@ -100,9 +129,32 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
-            $this->createOrUpdateConfigFile($envFile, '=', [
-                'AUTH_GUARD' => 'clerk',
-            ]);
+            $this->createOrUpdateConfigFile(
+                separator: '=',
+                data: [
+                    'AUTH_GUARD' => 'clerk',
+                ],
+                envDevelopment: '.env.development',
+                env: $envFile
+            );
+
+            $data = [
+                'CLERK_ALLOWED_ISSUER' => '',
+                'CLERK_SECRET_KEY' => '',
+                'CLERK_SIGNER_KEY_PATH' => '',
+            ];
+
+            if ($this->appType !== AppTypeEnum::Mobile) {
+                $data['CLERK_ALLOWED_ORIGINS'] = '';
+            }
+
+            $this->createOrUpdateConfigFile(
+                separator: '=',
+                data: $data,
+                envDevelopment: '.env.development',
+                env: $envFile,
+                envExample: '.env.example',
+            );
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -194,17 +246,19 @@ class InitCommand extends Command implements Isolatable
         ];
 
         if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->publishMigration(
+            $this->publishView(
                 view: view('initializator::admins_create_table')->with($this->adminCredentials),
-                migrationName: 'admins_create_table',
+                viewName: Carbon::now()->format('Y_m_d_His') . '_admins_create_table',
+                path: 'database/migration',
             );
         } else {
             $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
             $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
 
-            $this->publishMigration(
+            $this->publishView(
                 view: view('initializator::add_default_user')->with($this->adminCredentials),
-                migrationName: 'add_default_user'
+                viewName: Carbon::now()->format('Y_m_d_His') . '_add_default_user',
+                path: 'database/migration',
             );
         }
     }
@@ -215,13 +269,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->setReadmeValue($file, 'project_name', $this->appName);
 
-        $type = $this->choice(
-            question: 'What type of application will your API serve?',
-            choices: ['Mobile', 'Web', 'Multiplatform'],
-            default: 'Multiplatform'
-        );
-
-        $this->setReadmeValue($file, 'type', $type);
+        $this->setReadmeValue($file, 'type', $this->appType);
 
         $this->readmeContent = $file;
     }
@@ -319,7 +367,7 @@ class InitCommand extends Command implements Isolatable
     {
         $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
 
-        if ($this->adminCredentials) {
+        if (!empty($this->adminCredentials)) {
             $this->setReadmeValue($filePart, 'admin_email', $this->adminCredentials['email']);
             $this->setReadmeValue($filePart, 'admin_password', $this->adminCredentials['password']);
         }
@@ -363,40 +411,40 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
-    protected function publishMigration(View $view, string $migrationName): void
+    protected function publishView(View $view, string $viewName, string $path): void
     {
-        $time = Carbon::now()->format('Y_m_d_His');
-
-        $migrationName = "{$time}_{$migrationName}.php";
+        $viewName = "{$viewName}.php";
 
         $data = $view->render();
 
-        file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
+        file_put_contents("{$path}/{$viewName}", "<?php\n\n{$data}");
     }
 
-    protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
+    protected function createOrUpdateConfigFile(string $separator, array $data, ...$fileNames): void
     {
-        $parsed = file_get_contents($fileName);
+        foreach ($fileNames as $fileName) {
+            $parsed = file_get_contents($fileName);
 
-        $lines = explode("\n", $parsed);
+            $lines = explode("\n", $parsed);
 
-        foreach ($data as $key => $value) {
-            $value = $this->addQuotes($value);
+            foreach ($data as $key => $value) {
+                $value = $this->addQuotes($value);
 
-            foreach ($lines as &$line) {
-                if (Str::contains($line, $key)) {
-                    $line = "{$key}{$separator}{$value}";
+                foreach ($lines as &$line) {
+                    if (Str::contains($line, $key)) {
+                        $line = "{$key}{$separator}{$value}";
 
-                    continue 2;
+                        continue 2;
+                    }
                 }
+
+                $lines[] = "\n{$key}{$separator}{$value}";
             }
 
-            $lines[] = "\n{$key}{$separator}{$value}";
+            $ymlSettings = implode("\n", $lines);
+
+            file_put_contents($fileName, $ymlSettings);
         }
-
-        $ymlSettings = implode("\n", $lines);
-
-        file_put_contents($fileName, $ymlSettings);
     }
 
     protected function loadReadmePart(string $fileName): string
@@ -493,10 +541,19 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateAuthClerkConfig();
 
-        $this->publishMigration(
+        $this->publishView(
             view: view('initializator::users_add_clerk_id_field'),
-            migrationName: 'users_add_clerk_id_field',
+            viewName: Carbon::now()->format('Y_m_d_His') . '_users_add_clerk_id_field',
+            path: 'database/migrations',
         );
+
+        $this->publishView(
+            view: view('initializator::clerk_user_repository'),
+            viewName: 'ClerkUserRepository',
+            path: 'app/Support/Clerk',
+        );
+
+        $this->addClerkRepositoryBind();
     }
 
     // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
@@ -524,5 +581,57 @@ class InitCommand extends Command implements Isolatable
 
             return $matches[1] . $existing . $clerkGuard . $newLine . "    ],";
         };
+    }
+
+    protected function addClerkRepositoryBind(): void
+    {
+        $appServiceProvider = file_get_contents('app/Providers/AppServiceProvider.php');
+
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+
+        $ast = $parser->parse($appServiceProvider);
+
+        $bindStatement = new Expression(
+            new MethodCall(
+                new PropertyFetch(
+                    new Variable('this'),
+                    'app'
+                ),
+                'bind',
+                [
+                    new Arg(
+                        new ClassConstFetch(
+                            new Node\Name('RonasIT\Clerk\Contracts\UserRepositoryContract'),
+                            'class'
+                        )
+                    ),
+                    new Arg(
+                        new ClassConstFetch(
+                            new Node\Name('ClerkUserRepository'),
+                            'class'
+                        )
+                    )
+                ]
+            )
+        );
+
+        $traverser = new NodeTraverser();
+
+        $traverser->addVisitor(
+            new class($bindStatement) extends NodeVisitorAbstract {
+                public function __construct(private Node $stmtToAdd)
+                {
+                }
+
+                public function enterNode(Node $node)
+                {
+                    if ($node instanceof Node\Stmt\ClassMethod && $node->name->toString() === 'register') {
+                        $node->stmts[] = $this->stmtToAdd;
+                    }
+                }
+            }
+        );
+
+        $traverser->traverse($ast);
     }
 }
