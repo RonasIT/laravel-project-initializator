@@ -31,7 +31,8 @@
         "laravel/framework": ">=11.30",
         "php-mock/php-mock-phpunit": "^2.10",
         "ext-json": "*",
-        "ronasit/laravel-helpers": "^3.3"
+        "ronasit/laravel-helpers": "^3.3",
+        "winter/laravel-config-writer": "^1.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23.1",
@@ -40,8 +41,7 @@
         "php-coveralls/php-coveralls": "^2.7",
         "orchestra/testbench": "^9.3",
         "friendsofphp/php-cs-fixer": "^3.62",
-        "brainmaestro/composer-git-hooks": "^3.0",
-        "winter/laravel-config-writer": "^1.1"
+        "brainmaestro/composer-git-hooks": "^3.0"
     },
     "extra": {
         "laravel": {
