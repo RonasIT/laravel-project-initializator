@@ -33,12 +33,14 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -75,6 +77,7 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
@@ -82,6 +85,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "MyApp"')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -119,6 +123,7 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
@@ -127,6 +132,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -240,6 +246,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\\Clerk\\Providers\\ClerkServiceProvider" --ansi'],
@@ -250,6 +257,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
@@ -367,6 +375,7 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
@@ -375,6 +384,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -507,6 +517,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
@@ -517,6 +528,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
