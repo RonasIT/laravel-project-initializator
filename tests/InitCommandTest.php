@@ -303,7 +303,6 @@ class InitCommandTest extends TestCase
                 'later'
             )
             ->expectsQuestion('Please enter a Manager\'s email', '')
-            ->expectsQuestion('Please enter a Code Owner/Team Lead\'s email', '')
             ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
             ->expectsConfirmation('Do you need a `Getting Started` part?', 'yes')
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
@@ -318,7 +317,6 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- DataDog link')
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
-            ->expectsOutput('- Code Owner/Team Lead\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
@@ -428,7 +426,6 @@ class InitCommandTest extends TestCase
                 'no'
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
-            ->expectsQuestion('Please enter a Code Owner/Team Lead\'s email', '')
             ->expectsConfirmation('Do you need a `Prerequisites` part?')
             ->expectsConfirmation('Do you need a `Getting Started` part?')
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
@@ -436,7 +433,6 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
-            ->expectsOutput('- Code Owner/Team Lead\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
@@ -576,7 +572,6 @@ class InitCommandTest extends TestCase
                 'https://mypsite.com/nova-link'
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
-            ->expectsQuestion('Please enter a Code Owner/Team Lead\'s email', 'lead@mail.com')
             ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
             ->expectsConfirmation('Do you need a `Getting Started` part?', 'yes')
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')

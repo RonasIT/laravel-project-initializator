@@ -3,7 +3,6 @@
 use RonasIT\AutoDoc\Drivers\LocalDriver;
 use RonasIT\AutoDoc\Drivers\RemoteDriver;
 use RonasIT\AutoDoc\Drivers\StorageDriver;
-
 return [
 
     /*
@@ -47,7 +46,7 @@ return [
         'title' => env('APP_NAME', 'Name of Your Application'),
         'termsOfService' => '',
         'contact' => [
-            'email' => 'your@email.com',
+            'email' => 'test@example.com',
         ],
         'license' => [
             'name' => '',
@@ -88,7 +87,6 @@ return [
             'in' => 'cookie',
         ],
     ],
-
     'defaults' => [
 
         /*
@@ -124,7 +122,6 @@ return [
     | Available values: "swagger", "elements", "rapidoc"
     */
     'documentation_viewer' => env('SWAGGER_SPEC_VIEWER', 'swagger'),
-
     'drivers' => [
         'local' => [
             'class' => LocalDriver::class,
@@ -183,6 +180,5 @@ return [
         'local',
         'development',
     ],
-
     'config_version' => '2.8',
 ];
