@@ -46,7 +46,7 @@ return [
         'title' => env('APP_NAME', 'Name of Your Application'),
         'termsOfService' => '',
         'contact' => [
-            'email' => null,
+            'email' => 'test@example.com',
         ],
         'license' => [
             'name' => '',

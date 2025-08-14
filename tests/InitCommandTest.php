@@ -10,6 +10,8 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
+        $this->mockArrayFilePutContent();
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -54,6 +56,8 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
+        $this->mockArrayFilePutContent();
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -100,6 +104,8 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
+        $this->mockArrayFilePutContent();
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -150,6 +156,8 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
+        $this->mockArrayFilePutContent();
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -326,6 +334,8 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndPartialReadmeCreation()
     {
+        $this->mockArrayFilePutContent();
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -441,6 +451,8 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
+        $this->mockArrayFilePutContent();
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],

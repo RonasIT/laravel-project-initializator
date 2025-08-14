@@ -69,4 +69,18 @@ trait InitCommandMockTrait
     {
         return file_get_contents(base_path("/resources/md/readme/{$template}"));
     }
+
+    public function mockArrayFilePutContent(): void
+    {
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            [
+                [
+                    'function' => 'file_put_contents',
+                    'arguments' => [base_path('config/auto-doc.php'), $this->getFixture('auto-doc.php')],
+                    'result' => $this->getFixture('auto-doc.php'),
+                ],
+            ]
+        );    
+    }
 }
