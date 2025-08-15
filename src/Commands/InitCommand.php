@@ -46,7 +46,7 @@ class InitCommand extends Command implements Isolatable
 
     protected $description = 'Initialize required project parameters to run DEV environment';
 
-    protected string $emailTeamLead;
+    protected string $codeOwnerEmail;
 
     protected array $resources = [];
 
@@ -77,8 +77,8 @@ class InitCommand extends Command implements Isolatable
 
         $kebabName = Str::kebab($this->appName);
 
-        $this->emailTeamLead = $this->validateInput(
-            method: fn () => $this->ask('Please specify a Code Owner/Team Lead\'s email', Str::before($this->reviewer, '@')),
+        $this->codeOwnerEmail = $this->validateInput(
+            method: fn () => $this->ask('Please specify a Code Owner/Team Lead\'s email'),
             field: 'email of code owner / team lead',
             rules: 'required|email',
         );
@@ -188,8 +188,8 @@ class InitCommand extends Command implements Isolatable
             shell_exec("{$shellCommand} --ansi");
         }
 
-        $this->setAutoDocContactEmail($this->emailTeamLead);
-        
+        $this->setAutoDocContactEmail($this->codeOwnerEmail);
+
         Artisan::call('migrate');
     }
 
@@ -197,7 +197,7 @@ class InitCommand extends Command implements Isolatable
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
         
-        $config->set('info.contact.email',  $email);
+        $config->set('info.contact.email', $email);
 
         $config->write();
     }
@@ -291,10 +291,6 @@ class InitCommand extends Command implements Isolatable
 
         foreach (self::CONTACTS_ITEMS as $key => $title) {
             if ($link = $this->ask("Please enter a {$title}'s email", '')) {
-                if (!empty($link) && $key === $this->emailTeamLead) {
-                    $this->reviewer = $link;
-                }
-
                 $this->setReadmeValue($filePart, "{$key}_link", $link);
             } else {
                 $this->emptyValuesList[] = "{$title}'s email";
@@ -303,7 +299,7 @@ class InitCommand extends Command implements Isolatable
             $this->removeTag($filePart, $key);
         }
         
-        $this->setReadmeValue($filePart, "team_lead_link", $this->emailTeamLead);
+        $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
                 
         $this->updateReadmeFile($filePart);
     }
