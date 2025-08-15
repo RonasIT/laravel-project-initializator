@@ -10,6 +10,10 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
+        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
+
+        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -33,12 +37,14 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -52,6 +58,10 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
+        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
+
+        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -75,6 +85,7 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
@@ -82,6 +93,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "MyApp"')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -96,6 +108,10 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
+        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
+
+        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -119,6 +135,7 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
@@ -127,6 +144,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -144,6 +162,10 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
+        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
+
+        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -240,6 +262,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\\Clerk\\Providers\\ClerkServiceProvider" --ansi'],
@@ -250,6 +273,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
@@ -295,7 +319,6 @@ class InitCommandTest extends TestCase
                 'later'
             )
             ->expectsQuestion('Please enter a Manager\'s email', '')
-            ->expectsQuestion('Please enter a Code Owner/Team Lead\'s email', '')
             ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
             ->expectsConfirmation('Do you need a `Getting Started` part?', 'yes')
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
@@ -310,7 +333,6 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- DataDog link')
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
-            ->expectsOutput('- Code Owner/Team Lead\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
@@ -320,6 +342,10 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndPartialReadmeCreation()
     {
+        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
+
+        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -367,6 +393,7 @@ class InitCommandTest extends TestCase
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
@@ -375,6 +402,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -418,7 +446,6 @@ class InitCommandTest extends TestCase
                 'no'
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
-            ->expectsQuestion('Please enter a Code Owner/Team Lead\'s email', '')
             ->expectsConfirmation('Do you need a `Prerequisites` part?')
             ->expectsConfirmation('Do you need a `Getting Started` part?')
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
@@ -426,7 +453,6 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
-            ->expectsOutput('- Code Owner/Team Lead\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
@@ -435,6 +461,10 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
+        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
+
+        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -507,6 +537,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
@@ -517,6 +548,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -564,7 +596,6 @@ class InitCommandTest extends TestCase
                 'https://mypsite.com/nova-link'
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
-            ->expectsQuestion('Please enter a Code Owner/Team Lead\'s email', 'lead@mail.com')
             ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
             ->expectsConfirmation('Do you need a `Getting Started` part?', 'yes')
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
