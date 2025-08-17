@@ -23,7 +23,9 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use Illuminate\Support\Facades\Storage;
+use PhpParser\PrettyPrinter\Standard;
+
+use function PHPUnit\Framework\directoryExists;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -194,6 +196,7 @@ class InitCommand extends Command implements Isolatable
             $this->saveReadme();
 
             $this->info('README generated successfully!');
+
 
             if ($this->emptyValuesList) {
                 $this->warn('Don`t forget to fill the following empty values:');
@@ -542,13 +545,22 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateAuthClerkConfig();
 
+        //TODO Need to remove after reducing Laravel Empty project
+        $this->publishView(
+            view('initializator::users_remove_password_make_nullable_email_and_name'),
+            viewName: Carbon::now()->format('Y_m_d_His') . '_users_remove_password_make_nullable_email_and_name',
+            path: 'database/migrations',
+        );
+
         $this->publishView(
             view: view('initializator::users_add_clerk_id_field'),
             viewName: Carbon::now()->format('Y_m_d_His') . '_users_add_clerk_id_field',
             path: 'database/migrations',
         );
 
-        Storage::disk('local')->makeDirectory('app/Support/Clerk');
+        if (!directoryExists(app_path('Support/Clerk'))) {
+            app('files')->makeDirectory(app_path('Support/Clerk'), 0777, true);
+        }
 
         $this->publishView(
             view: view('initializator::clerk_user_repository'),
@@ -557,6 +569,7 @@ class InitCommand extends Command implements Isolatable
         );
 
         $this->addClerkRepositoryBind();
+        $this->addClerkIdToUserFillable();
     }
 
     // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
@@ -635,6 +648,59 @@ class InitCommand extends Command implements Isolatable
             }
         );
 
-        $traverser->traverse($ast);
+        $modifiedAst = $traverser->traverse($ast);
+
+        $prettyPrinter = new Standard();
+
+        file_put_contents('app/Providers/AppServiceProvider.php', $prettyPrinter->prettyPrintFile($modifiedAst));
+    }
+
+    protected function addClerkIdToUserFillable()
+    {
+        $userModel = file_get_contents('app/Models/User.php');
+
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+
+        $ast = $parser->parse($userModel);
+
+        $traverser = new NodeTraverser();
+
+        $traverser->addVisitor(
+            new class extends NodeVisitorAbstract {
+                public function enterNode(Node $node)
+                {
+                    if ($node instanceof Node\Stmt\Property
+                        && $node->props[0]->name->toString() === 'fillable'
+                    ) {
+                        $array = $node->props[0]->default;
+
+                        if ($array instanceof Node\Expr\Array_) {
+                            $exists = false;
+                            foreach ($array->items as $item) {
+                                if ($item->value instanceof Node\Scalar\String_
+                                    && $item->value->value === 'clerk_id') {
+                                    $exists = true;
+                                    break;
+                                }
+                            }
+
+                            if (!$exists) {
+                                $array->items[] = new Node\Expr\ArrayItem(
+                                    new Node\Scalar\String_('clerk_id')
+                                );
+                            }
+                        }
+                    }
+
+                    return null;
+                }
+            }
+        );
+
+        $modifiedAst = $traverser->traverse($ast);
+
+        $prettyPrinter = new Standard();
+
+        file_put_contents('app/Models/User.php', $prettyPrinter->prettyPrintFile($modifiedAst));
     }
 }
