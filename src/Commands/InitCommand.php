@@ -569,7 +569,7 @@ class InitCommand extends Command implements Isolatable
         );
 
         $this->addClerkRepositoryBind();
-        $this->addClerkIdToUserFillable();
+        $this->modifyUserModel();
     }
 
     // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
@@ -655,47 +655,55 @@ class InitCommand extends Command implements Isolatable
         file_put_contents('app/Providers/AppServiceProvider.php', $prettyPrinter->prettyPrintFile($modifiedAst));
     }
 
-    protected function addClerkIdToUserFillable()
+    protected function modifyUserModel(): void
     {
         $userModel = file_get_contents('app/Models/User.php');
 
         $parser = (new ParserFactory())->createForNewestSupportedVersion();
-
         $ast = $parser->parse($userModel);
 
         $traverser = new NodeTraverser();
 
-        $traverser->addVisitor(
-            new class extends NodeVisitorAbstract {
-                public function enterNode(Node $node)
-                {
-                    if ($node instanceof Node\Stmt\Property
-                        && $node->props[0]->name->toString() === 'fillable'
-                    ) {
-                        $array = $node->props[0]->default;
+        $traverser->addVisitor(new class extends NodeVisitorAbstract {
+            public function enterNode(Node $node)
+            {
+                if ($node instanceof Node\Stmt\Property) {
+                    $propName = $node->props[0]->name->toString();
+                    $array = $node->props[0]->default;
 
-                        if ($array instanceof Node\Expr\Array_) {
-                            $exists = false;
-                            foreach ($array->items as $item) {
-                                if ($item->value instanceof Node\Scalar\String_
-                                    && $item->value->value === 'clerk_id') {
-                                    $exists = true;
-                                    break;
+                    if ($array instanceof Node\Expr\Array_) {
+                        $newItems = [];
+                        $foundClerkId = false;
+
+                        foreach ($array->items as $item) {
+                            if ($item->value instanceof Node\Scalar\String_) {
+                                $val = $item->value->value;
+
+                                if ($val === 'password') {
+                                    continue;
+                                }
+
+                                if ($propName === 'fillable' && $val === 'clerk_id') {
+                                    $foundClerkId = true;
                                 }
                             }
 
-                            if (!$exists) {
-                                $array->items[] = new Node\Expr\ArrayItem(
-                                    new Node\Scalar\String_('clerk_id')
-                                );
-                            }
+                            $newItems[] = $item;
                         }
-                    }
 
-                    return null;
+                        if ($propName === 'fillable' && !$foundClerkId) {
+                            $newItems[] = new Node\Expr\ArrayItem(
+                                new Node\Scalar\String_('clerk_id')
+                            );
+                        }
+
+                        $array->items = $newItems;
+                    }
                 }
+
+                return null;
             }
-        );
+        });
 
         $modifiedAst = $traverser->traverse($ast);
 
