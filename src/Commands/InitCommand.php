@@ -273,7 +273,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->setReadmeValue($file, 'project_name', $this->appName);
 
-        $this->setReadmeValue($file, 'type', $this->appType->values);
+        $this->setReadmeValue($file, 'type', $this->appType->value);
 
         $this->readmeContent = $file;
     }
