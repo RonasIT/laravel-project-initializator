@@ -197,7 +197,6 @@ class InitCommand extends Command implements Isolatable
 
             $this->info('README generated successfully!');
 
-
             if ($this->emptyValuesList) {
                 $this->warn('Don`t forget to fill the following empty values:');
 
@@ -679,6 +678,7 @@ class InitCommand extends Command implements Isolatable
                             if ($item->value instanceof Node\Scalar\String_) {
                                 $val = $item->value->value;
 
+                                // убираем password
                                 if ($val === 'password') {
                                     continue;
                                 }
@@ -701,6 +701,23 @@ class InitCommand extends Command implements Isolatable
                     }
                 }
 
+                if ($node instanceof Node\Stmt\ClassMethod && $node->name->toString() === 'casts') {
+                    foreach ($node->stmts as $stmt) {
+                        if ($stmt instanceof Node\Stmt\Return_ && $stmt->expr instanceof Node\Expr\Array_) {
+                            $newItems = [];
+
+                            foreach ($stmt->expr->items as $item) {
+                                if ($item->key instanceof Node\Scalar\String_ && $item->key->value === 'password') {
+                                    continue;
+                                }
+                                $newItems[] = $item;
+                            }
+
+                            $stmt->expr->items = $newItems;
+                        }
+                    }
+                }
+
                 return null;
             }
         });
@@ -708,7 +725,6 @@ class InitCommand extends Command implements Isolatable
         $modifiedAst = $traverser->traverse($ast);
 
         $prettyPrinter = new Standard();
-
         file_put_contents('app/Models/User.php', $prettyPrinter->prettyPrintFile($modifiedAst));
     }
 }
