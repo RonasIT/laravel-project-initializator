@@ -10,9 +10,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
-        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
-
-        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockFileGetContent(
             [
@@ -58,9 +56,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
-        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
-
-        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockFileGetContent(
             [
@@ -108,9 +104,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
-        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
-
-        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockFileGetContent(
             [
@@ -162,9 +156,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
-        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
-
-        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockFileGetContent(
             [
@@ -342,9 +334,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndPartialReadmeCreation()
     {
-        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
-
-        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockFileGetContent(
             [
@@ -461,9 +451,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
-        $this->mockUpdateConfigGetContent('config/auto-doc.php', 'auto_doc.php');
-
-        $this->mockUpdateConfigPutContent('config/auto-doc.php', 'auto_doc_after_changes.php');
+        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockFileGetContent(
             [
