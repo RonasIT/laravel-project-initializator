@@ -69,8 +69,6 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appName;
 
-    protected ?string $reviewer = null;
-
     public function handle(): void
     {
         $this->prepareAppName();
@@ -461,8 +459,8 @@ class InitCommand extends Command implements Isolatable
 
     protected function saveRenovateJSON(): void
     {
-        $this->reviewer = $this->validateInput(
-            method: fn () => $this->ask('Please type username of the project reviewer', Str::before($this->reviewer, '@')),
+        $reviewer = $this->validateInput(
+            method: fn () => $this->ask('Please type username of the project reviewer', Str::before($this->codeOwnerEmail, '@')),
             field: 'username of the project reviewer',
             rules: 'required|alpha_dash',
         );
@@ -471,7 +469,7 @@ class InitCommand extends Command implements Isolatable
             '$schema' => 'https://docs.renovatebot.com/renovate-schema.json',
             'extends' => ['config:recommended'],
             'enabledManagers' => ['composer'],
-            'assignees' => [$this->reviewer],
+            'assignees' => [$reviewer],
         ];
 
         file_put_contents('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
