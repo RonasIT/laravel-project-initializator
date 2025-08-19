@@ -69,4 +69,16 @@ trait InitCommandMockTrait
     {
         return file_get_contents(base_path("/resources/md/readme/{$template}"));
     }
+
+    public function mockChangeConfig(string $path, string $initialContent, string $finalContent): void 
+    {
+        $this->mockNativeFunction('\Winter\LaravelConfigWriter', [
+            $this->functionCall('file_exists', [base_path($path)], true),
+            $this->functionCall('file_get_contents', [base_path($path)], $this->getFixture($initialContent)),
+            $this->functionCall('file_put_contents', [
+                base_path($path),
+                $this->getFixture($finalContent),
+            ], 1),
+        ]);  
+    }
 }
