@@ -2,7 +2,6 @@
 
 namespace RonasIT\ProjectInitializator\Tests\Support\Traits;
 
-use com_exception;
 use Illuminate\Support\Arr;
 use RonasIT\Support\Traits\MockTrait;
 
