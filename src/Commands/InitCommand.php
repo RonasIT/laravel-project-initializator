@@ -13,19 +13,14 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
-use PhpParser\ParserFactory;
-use PhpParser\Node;
+use RonasIT\ProjectInitializator\Support\PhpParser;
 use PhpParser\Node\Stmt\Expression;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\Variable;
-use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\ClassConstFetch;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitorAbstract;
-use PhpParser\PrettyPrinter\Standard;
-
-use function PHPUnit\Framework\directoryExists;
+use PhpParser\Node\Name;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -600,131 +595,31 @@ class InitCommand extends Command implements Isolatable
 
     protected function addClerkRepositoryBind(): void
     {
-        $appServiceProvider = file_get_contents('app/Providers/AppServiceProvider.php');
-
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
-
-        $ast = $parser->parse($appServiceProvider);
-
-        $bindStatement = new Expression(
+        $expression = new Expression(
             new MethodCall(
-                new PropertyFetch(
-                    new Variable('this'),
-                    'app'
-                ),
+                new PropertyFetch(new Variable('this'), 'app'),
                 'bind',
                 [
-                    new Arg(
-                        new ClassConstFetch(
-                            new Node\Name('RonasIT\Clerk\Contracts\UserRepositoryContract'),
-                            'class'
-                        )
-                    ),
-                    new Arg(
-                        new ClassConstFetch(
-                            new Node\Name('ClerkUserRepository'),
-                            'class'
-                        )
-                    )
+                    new Arg(new ClassConstFetch(new Name('RonasIT\Clerk\Contracts\UserRepositoryContract'), 'class')),
+                    new Arg(new ClassConstFetch(new Name('ClerkUserRepository'), 'class'))
                 ]
             )
         );
 
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(
-            new class($bindStatement) extends NodeVisitorAbstract {
-                public function __construct(private Node $stmtToAdd)
-                {
-                }
-
-                public function enterNode(Node $node)
-                {
-                    if ($node instanceof Node\Stmt\ClassMethod && $node->name->toString() === 'boot') {
-                        $node->stmts[] = $this->stmtToAdd;
-                    }
-                }
-            }
-        );
-
-        $modifiedAst = $traverser->traverse($ast);
-
-        $prettyPrinter = new Standard();
-
-        file_put_contents('app/Providers/AppServiceProvider.php', $prettyPrinter->prettyPrintFile($modifiedAst));
+        (new PhpParser('app/Providers/AppServiceProvider.php'))
+            ->appendPartToMethod('boot', $expression)
+            ->addImports([
+                'RonasIT\\Clerk\\Contracts\\UserRepositoryContract',
+                'App\\Support\Clerk\\ClerkUserRepository',
+            ]);
     }
 
     protected function modifyUserModel(): void
     {
-        $userModel = file_get_contents('app/Models/User.php');
-
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
-        $ast = $parser->parse($userModel);
-
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(new class extends NodeVisitorAbstract {
-            public function enterNode(Node $node)
-            {
-                if ($node instanceof Node\Stmt\Property) {
-                    $propName = $node->props[0]->name->toString();
-                    $array = $node->props[0]->default;
-
-                    if ($array instanceof Node\Expr\Array_) {
-                        $newItems = [];
-                        $foundClerkId = false;
-
-                        foreach ($array->items as $item) {
-                            if ($item->value instanceof Node\Scalar\String_) {
-                                $val = $item->value->value;
-
-                                // убираем password
-                                if ($val === 'password') {
-                                    continue;
-                                }
-
-                                if ($propName === 'fillable' && $val === 'clerk_id') {
-                                    $foundClerkId = true;
-                                }
-                            }
-
-                            $newItems[] = $item;
-                        }
-
-                        if ($propName === 'fillable' && !$foundClerkId) {
-                            $newItems[] = new Node\Expr\ArrayItem(
-                                new Node\Scalar\String_('clerk_id')
-                            );
-                        }
-
-                        $array->items = $newItems;
-                    }
-                }
-
-                if ($node instanceof Node\Stmt\ClassMethod && $node->name->toString() === 'casts') {
-                    foreach ($node->stmts as $stmt) {
-                        if ($stmt instanceof Node\Stmt\Return_ && $stmt->expr instanceof Node\Expr\Array_) {
-                            $newItems = [];
-
-                            foreach ($stmt->expr->items as $item) {
-                                if ($item->key instanceof Node\Scalar\String_ && $item->key->value === 'password') {
-                                    continue;
-                                }
-                                $newItems[] = $item;
-                            }
-
-                            $stmt->expr->items = $newItems;
-                        }
-                    }
-                }
-
-                return null;
-            }
-        });
-
-        $modifiedAst = $traverser->traverse($ast);
-
-        $prettyPrinter = new Standard();
-        file_put_contents('app/Models/User.php', $prettyPrinter->prettyPrintFile($modifiedAst));
+        (new PhpParser('app/Models/User.php'))
+            ->addValueToArrayProperty(['fillable'], 'clerk_id')
+            ->removeValueFromArrayProperty(['fillable', 'hidden'], 'password')
+            ->removeValueFromMethodReturnArray(['casts'], 'password')
+            ->save();
     }
 }

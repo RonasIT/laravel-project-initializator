@@ -41,6 +41,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
@@ -84,6 +85,7 @@ class InitCommandTest extends TestCase
             ->artisan('init "MyApp"')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
@@ -129,6 +131,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
@@ -211,8 +214,16 @@ class InitCommandTest extends TestCase
                 $this->getFixture('auth-modified.php'),
             ],
             [
+                'database/migrations/2018_11_11_111111_users_remove_password_make_nullable_email_and_name.php',
+                $this->getFixture('users_remove_password_make_nullable_email_and_name.php'),
+            ],
+            [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
+            ],
+            [
+                'app/Support/Clerk/ClerkUserRepository.php',
+                $this->getFixture('user_clerk_repository.php'),
             ],
             [
                 '.env.example',
@@ -252,12 +263,12 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter an admin password', '123456')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
@@ -377,10 +388,10 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Web')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsQuestion('What type of application will your API serve?', 'Web')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
@@ -519,6 +530,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Mobile')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
@@ -526,7 +538,6 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsQuestion('What type of application will your API serve?', 'Mobile')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
