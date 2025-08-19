@@ -600,7 +600,7 @@ class InitCommand extends Command implements Isolatable
                 new PropertyFetch(new Variable('this'), 'app'),
                 'bind',
                 [
-                    new Arg(new ClassConstFetch(new Name('RonasIT\Clerk\Contracts\UserRepositoryContract'), 'class')),
+                    new Arg(new ClassConstFetch(new Name('UserRepositoryContract'), 'class')),
                     new Arg(new ClassConstFetch(new Name('ClerkUserRepository'), 'class'))
                 ]
             )
@@ -611,7 +611,8 @@ class InitCommand extends Command implements Isolatable
             ->addImports([
                 'RonasIT\\Clerk\\Contracts\\UserRepositoryContract',
                 'App\\Support\Clerk\\ClerkUserRepository',
-            ]);
+            ])
+        ->save();
     }
 
     protected function modifyUserModel(): void
