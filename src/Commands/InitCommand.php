@@ -552,7 +552,7 @@ class InitCommand extends Command implements Isolatable
             path: 'database/migrations',
         );
 
-        if (!directoryExists(app_path('Support/Clerk'))) {
+        if (!is_dir(app_path('Support/Clerk'))) {
             app('files')->makeDirectory(app_path('Support/Clerk'), 0777, true);
         }
 
