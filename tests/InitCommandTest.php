@@ -428,18 +428,22 @@ class InitCommandTest extends TestCase
             ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'later'
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Nova? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'later'
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
             ->expectsConfirmation('Do you need a `Prerequisites` part?')
             ->expectsConfirmation('Do you need a `Getting Started` part?')
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
+            ->expectsQuestion('Please enter a Laravel Telescope\'s admin email', 'telescope_mail@mail.com')
+            ->expectsQuestion('Please enter a Laravel Telescope\'s admin password', '654321')
+            ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'nova_mail@mail.com')
+            ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '654321')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
