@@ -80,19 +80,27 @@ class InitCommand extends Command implements Isolatable
             field: 'email of code owner / team lead',
             rules: 'required|email',
         );
-        
+
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$kebabName}.com");
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->createOrUpdateConfigFile($envFile, '=', [
-            'APP_NAME' => $this->appName,
-        ]);
+        $this->createOrUpdateConfigFile(
+            separator: '=',
+            data: [
+                'APP_NAME' => $this->appName,
+            ],
+            env: $envFile
+        );
 
-        $this->createOrUpdateConfigFile('.env.development', '=', [
-            'APP_NAME' => $this->appName,
-            'APP_URL' => $this->appUrl,
-        ]);
+        $this->createOrUpdateConfigFile(
+            separator: '=',
+            data: [
+                'APP_NAME' => $this->appName,
+                'APP_URL' => $this->appUrl,
+            ],
+            envDevelopment: '.env.development'
+        );
 
         $this->info('Project initialized successfully!');
 
@@ -105,9 +113,14 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
-            $this->createOrUpdateConfigFile($envFile, '=', [
-                'AUTH_GUARD' => 'clerk',
-            ]);
+            $this->createOrUpdateConfigFile(
+                separator: '=',
+                data: [
+                    'AUTH_GUARD' => 'clerk',
+                ],
+                envDevelopment: '.env.development',
+                env: $envFile
+            );
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -194,7 +207,7 @@ class InitCommand extends Command implements Isolatable
     protected function setAutoDocContactEmail(string $email): void
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
-        
+
         $config->set('info.contact.email', $email);
 
         $config->write();
@@ -296,9 +309,9 @@ class InitCommand extends Command implements Isolatable
 
             $this->removeTag($filePart, $key);
         }
-        
+
         $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
-                
+
         $this->updateReadmeFile($filePart);
     }
 
@@ -388,29 +401,31 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
     }
 
-    protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
+    protected function createOrUpdateConfigFile(string $separator, array $data, ...$fileNames): void
     {
-        $parsed = file_get_contents($fileName);
+        foreach ($fileNames as $fileName) {
+            $parsed = file_get_contents($fileName);
 
-        $lines = explode("\n", $parsed);
+            $lines = explode("\n", $parsed);
 
-        foreach ($data as $key => $value) {
-            $value = $this->addQuotes($value);
+            foreach ($data as $key => $value) {
+                $value = $this->addQuotes($value);
 
-            foreach ($lines as &$line) {
-                if (Str::contains($line, $key)) {
-                    $line = "{$key}{$separator}{$value}";
+                foreach ($lines as &$line) {
+                    if (Str::contains($line, $key)) {
+                        $line = "{$key}{$separator}{$value}";
 
-                    continue 2;
+                        continue 2;
+                    }
                 }
+
+                $lines[] = "\n{$key}{$separator}{$value}";
             }
 
-            $lines[] = "\n{$key}{$separator}{$value}";
+            $ymlSettings = implode("\n", $lines);
+
+            file_put_contents($fileName, $ymlSettings);
         }
-
-        $ymlSettings = implode("\n", $lines);
-
-        file_put_contents($fileName, $ymlSettings);
     }
 
     protected function loadReadmePart(string $fileName): string

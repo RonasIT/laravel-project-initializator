@@ -172,6 +172,10 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('auth.php'),
             ],
             [
+                'arguments' => ['.env.development'],
+                'result' => $this->getFixture('env.development.yml'),
+            ],
+            [
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example.yml'),
             ],
@@ -227,6 +231,10 @@ class InitCommandTest extends TestCase
             [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
+            ],
+            [
+                '.env.development',
+                $this->getFixture('env.development_clerk_guard_added.yml'),
             ],
             [
                 '.env.example',
