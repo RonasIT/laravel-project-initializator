@@ -333,7 +333,7 @@ class InitCommand extends Command implements Isolatable
     {
         $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
 
-        if ($this->adminCredentials) {
+        if (!empty($this->adminCredentials)) {
             $this->setReadmeValue($filePart, 'admin_email', $this->adminCredentials['email']);
             $this->setReadmeValue($filePart, 'admin_password', $this->adminCredentials['password']);
         }
