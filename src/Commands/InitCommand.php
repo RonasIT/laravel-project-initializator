@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
+use Winter\LaravelConfigWriter\ArrayFile;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -137,7 +138,10 @@ class InitCommand extends Command implements Isolatable
 
             $this->createOrUpdateConfigFile($envFile, '=', $data);
             $this->createOrUpdateConfigFile('.env.development', '=', $data);
-            $this->createOrUpdateConfigFile('.env.example', '=', $data);
+
+            if ($envFile !== '.env.example') {
+                $this->createOrUpdateConfigFile('.env.example', '=', $data);
+            }
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -418,6 +422,8 @@ class InitCommand extends Command implements Isolatable
 
         $lines = explode("\n", $parsed);
 
+        $previousKey = null;
+
         foreach ($data as $key => $value) {
             $value = $this->addQuotes($value);
 
@@ -429,7 +435,13 @@ class InitCommand extends Command implements Isolatable
                 }
             }
 
-            $lines[] = "\n{$key}{$separator}{$value}";
+            if (Str::before($key, '_') === Str::before($previousKey, '_')) {
+                $lines[] = "{$key}{$separator}{$value}";
+            } else {
+                $lines[] = "\n{$key}{$separator}{$value}";
+            }
+
+            $previousKey = $key;
         }
 
         $ymlSettings = implode("\n", $lines);
