@@ -360,7 +360,7 @@ class InitCommand extends Command implements Isolatable
                 continue;
             }
 
-            if ($this->confirm("Is {$title}'s admin the same as default one?", true)) {
+            if (!empty($this->adminCredentials) && $this->confirm("Is {$title}'s admin the same as default one?", true)) {
                 $email = $this->adminCredentials['email'];
                 $password = $this->adminCredentials['password'];
             } else {
