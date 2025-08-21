@@ -105,6 +105,10 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
+            $this->createOrUpdateConfigFile('.env.development', '=', [
+                'AUTH_GUARD' => 'clerk',
+            ]);
+
             $this->createOrUpdateConfigFile($envFile, '=', [
                 'AUTH_GUARD' => 'clerk',
             ]);
