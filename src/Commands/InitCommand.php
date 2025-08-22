@@ -105,6 +105,10 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
+            $this->createOrUpdateConfigFile('.env.development', '=', [
+                'AUTH_GUARD' => 'clerk',
+            ]);
+
             $this->createOrUpdateConfigFile($envFile, '=', [
                 'AUTH_GUARD' => 'clerk',
             ]);
@@ -333,7 +337,7 @@ class InitCommand extends Command implements Isolatable
     {
         $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
 
-        if ($this->adminCredentials) {
+        if (!empty($this->adminCredentials)) {
             $this->setReadmeValue($filePart, 'admin_email', $this->adminCredentials['email']);
             $this->setReadmeValue($filePart, 'admin_password', $this->adminCredentials['password']);
         }
@@ -347,7 +351,7 @@ class InitCommand extends Command implements Isolatable
                 continue;
             }
 
-            if ($this->confirm("Is {$title}'s admin the same as default one?", true)) {
+            if (!empty($this->adminCredentials) && $this->confirm("Is {$title}'s admin the same as default one?", true)) {
                 $email = $this->adminCredentials['email'];
                 $password = $this->adminCredentials['password'];
             } else {
