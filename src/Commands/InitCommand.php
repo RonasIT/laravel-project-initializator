@@ -13,14 +13,6 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
-use RonasIT\ProjectInitializator\Support\PhpParser;
-use PhpParser\Node\Stmt\Expression;
-use PhpParser\Node\Expr\MethodCall;
-use PhpParser\Node\Expr\PropertyFetch;
-use PhpParser\Node\Expr\Variable;
-use PhpParser\Node\Arg;
-use PhpParser\Node\Expr\ClassConstFetch;
-use PhpParser\Node\Name;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -36,11 +28,8 @@ class InitCommand extends Command implements Isolatable
         'nova' => 'Laravel Nova',
     ];
 
-    public const string CONTACTS_TEAM_LEAD = 'team_lead';
-
     public const array CONTACTS_ITEMS = [
         'manager' => 'Manager',
-        self::CONTACTS_TEAM_LEAD => 'Code Owner/Team Lead',
     ];
 
     public const array CREDENTIALS_ITEMS = [
@@ -57,6 +46,8 @@ class InitCommand extends Command implements Isolatable
 
     protected $description = 'Initialize required project parameters to run DEV environment';
 
+    protected string $codeOwnerEmail;
+
     protected array $resources = [];
 
     protected array $adminCredentials = [];
@@ -72,14 +63,13 @@ class InitCommand extends Command implements Isolatable
     protected array $shellCommands = [
         'composer require ronasit/laravel-helpers',
         'composer require ronasit/laravel-swagger',
+        'php artisan vendor:publish --provider="RonasIT\\AutoDoc\\AutoDocServiceProvider"',
         'composer require --dev ronasit/laravel-entity-generator',
     ];
 
-    protected string $appName;
-
-    protected ?string $reviewer = null;
-
     protected AppTypeEnum $appType;
+
+    protected string $appName;
 
     public function handle(): void
     {
@@ -87,26 +77,24 @@ class InitCommand extends Command implements Isolatable
 
         $kebabName = Str::kebab($this->appName);
 
+        $this->codeOwnerEmail = $this->validateInput(
+            method: fn () => $this->ask('Please specify a Code Owner/Team Lead\'s email'),
+            field: 'email of code owner / team lead',
+            rules: 'required|email',
+        );
+
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$kebabName}.com");
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->createOrUpdateConfigFile(
-            separator: '=',
-            data: [
-                'APP_NAME' => $this->appName,
-            ],
-            env: $envFile
-        );
+        $this->createOrUpdateConfigFile($envFile, '=', [
+            'APP_NAME' => $this->appName,
+        ]);
 
-        $this->createOrUpdateConfigFile(
-            separator: '=',
-            data: [
-                'APP_NAME' => $this->appName,
-                'APP_URL' => $this->appUrl,
-            ],
-            envDevelopment: '.env.development'
-        );
+        $this->createOrUpdateConfigFile('.env.development', '=', [
+            'APP_NAME' => $this->appName,
+            'APP_URL' => $this->appUrl,
+        ]);
 
         $this->info('Project initialized successfully!');
 
@@ -127,32 +115,13 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
-            $this->createOrUpdateConfigFile(
-                separator: '=',
-                data: [
-                    'AUTH_GUARD' => 'clerk',
-                ],
-                envDevelopment: '.env.development',
-                env: $envFile
-            );
+            $this->createOrUpdateConfigFile('.env.development', '=', [
+                'AUTH_GUARD' => 'clerk',
+            ]);
 
-            $data = [
-                'CLERK_ALLOWED_ISSUER' => '',
-                'CLERK_SECRET_KEY' => '',
-                'CLERK_SIGNER_KEY_PATH' => '',
-            ];
-
-            if ($this->appType !== AppTypeEnum::Mobile) {
-                $data['CLERK_ALLOWED_ORIGINS'] = '';
-            }
-
-            $this->createOrUpdateConfigFile(
-                separator: '=',
-                data: $data,
-                envDevelopment: '.env.development',
-                env: $envFile,
-                envExample: '.env.example',
-            );
+            $this->createOrUpdateConfigFile($envFile, '=', [
+                'AUTH_GUARD' => 'clerk',
+            ]);
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -231,7 +200,18 @@ class InitCommand extends Command implements Isolatable
             shell_exec("{$shellCommand} --ansi");
         }
 
+        $this->setAutoDocContactEmail($this->codeOwnerEmail);
+
         Artisan::call('migrate');
+    }
+
+    protected function setAutoDocContactEmail(string $email): void
+    {
+        $config = ArrayFile::open(base_path('config/auto-doc.php'));
+
+        $config->set('info.contact.email', $email);
+
+        $config->write();
     }
 
     protected function createAdminUser(string $kebabName): void
@@ -319,10 +299,6 @@ class InitCommand extends Command implements Isolatable
 
         foreach (self::CONTACTS_ITEMS as $key => $title) {
             if ($link = $this->ask("Please enter a {$title}'s email", '')) {
-                if (!empty($link) && $key === self::CONTACTS_TEAM_LEAD) {
-                    $this->reviewer = $link;
-                }
-
                 $this->setReadmeValue($filePart, "{$key}_link", $link);
             } else {
                 $this->emptyValuesList[] = "{$title}'s email";
@@ -330,6 +306,8 @@ class InitCommand extends Command implements Isolatable
 
             $this->removeTag($filePart, $key);
         }
+
+        $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
 
         $this->updateReadmeFile($filePart);
     }
@@ -379,7 +357,7 @@ class InitCommand extends Command implements Isolatable
                 continue;
             }
 
-            if ($this->confirm("Is {$title}'s admin the same as default one?", true)) {
+            if (!empty($this->adminCredentials) && $this->confirm("Is {$title}'s admin the same as default one?", true)) {
                 $email = $this->adminCredentials['email'];
                 $password = $this->adminCredentials['password'];
             } else {
@@ -418,31 +396,29 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("{$path}/{$viewName}", "<?php\n\n{$data}");
     }
 
-    protected function createOrUpdateConfigFile(string $separator, array $data, ...$fileNames): void
+    protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
     {
-        foreach ($fileNames as $fileName) {
-            $parsed = file_get_contents($fileName);
+        $parsed = file_get_contents($fileName);
 
-            $lines = explode("\n", $parsed);
+        $lines = explode("\n", $parsed);
 
-            foreach ($data as $key => $value) {
-                $value = $this->addQuotes($value);
+        foreach ($data as $key => $value) {
+            $value = $this->addQuotes($value);
 
-                foreach ($lines as &$line) {
-                    if (Str::contains($line, $key)) {
-                        $line = "{$key}{$separator}{$value}";
+            foreach ($lines as &$line) {
+                if (Str::contains($line, $key)) {
+                    $line = "{$key}{$separator}{$value}";
 
-                        continue 2;
-                    }
+                    continue 2;
                 }
-
-                $lines[] = "\n{$key}{$separator}{$value}";
             }
 
-            $ymlSettings = implode("\n", $lines);
-
-            file_put_contents($fileName, $ymlSettings);
+            $lines[] = "\n{$key}{$separator}{$value}";
         }
+
+        $ymlSettings = implode("\n", $lines);
+
+        file_put_contents($fileName, $ymlSettings);
     }
 
     protected function loadReadmePart(string $fileName): string
@@ -491,8 +467,8 @@ class InitCommand extends Command implements Isolatable
 
     protected function saveRenovateJSON(): void
     {
-        $this->reviewer = $this->validateInput(
-            method: fn () => $this->ask('Please type username of the project reviewer', Str::before($this->reviewer, '@')),
+        $reviewer = $this->validateInput(
+            method: fn () => $this->ask('Please type username of the project reviewer', Str::before($this->codeOwnerEmail, '@')),
             field: 'username of the project reviewer',
             rules: 'required|alpha_dash',
         );
@@ -501,7 +477,7 @@ class InitCommand extends Command implements Isolatable
             '$schema' => 'https://docs.renovatebot.com/renovate-schema.json',
             'extends' => ['config:recommended'],
             'enabledManagers' => ['composer'],
-            'assignees' => [$this->reviewer],
+            'assignees' => [$reviewer],
         ];
 
         file_put_contents('renovate.json', json_encode($data, JSON_PRETTY_PRINT));

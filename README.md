@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/RonasIT/laravel-project-initializator/badge.svg?branch=main)](https://coveralls.io/github/RonasIT/laravel-project-initializator?branch=main)
+
 # Laravel Project initializator
 
 ## Installation
