@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
+use Winter\LaravelConfigWriter\ArrayFile;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -67,9 +68,9 @@ class InitCommand extends Command implements Isolatable
         'composer require --dev ronasit/laravel-entity-generator',
     ];
 
-    protected AppTypeEnum $appType;
-
     protected string $appName;
+
+    protected AppTypeEnum $appType;
 
     public function handle(): void
     {
@@ -122,6 +123,23 @@ class InitCommand extends Command implements Isolatable
             $this->createOrUpdateConfigFile($envFile, '=', [
                 'AUTH_GUARD' => 'clerk',
             ]);
+
+            $data = [
+                'CLERK_ALLOWED_ISSUER' => '',
+                'CLERK_SECRET_KEY' => '',
+                'CLERK_SIGNER_KEY_PATH' => '',
+            ];
+
+            if ($this->appType !== AppTypeEnum::Mobile) {
+                $data['CLERK_ALLOWED_ORIGINS'] = '';
+            }
+
+            $this->createOrUpdateConfigFile($envFile, '=', $data);
+            $this->createOrUpdateConfigFile('.env.development', '=', $data);
+
+            if ($envFile !== '.env.example') {
+                $this->createOrUpdateConfigFile('.env.example', '=', $data);
+            }
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -224,19 +242,17 @@ class InitCommand extends Command implements Isolatable
         ];
 
         if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->publishView(
+            $this->publishMigration(
                 view: view('initializator::admins_create_table')->with($this->adminCredentials),
-                viewName: Carbon::now()->format('Y_m_d_His') . '_admins_create_table',
-                path: 'database/migrations',
+                migrationName: 'admins_create_table',
             );
         } else {
             $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
             $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
 
-            $this->publishView(
+            $this->publishMigration(
                 view: view('initializator::add_default_user')->with($this->adminCredentials),
-                viewName: Carbon::now()->format('Y_m_d_His') . '_add_default_user',
-                path: 'database/migrations',
+                migrationName: 'add_default_user'
             );
         }
     }
@@ -387,13 +403,15 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
-    protected function publishView(View $view, string $viewName, string $path): void
+    protected function publishMigration(View $view, string $migrationName): void
     {
-        $viewName = "{$viewName}.php";
+        $time = Carbon::now()->format('Y_m_d_His');
+
+        $migrationName = "{$time}_{$migrationName}.php";
 
         $data = $view->render();
 
-        file_put_contents("{$path}/{$viewName}", "<?php\n\n{$data}");
+        file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
     }
 
     protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
@@ -401,6 +419,8 @@ class InitCommand extends Command implements Isolatable
         $parsed = file_get_contents($fileName);
 
         $lines = explode("\n", $parsed);
+
+        $previousKey = null;
 
         foreach ($data as $key => $value) {
             $value = $this->addQuotes($value);
@@ -413,7 +433,15 @@ class InitCommand extends Command implements Isolatable
                 }
             }
 
-            $lines[] = "\n{$key}{$separator}{$value}";
+            $item = "{$key}{$separator}{$value}";
+
+            if (Str::before($key, '_') === Str::before($previousKey, '_')) {
+                $lines[] = $item;
+            } else {
+                $lines[] = "\n{$item}";
+            }
+
+            $previousKey = $key;
         }
 
         $ymlSettings = implode("\n", $lines);
@@ -515,31 +543,10 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateAuthClerkConfig();
 
-        //TODO Need to remove after reducing Laravel Empty project
-        $this->publishView(
-            view('initializator::users_remove_password_make_nullable_email_and_name'),
-            viewName: Carbon::now()->format('Y_m_d_His') . '_users_remove_password_make_nullable_email_and_name',
-            path: 'database/migrations',
-        );
-
-        $this->publishView(
+        $this->publishMigration(
             view: view('initializator::users_add_clerk_id_field'),
-            viewName: Carbon::now()->format('Y_m_d_His') . '_users_add_clerk_id_field',
-            path: 'database/migrations',
+            migrationName: 'users_add_clerk_id_field',
         );
-
-        if (!is_dir(app_path('Support/Clerk'))) {
-            app('files')->makeDirectory(app_path('Support/Clerk'), 0777, true);
-        }
-
-        $this->publishView(
-            view: view('initializator::clerk_user_repository'),
-            viewName: 'ClerkUserRepository',
-            path: 'app/Support/Clerk',
-        );
-
-        $this->addClerkRepositoryBind();
-        $this->modifyUserModel();
     }
 
     // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
@@ -567,36 +574,5 @@ class InitCommand extends Command implements Isolatable
 
             return $matches[1] . $existing . $clerkGuard . $newLine . "    ],";
         };
-    }
-
-    protected function addClerkRepositoryBind(): void
-    {
-        $expression = new Expression(
-            new MethodCall(
-                new PropertyFetch(new Variable('this'), 'app'),
-                'bind',
-                [
-                    new Arg(new ClassConstFetch(new Name('UserRepositoryContract'), 'class')),
-                    new Arg(new ClassConstFetch(new Name('ClerkUserRepository'), 'class'))
-                ]
-            )
-        );
-
-        (new PhpParser('app/Providers/AppServiceProvider.php'))
-            ->appendPartToMethod('boot', $expression)
-            ->addImports([
-                'RonasIT\\Clerk\\Contracts\\UserRepositoryContract',
-                'App\\Support\Clerk\\ClerkUserRepository',
-            ])
-        ->save();
-    }
-
-    protected function modifyUserModel(): void
-    {
-        (new PhpParser('app/Models/User.php'))
-            ->addValueToArrayProperty(['fillable'], 'clerk_id')
-            ->removeValueFromArrayProperty(['fillable', 'hidden'], 'password')
-            ->removeValueFromMethodReturnArray(['casts'], 'password')
-            ->save();
     }
 }
