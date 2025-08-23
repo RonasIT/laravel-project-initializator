@@ -69,7 +69,7 @@ class InitCommand extends Command implements Isolatable
     ];
 
     protected string $appName;
-    
+
     protected AppTypeEnum $appType;
 
     public function handle(): void
@@ -433,10 +433,12 @@ class InitCommand extends Command implements Isolatable
                 }
             }
 
+            $item = "{$key}{$separator}{$value}";
+
             if (Str::before($key, '_') === Str::before($previousKey, '_')) {
-                $lines[] = "{$key}{$separator}{$value}";
+                $lines[] = $item;
             } else {
-                $lines[] = "\n{$key}{$separator}{$value}";
+                $lines[] = "\n{$item}";
             }
 
             $previousKey = $key;
