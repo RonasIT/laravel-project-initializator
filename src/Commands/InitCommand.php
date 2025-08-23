@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use Winter\LaravelConfigWriter\ArrayFile;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
+use Winter\LaravelConfigWriter\ArrayFile;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -123,6 +123,23 @@ class InitCommand extends Command implements Isolatable
             $this->createOrUpdateConfigFile($envFile, '=', [
                 'AUTH_GUARD' => 'clerk',
             ]);
+
+            $data = [
+                'CLERK_ALLOWED_ISSUER' => '',
+                'CLERK_SECRET_KEY' => '',
+                'CLERK_SIGNER_KEY_PATH' => '',
+            ];
+
+            if ($this->appType !== AppTypeEnum::Mobile) {
+                $data['CLERK_ALLOWED_ORIGINS'] = '';
+            }
+
+            $this->createOrUpdateConfigFile($envFile, '=', $data);
+            $this->createOrUpdateConfigFile('.env.development', '=', $data);
+
+            if ($envFile !== '.env.example') {
+                $this->createOrUpdateConfigFile('.env.example', '=', $data);
+            }
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -209,7 +226,7 @@ class InitCommand extends Command implements Isolatable
     protected function setAutoDocContactEmail(string $email): void
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
-
+        
         $config->set('info.contact.email', $email);
 
         $config->write();
@@ -248,7 +265,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->setReadmeValue($file, 'project_name', $this->appName);
 
-        $this->setReadmeValue($file, 'type', $this->appType);
+        $this->setReadmeValue($file, 'type', $this->appType->value);
 
         $this->readmeContent = $file;
     }
@@ -403,6 +420,8 @@ class InitCommand extends Command implements Isolatable
 
         $lines = explode("\n", $parsed);
 
+        $previousKey = null;
+
         foreach ($data as $key => $value) {
             $value = $this->addQuotes($value);
 
@@ -414,7 +433,15 @@ class InitCommand extends Command implements Isolatable
                 }
             }
 
-            $lines[] = "\n{$key}{$separator}{$value}";
+            $item = "{$key}{$separator}{$value}";
+
+            if (Str::before($key, '_') === Str::before($previousKey, '_')) {
+                $lines[] = $item;
+            } else {
+                $lines[] = "\n{$item}";
+            }
+
+            $previousKey = $key;
         }
 
         $ymlSettings = implode("\n", $lines);

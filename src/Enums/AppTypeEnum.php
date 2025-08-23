@@ -8,7 +8,7 @@ enum AppTypeEnum: string
 {
     use EnumTrait;
 
-    case Mobile = 'mobile';
-    case Web = 'web';
-    case Multiplatform = 'multiplatform';
+    case Mobile = 'Mobile';
+    case Web = 'Web';
+    case Multiplatform = 'Multiplatform';
 }
