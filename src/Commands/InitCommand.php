@@ -242,19 +242,17 @@ class InitCommand extends Command implements Isolatable
         ];
 
         if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->publishView(
+            $this->publishMigration(
                 view: view('initializator::admins_create_table')->with($this->adminCredentials),
-                viewName: Carbon::now()->format('Y_m_d_His') . '_admins_create_table',
-                path: 'database/migration',
+                migrationName: 'admins_create_table',
             );
         } else {
             $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
             $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
 
-            $this->publishView(
+            $this->publishMigration(
                 view: view('initializator::add_default_user')->with($this->adminCredentials),
-                viewName: Carbon::now()->format('Y_m_d_His') . '_add_default_user',
-                path: 'database/migration',
+                migrationName: 'add_default_user',
             );
         }
     }
@@ -414,6 +412,15 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("{$path}/{$viewName}", "<?php\n\n{$data}");
     }
 
+    protected function publishMigration(View $view, string $migrationName): void
+    {
+        $time = Carbon::now()->format('Y_m_d_His');
+
+        $migrationName = "{$time}_{$migrationName}";
+
+        $this->publishView($view, $migrationName, "database/migrations");
+    }
+
     protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
     {
         $parsed = file_get_contents($fileName);
@@ -543,10 +550,9 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateAuthClerkConfig();
 
-        $this->publishView(
+        $this->publishMigration(
             view: view('initializator::users_add_clerk_id_field'),
-            viewName: Carbon::now()->format('Y_m_d_His') . '_users_add_clerk_id_field',
-            path: 'database/migrations',
+            migrationName: 'users_add_clerk_id_field',
         );
 
         $this->publishView(
@@ -554,8 +560,6 @@ class InitCommand extends Command implements Isolatable
             viewName: 'ClerkUserRepository',
             path: 'app/Support/Clerk',
         );
-
-        $this->addClerkRepositoryBind();
     }
 
     // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
