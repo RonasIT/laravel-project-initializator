@@ -69,9 +69,7 @@ class InitCommand extends Command implements Isolatable
     ];
 
     protected string $appName;
-
-    protected ?string $reviewer = null;
-
+    
     protected AppTypeEnum $appType;
 
     public function handle(): void
