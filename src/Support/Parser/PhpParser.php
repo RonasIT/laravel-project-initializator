@@ -17,7 +17,9 @@ use PhpParser\Node\Stmt\Use_;
 class PhpParser
 {
     private array $ast;
+
     private NodeTraverser $traverser;
+
     private Standard $printer;
 
     public function __construct(protected string $filePath)
@@ -57,7 +59,7 @@ class PhpParser
     public function save(): void
     {
         $modifiedAst = $this->traverser->traverse($this->ast);
-        
+
         file_put_contents($this->filePath, $this->printer->prettyPrintFile($modifiedAst));
     }
 
