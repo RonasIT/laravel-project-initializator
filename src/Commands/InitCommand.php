@@ -14,6 +14,7 @@ use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use Winter\LaravelConfigWriter\ArrayFile;
+use RonasIT\ProjectInitializator\Support\Parser\PhpParser;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -226,7 +227,7 @@ class InitCommand extends Command implements Isolatable
     protected function setAutoDocContactEmail(string $email): void
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
-        
+
         $config->set('info.contact.email', $email);
 
         $config->write();
@@ -560,6 +561,8 @@ class InitCommand extends Command implements Isolatable
             viewName: 'ClerkUserRepository',
             path: 'app/Support/Clerk',
         );
+
+        $this->modifyUserModel();
     }
 
     // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
@@ -587,5 +590,14 @@ class InitCommand extends Command implements Isolatable
 
             return $matches[1] . $existing . $clerkGuard . $newLine . "    ],";
         };
+    }
+
+    protected function modifyUserModel(): void
+    {
+        (new PhpParser('app/Models/User.php'))
+            ->addValueToArrayProperty(['fillable'], 'clerk_id')
+            ->removeValueFromArrayProperty(['fillable', 'hidden'], 'password')
+            ->removeValueFromMethodReturnArray(['casts'], 'password')
+            ->save();
     }
 }
