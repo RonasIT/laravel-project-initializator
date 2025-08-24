@@ -23,9 +23,11 @@ class PhpParser
     public function __construct(protected string $filePath)
     {
         $parser = (new ParserFactory())->createForNewestSupportedVersion();
+
         $this->ast = $parser->parse(file_get_contents($filePath));
 
         $this->traverser = new NodeTraverser();
+
         $this->printer = new Standard();
 
         $this->addEmptySpacesVisitor();
@@ -55,6 +57,7 @@ class PhpParser
     public function save(): void
     {
         $modifiedAst = $this->traverser->traverse($this->ast);
+        
         file_put_contents($this->filePath, $this->printer->prettyPrintFile($modifiedAst));
     }
 
