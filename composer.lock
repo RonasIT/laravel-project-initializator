@@ -4,8 +4,71 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cfdb9203d06ec69f49f7d9a6b51e690c",
+    "content-hash": "da3ad555312f45674e75911f86fe202f",
     "packages": [
+        {
+            "name": "ajthinking/archetype",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ajthinking/archetype.git",
+                "reference": "d2c5cd0f072ebde50dfa8a47a5a672023f561bdb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ajthinking/archetype/zipball/d2c5cd0f072ebde50dfa8a47a5a672023f561bdb",
+                "reference": "d2c5cd0f072ebde50dfa8a47a5a672023f561bdb",
+                "shasum": ""
+            },
+            "require": {
+                "nikic/php-parser": "^5.0"
+            },
+            "require-dev": {
+                "laravel/laravel": "^6.0 || ^7.0 || ^8.0 || ^9.0",
+                "orchestra/testbench": "^4.0 || ^5.0 || ^6.0",
+                "pestphp/pest": "^1.21",
+                "phpstan/phpstan": "^1.6",
+                "phpunit/phpunit": "^8.0 || ^9.5"
+            },
+            "type": "package",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Archetype\\ServiceProvider"
+                    ],
+                    "dont-discover": []
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Archetype\\": "src/",
+                    "Archetype\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anders Jürisoo",
+                    "email": "jurisoo@hotmail.com"
+                }
+            ],
+            "description": "Programmatically edit PHP and Laravel files.",
+            "keywords": [
+                "abstract syntax tree",
+                "ast",
+                "laravel",
+                "php",
+                "php-parser"
+            ],
+            "support": {
+                "issues": "https://github.com/ajthinking/archetype/issues",
+                "source": "https://github.com/ajthinking/archetype/tree/v2.0.0"
+            },
+            "time": "2024-05-11T08:05:58+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.12.3",
@@ -11008,13 +11071,13 @@
     ],
     "aliases": [],
     "minimum-stability": "alpha",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.3",
         "ext-json": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

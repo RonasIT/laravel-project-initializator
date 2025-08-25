@@ -14,7 +14,7 @@ use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use Winter\LaravelConfigWriter\ArrayFile;
-use RonasIT\ProjectInitializator\Support\Parser\PhpParser;
+use Archetype\Factories\LaravelFileFactory;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -594,10 +594,17 @@ class InitCommand extends Command implements Isolatable
 
     protected function modifyUserModel(): void
     {
-        (new PhpParser('app/Models/User.php'))
-            ->addValueToArrayProperty(['fillable'], 'clerk_id')
-            ->removeValueFromArrayProperty(['fillable', 'hidden'], 'password')
-            ->removeValueFromMethodReturnArray(['casts'], 'password')
-            ->save();
+        $parser = LaravelFileFactory::make()->class('App\\Models\\User')
+            ->add()->fillable('clerk_id')
+            ->remove()->fillable('password')
+            ->remove()->hidden('password')
+            ->remove()->casts('password')
+            ->save()
+            ->render();
+//        (new PhpParser('app/Models/User.php'))
+//            ->addValueToArrayProperty(['fillable'], 'clerk_id')
+//            ->removeValueFromArrayProperty(['fillable', 'hidden'], 'password')
+//            ->removeValueFromMethodReturnArray(['casts'], 'password')
+//            ->save();
     }
 }
