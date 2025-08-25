@@ -10,22 +10,27 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
 
-        $this->mockFileGetContent(
+        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+
+        $this->mockFileUpdate(
+            '\Winter\LaravelConfigWriter', 
             [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
+                'path' => '.env.example',
+                'source' => 'env.example.yml',
+                'result' => 'env.example_app_name_pascal_case.yml',
             ],
             [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
+                'path' => '.env.development',
+                'source' => 'env.development.yml',
+                'result' => 'env.development_app_name_pascal_case.yml',
             ],
-        );
-
-        $this->mockFilePutContent(
-            'env.example_app_name_pascal_case.yml',
-            'env.development_app_name_pascal_case.yml',
+            [
+                'path' => base_path('config/auto-doc.php'),
+                'source' => 'auto_doc.php',
+                'result' => 'auto_doc_after_changes.php',
+            ],
         );
 
         $this->mockClassExists([
@@ -56,26 +61,37 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
 
-        $this->mockFileGetContent(
+        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+
+        $this->mockFileUpdate(
+            '\Winter\LaravelConfigWriter', 
             [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
+                'path' => '.env.example',
+                'source' => 'env.example.yml',
+                'result' => 'env.example_app_name_pascal_case.yml',
             ],
             [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
+                'path' => '.env.development',
+                'source' => 'env.development.yml',
+                'result' => 'env.development_app_name_pascal_case.yml',
+            ],
+            [
+                'path' => base_path('config/auto-doc.php'),
+                'source' => 'auto_doc.php',
+                'result' => 'auto_doc_after_changes.php',
             ],
         );
 
         $this->mockFilePutContent(
-            'env.example_app_name_pascal_case.yml',
-            'env.development_app_name_pascal_case.yml',
+            'RonasIT\ProjectInitializator\Commands', 
             [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
+                [
+                    'path' => 'renovate.json',
+                    'result' => 'renovate.json',
+                ],
+            ]
         );
 
         $this->mockShellExec(
@@ -104,26 +120,37 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
 
-        $this->mockFileGetContent(
+        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+
+        $this->mockFileUpdate(
+            '\Winter\LaravelConfigWriter', 
             [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
+                'path' => '.env.example',
+                'source' => 'env.example.yml',
+                'result' => 'env.example_app_name_pascal_case.yml',
             ],
             [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
+                'path' => '.env.development',
+                'source' => 'env.development.yml',
+                'result' => 'env.development_app_name_pascal_case.yml',
+            ],
+            [
+                'path' => base_path('config/auto-doc.php'),
+                'source' => 'auto_doc.php',
+                'result' => 'auto_doc_after_changes.php',
             ],
         );
 
         $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
+            'RonasIT\ProjectInitializator\Commands', 
             [
-                'database/migrations/2018_11_11_111111_add_default_user.php',
-                $this->getFixture('migration.php'),
-            ],
+                [
+                    'path' => 'database/migrations/2018_11_11_111111_add_default_user.php',
+                    'result' => 'migration.php',
+                ],
+            ]
         );
 
         $this->mockShellExec(
@@ -137,7 +164,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
@@ -156,16 +183,21 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
 
-        $this->mockFileGetContent(
+        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+
+        $this->mockFileUpdate(
+            '\Winter\LaravelConfigWriter', 
             [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
+                'path' => '.env.example',
+                'source' => 'env.example.yml',
+                'result' => 'env.example_app_name_pascal_case.yml',
             ],
             [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
+                'path' => '.env.development',
+                'source' => 'env.development.yml',
+                'result' => 'env.development_app_name_pascal_case.yml',
             ],
             [
                 'arguments' => ['.env.development'],
@@ -264,7 +296,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
@@ -391,7 +423,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
@@ -535,7 +567,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
@@ -659,7 +691,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')

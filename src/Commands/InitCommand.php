@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use Winter\LaravelConfigWriter\ArrayFile;
+use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -85,13 +86,24 @@ class InitCommand extends Command implements Isolatable
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->createOrUpdateConfigFile($envFile, '=', [
+        $this->createOrUpdateConfigFile($envFile, [
             'APP_NAME' => $this->appName,
+            'DB_CONNECTION' => 'pgsql',
+            'DB_HOST' => 'pgsql',
+            'DB_PORT' => '5432',
+            'DB_DATABASE' => 'postgres',
+            'DB_USERNAME' => 'postgres',
+            'DB_PASSWORD' => '',
         ]);
 
-        $this->createOrUpdateConfigFile('.env.development', '=', [
+        $this->createOrUpdateConfigFile('.env.development', [
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
+            'APP_MAINTENANCE_DRIVER' => 'cache',
+            'CACHE_STORE' => 'redis',
+            'QUEUE_CONNECTION' => 'redis',
+            'SESSION_DRIVER' => 'redis',
+            'DB_CONNECTION' => 'pgsql',
         ]);
 
         $this->info('Project initialized successfully!');
@@ -105,11 +117,11 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
-            $this->createOrUpdateConfigFile('.env.development', '=', [
+            $this->createOrUpdateConfigFile('.env.development', [
                 'AUTH_GUARD' => 'clerk',
             ]);
 
-            $this->createOrUpdateConfigFile($envFile, '=', [
+            $this->createOrUpdateConfigFile($envFile, [
                 'AUTH_GUARD' => 'clerk',
             ]);
         }
@@ -392,29 +404,13 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
     }
 
-    protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
+    protected function createOrUpdateConfigFile(string $fileName, array $data): void
     {
-        $parsed = file_get_contents($fileName);
+        $env = EnvFile::open($fileName);
 
-        $lines = explode("\n", $parsed);
+        $env->set($data);
 
-        foreach ($data as $key => $value) {
-            $value = $this->addQuotes($value);
-
-            foreach ($lines as &$line) {
-                if (Str::contains($line, $key)) {
-                    $line = "{$key}{$separator}{$value}";
-
-                    continue 2;
-                }
-            }
-
-            $lines[] = "\n{$key}{$separator}{$value}";
-        }
-
-        $ymlSettings = implode("\n", $lines);
-
-        file_put_contents($fileName, $ymlSettings);
+        $env->write();
     }
 
     protected function loadReadmePart(string $fileName): string
