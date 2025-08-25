@@ -168,10 +168,6 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => ['config/auth.php'],
-                'result' => $this->getFixture('auth.php'),
-            ],
-            [
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development.yml'),
             ],
@@ -225,10 +221,6 @@ class InitCommandTest extends TestCase
             'env.example.yml',
             'env.development.yml',
             [
-                'config/auth.php',
-                $this->getFixture('auth-modified.php'),
-            ],
-            [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
             ],
@@ -265,7 +257,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
             ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\\Clerk\\Providers\\ClerkServiceProvider" --ansi'],
+            ['arguments' => 'php artisan laravel-clerk:install --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
