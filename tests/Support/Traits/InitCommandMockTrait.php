@@ -9,20 +9,6 @@ trait InitCommandMockTrait
 {
     use MockTrait;
 
-    // public function mockFilePutContent(...$arguments): void {
-    //     $callChain = [
-    //         ...$arguments,
-    //     ];
-
-    //     $this->mockNativeFunction(
-    //         namespace: 'RonasIT\ProjectInitializator\Commands',
-    //         callChain: array_map(
-    //             fn ($call) => $this->functionCall('file_put_contents', $call),
-    //             $callChain,
-    //         ),
-    //     );
-    // }
-
     public function mockShellExec(array ...$rawCallChain): void
     {
         $callChain = array_map(fn ($call) => $this->functionCall(
@@ -33,20 +19,6 @@ trait InitCommandMockTrait
 
         $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands', $callChain);
     }
-
-    // public function mockFileGetContent(array ...$rawCallChain): void
-    // {
-    //     $callChain = array_map(fn ($call) => $this->functionCall(
-    //         name: 'file_get_contents',
-    //         arguments: $call['arguments'],
-    //         result: $call['result'],
-    //     ), $rawCallChain);
-
-    //     $this->mockNativeFunction(
-    //         namespace: 'RonasIT\ProjectInitializator\Commands',
-    //         callChain: $callChain,
-    //     );
-    // }
 
     protected function mockClassExists(array ...$rawCallChain): void
     {
@@ -103,7 +75,7 @@ trait InitCommandMockTrait
         $callChain = array_map(fn ($call) => $this->functionCall(
             name: 'file_get_contents',
             arguments: [$call['path']],
-            result: $this->getFixture($call['source']),
+            result: $call['source'],
         ), $rawCallChain);
 
         $this->mockNativeFunction(
@@ -116,7 +88,7 @@ trait InitCommandMockTrait
     {
         $callChain = array_map(fn ($call) => $this->functionCall(
             name: 'file_put_contents',
-            arguments: [$call['path'], $this->getFixture($call['result'])],
+            arguments: [$call['path'], $call['result']],
             result: 1,
         ), $rawCallChain);
 
