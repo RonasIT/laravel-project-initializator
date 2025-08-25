@@ -183,14 +183,6 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.example.yml'),
             ],
             [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
@@ -245,19 +237,11 @@ class InitCommandTest extends TestCase
             ],
             [
                 '.env.development',
-                $this->getFixture('env.development_clerk_guard_added.yml'),
-            ],
-            [
-                '.env.example',
-                $this->getFixture('env.example_clerk_guard_added.yml'),
+                $this->getFixture('env.development_clerk_credentials_added.yml'),
             ],
             [
                 '.env.example',
                 $this->getFixture('env.example_clerk_credentials_added.yml'),
-            ],
-            [
-                '.env.development',
-                $this->getFixture('env.development_clerk_credentials_added.yml'),
             ],
             [
                 'database/migrations/2018_11_11_111111_admins_create_table.php',
@@ -774,14 +758,6 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.example.yml'),
             ],
             [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
@@ -836,19 +812,11 @@ class InitCommandTest extends TestCase
             ],
             [
                 '.env.development',
-                $this->getFixture('env.development_clerk_guard_added.yml'),
-            ],
-            [
-                '.env.example',
-                $this->getFixture('env.example_clerk_guard_added.yml'),
+                $this->getFixture('env.development_clerk_credentials_added_mobile_app.yml'),
             ],
             [
                 '.env.example',
                 $this->getFixture('env.example_clerk_credentials_added_mobile_app.yml'),
-            ],
-            [
-                '.env.development',
-                $this->getFixture('env.development_clerk_credentials_added_mobile_app.yml'),
             ],
             [
                 'database/migrations/2018_11_11_111111_admins_create_table.php',

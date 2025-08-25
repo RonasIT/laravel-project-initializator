@@ -116,15 +116,8 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
-            $this->createOrUpdateConfigFile('.env.development', '=', [
-                'AUTH_GUARD' => 'clerk',
-            ]);
-
-            $this->createOrUpdateConfigFile($envFile, '=', [
-                'AUTH_GUARD' => 'clerk',
-            ]);
-
             $data = [
+                'AUTH_GUARD' => 'clerk',
                 'CLERK_ALLOWED_ISSUER' => '',
                 'CLERK_SECRET_KEY' => '',
                 'CLERK_SIGNER_KEY_PATH' => '',
@@ -134,8 +127,8 @@ class InitCommand extends Command implements Isolatable
                 $data['CLERK_ALLOWED_ORIGINS'] = '';
             }
 
-            $this->createOrUpdateConfigFile($envFile, '=', $data);
             $this->createOrUpdateConfigFile('.env.development', '=', $data);
+            $this->createOrUpdateConfigFile($envFile, '=', $data);
 
             if ($envFile !== '.env.example') {
                 $this->createOrUpdateConfigFile('.env.example', '=', $data);
