@@ -183,7 +183,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
-        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
+        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development', '.env.development', '.env.example']);
 
         $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
 
@@ -198,6 +198,16 @@ class InitCommandTest extends TestCase
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
+            ],
+            [
+                'path' => '.env.development',
+                'source' => $this->getFixture('env.development.yml'),
+                'result' => $this->getFixture('env.development_clerk_guard_added.yml'),
+            ],
+            [
+                'path' => '.env.example',
+                'source' => $this->getFixture('env.example.yml'),
+                'result' => $this->getFixture('env.example_clerk_guard_added.yml'),
             ],
             [
                 'path' => base_path('config/auto-doc.php'),
