@@ -116,15 +116,8 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
-            $this->createOrUpdateConfigFile('.env.development', '=', [
-                'AUTH_GUARD' => 'clerk',
-            ]);
-
-            $this->createOrUpdateConfigFile($envFile, '=', [
-                'AUTH_GUARD' => 'clerk',
-            ]);
-
             $data = [
+                'AUTH_GUARD' => 'clerk',
                 'CLERK_ALLOWED_ISSUER' => '',
                 'CLERK_SECRET_KEY' => '',
                 'CLERK_SIGNER_KEY_PATH' => '',
@@ -134,8 +127,8 @@ class InitCommand extends Command implements Isolatable
                 $data['CLERK_ALLOWED_ORIGINS'] = '';
             }
 
-            $this->createOrUpdateConfigFile($envFile, '=', $data);
             $this->createOrUpdateConfigFile('.env.development', '=', $data);
+            $this->createOrUpdateConfigFile($envFile, '=', $data);
 
             if ($envFile !== '.env.example') {
                 $this->createOrUpdateConfigFile('.env.example', '=', $data);
@@ -545,10 +538,8 @@ class InitCommand extends Command implements Isolatable
         array_push(
             $this->shellCommands,
             'composer require ronasit/laravel-clerk',
-            'php artisan vendor:publish --provider="RonasIT\\Clerk\\Providers\\ClerkServiceProvider"',
+            'php artisan laravel-clerk:install',
         );
-
-        $this->updateAuthClerkConfig();
 
         $this->publishMigration(
             view: view('initializator::users_add_clerk_id_field'),
@@ -560,32 +551,5 @@ class InitCommand extends Command implements Isolatable
             viewName: 'ClerkUserRepository',
             path: 'app/Support/Clerk',
         );
-    }
-
-    // TODO: try to use package after fixing https://github.com/wintercms/laravel-config-writer/issues/6
-    protected function updateAuthClerkConfig(): void
-    {
-        $filePath = 'config/auth.php';
-
-        $content = file_get_contents($filePath);
-
-        $content = preg_replace_callback(
-            pattern: "/('guards'\s*=>\s*\[)(.*?)(^\s{4}],)/sm",
-            callback: $this->addClerkToAuthConfigCallback(),
-            subject: $content,
-        );
-
-        file_put_contents($filePath, $content);
-    }
-
-    protected function addClerkToAuthConfigCallback(): callable
-    {
-        return function (array $matches): string {
-            $existing = rtrim($matches[2]);
-            $newLine = "\n";
-            $clerkGuard = "{$newLine}        'clerk' => [{$newLine}            'driver' => 'clerk_session',{$newLine}            'provider' => 'users',{$newLine}        ],";
-
-            return $matches[1] . $existing . $clerkGuard . $newLine . "    ],";
-        };
     }
 }
