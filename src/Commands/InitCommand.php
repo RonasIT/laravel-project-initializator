@@ -594,7 +594,9 @@ class InitCommand extends Command implements Isolatable
 
     protected function modifyUserModel(): void
     {
-        (new PhpParser('app/Models/User.php'))
+        $parser = app(PhpParser::class, ['filePath' => 'app/Models/User.php']);
+
+        $parser
             ->addValueToArrayProperty(['fillable'], 'clerk_id')
             ->removeValueFromArrayProperty(['fillable', 'hidden'], 'password')
             ->removeValueFromMethodReturnArray(['casts'], 'password')

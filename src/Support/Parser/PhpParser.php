@@ -2,9 +2,6 @@
 
 namespace RonasIT\ProjectInitializator\Support\Parser;
 
-use PhpParser\ParserFactory;
-use PhpParser\NodeTraverser;
-use PhpParser\PrettyPrinter\Standard;
 use RonasIT\ProjectInitializator\Support\Parser\Visitors\ArrayVisitors\PropertyArrayVisitors\RemoveValueFromArrayPropertyPropertyArrayVisitor;
 use RonasIT\ProjectInitializator\Support\Parser\Visitors\ArrayVisitors\MethodReturnArrayVisitors\RemoveValueFromMethodReturnArrayVisitor;
 use RonasIT\ProjectInitializator\Support\Parser\Visitors\ArrayVisitors\PropertyArrayVisitors\AddValueToArrayPropertyPropertyArrayVisitor;
@@ -13,24 +10,22 @@ use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Use_;
+use PhpParser\Parser;
+use PhpParser\PrettyPrinterAbstract;
+use PhpParser\NodeTraverserInterface;
 
 class PhpParser
 {
     private array $ast;
 
-    private NodeTraverser $traverser;
-
-    private Standard $printer;
-
-    public function __construct(protected string $filePath)
+    public function __construct(
+        protected string $filePath,
+        protected Parser $parser,
+        protected NodeTraverserInterface $traverser,
+        protected PrettyPrinterAbstract $printer,
+    )
     {
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
-
         $this->ast = $parser->parse(file_get_contents($filePath));
-
-        $this->traverser = new NodeTraverser();
-
-        $this->printer = new Standard();
 
         $this->addEmptySpacesVisitor();
     }
