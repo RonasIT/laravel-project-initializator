@@ -25,7 +25,7 @@ class AddValueToArrayPropertyPropertyArrayVisitor extends BasePropertyArrayVisit
 
         $array = $property->default;
 
-        if (!empty($this->getTargetItems($array->items))) {
+        if ($this->getTargetItems($array->items) !== $array->items) {
             return;
         }
 
