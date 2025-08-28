@@ -128,10 +128,10 @@ class InitCommand extends Command implements Isolatable
             }
 
             $this->createOrUpdateConfigFile('.env.development', '=', $data);
-            $this->createOrUpdateConfigFile($envFile, '=', $data);
+            $this->createOrUpdateConfigFile('.env.example', '=', $data);
 
-            if ($envFile !== '.env.example') {
-                $this->createOrUpdateConfigFile('.env.example', '=', $data);
+            if ($envFile === '.env') {
+                $this->createOrUpdateConfigFile($envFile, '=', $data);
             }
         }
 
@@ -400,6 +400,10 @@ class InitCommand extends Command implements Isolatable
     {
         $viewName = "{$viewName}.php";
 
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+
         $data = $view->render();
 
         file_put_contents("{$path}/{$viewName}", "<?php\n\n{$data}");
@@ -546,7 +550,7 @@ class InitCommand extends Command implements Isolatable
             migrationName: 'users_add_clerk_id_field',
         );
 
-        $this->publishView(
+        $this-> publishView(
             view: view('initializator::clerk_user_repository'),
             viewName: 'ClerkUserRepository',
             path: 'app/Support/Clerk',
