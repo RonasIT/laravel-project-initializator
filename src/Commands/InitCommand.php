@@ -192,6 +192,8 @@ class InitCommand extends Command implements Isolatable
 
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
+        $this->addDefaultHttpExceptionRender();
+
         Artisan::call('migrate');
     }
 
@@ -202,6 +204,50 @@ class InitCommand extends Command implements Isolatable
         $config->set('info.contact.email', $email);
 
         $config->write();
+    }
+
+    protected function addDefaultHttpExceptionRender(): void
+    {
+        $file = base_path('bootstrap/app.php');
+
+        $content = file_get_contents($file);
+
+        $find = [
+            '$exceptions->render(function (HttpException $exception, Request $request)',
+            '$exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $exception, \Illuminate\Http\Request $request)',
+        ];
+
+        if (Str::contains($content, $find)) {
+            return;
+        }
+
+        $imports = [
+            'use Symfony\Component\HttpKernel\Exception\HttpException;',
+            'use Illuminate\Http\Request;',
+        ];
+
+        foreach ($imports as $import) {
+            if (!Str::contains($content, $import)) {
+                $content = preg_replace('/<\?php\s*/', "<?php\n\n{$import}\n", $content, 1);
+            }
+        }
+
+        $codeToAdd = <<<'PHP'
+                $exceptions->render(function (HttpException $exception, Request $request) {
+                    return ($request->expectsJson())
+                        ? response()->json(['error' => $exception->getMessage()], $exception->getStatusCode())
+                        : null;
+                });
+        PHP;
+
+        $content = preg_replace(
+            '/(->withExceptions\(function \(Exceptions \$exceptions\)(?:\: void)? \{)/',
+            "$1\n" . $codeToAdd . "\n",
+            $content,
+            1
+        );
+
+        file_put_contents($file, $content);
     }
 
     protected function createAdminUser(string $kebabName): void
