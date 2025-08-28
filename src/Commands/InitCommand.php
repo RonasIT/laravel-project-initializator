@@ -435,7 +435,7 @@ class InitCommand extends Command implements Isolatable
 
             $item = "{$key}{$separator}{$value}";
 
-            if (Str::before($key, '_') === Str::before($previousKey, '_')) {
+            if (!empty($previousKey) && Str::before($key, '_') === Str::before($previousKey, '_')) {
                 $lines[] = $item;
             } else {
                 $lines[] = "\n{$item}";
