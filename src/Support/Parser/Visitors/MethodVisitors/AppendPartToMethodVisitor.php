@@ -63,10 +63,8 @@ class AppendPartToMethodVisitor extends NodeVisitorAbstract
     {
         $nodeStmtsKey = [];
 
-        if ($node instanceof ClassMethod) {
-            foreach ($node->stmts as $stmt) {
-                $nodeStmtsKey[] = $this->classMethodKeys($stmt);
-            }
+        foreach ($node->stmts as $stmt) {
+            $nodeStmtsKey[] = $this->classMethodKeys($stmt);
         }
 
         return $nodeStmtsKey;
