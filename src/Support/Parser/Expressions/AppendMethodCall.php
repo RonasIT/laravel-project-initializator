@@ -6,7 +6,7 @@ use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\Variable;
 
-class AppendMethodCall extends MethodCall
+class AppendMethodCall
 {
     public static function make(
         string $variableName,
@@ -14,11 +14,11 @@ class AppendMethodCall extends MethodCall
         array $arguments,
         ?string $propertyName = null,
         array $attributes = [],
-    ): self
+    ): MethodCall
     {
         $variable = self::setVariable($variableName, $propertyName);
 
-       return new self(
+       return new MethodCall(
            var: $variable,
            name: $methodName,
            args: $arguments,
