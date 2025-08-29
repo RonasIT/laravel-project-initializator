@@ -86,7 +86,7 @@ class InitCommand extends Command implements Isolatable
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->createOrUpdateConfigFile($envFile, [
+        $this->updateEnvFile($envFile, [
             'APP_NAME' => $this->appName,
             'DB_CONNECTION' => 'pgsql',
             'DB_HOST' => 'pgsql',
@@ -96,7 +96,7 @@ class InitCommand extends Command implements Isolatable
             'DB_PASSWORD' => '',
         ]);
 
-        $this->createOrUpdateConfigFile('.env.development', [
+        $this->updateEnvFile('.env.development', [
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
             'APP_MAINTENANCE_DRIVER' => 'cache',
@@ -117,11 +117,11 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
-            $this->createOrUpdateConfigFile('.env.development', [
+            $this->updateEnvFile('.env.development', [
                 'AUTH_GUARD' => 'clerk',
             ]);
 
-            $this->createOrUpdateConfigFile($envFile, [
+            $this->updateEnvFile($envFile, [
                 'AUTH_GUARD' => 'clerk',
             ]);
         }
@@ -404,7 +404,7 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
     }
 
-    protected function createOrUpdateConfigFile(string $fileName, array $data): void
+    protected function updateEnvFile(string $fileName, array $data): void
     {
         $env = EnvFile::open($fileName);
 

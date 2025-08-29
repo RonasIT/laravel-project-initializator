@@ -36,41 +36,40 @@ trait InitCommandMockTrait
         return file_get_contents(base_path("/resources/md/readme/{$template}"));
     }
 
-    public function mockIsFile(string $namespace, array $rawCallChain): void 
+    public function mockConfigWriterFilesExist(array ...$arguments): void
     {
-        $callChain = array_map(fn ($path) => $this->functionCall(
-            name: 'is_file',
-            arguments: [$path],
-            result: true,
-        ), $rawCallChain);
+        $callChain = [
+            [
+                'function' => 'is_file',
+                'arguments' => '.env.example',
+            ],
+            [
+                'function' => 'is_file',
+                'arguments' => '.env.development',
+            ],
+            [
+                'function' => 'file_exists',
+                'arguments' => base_path('config/auto-doc.php'),
+            ],
+            ...$arguments,
+        ];
 
         $this->mockNativeFunction(
-            namespace: $namespace,
-            callChain: $callChain,
+            namespace: '\Winter\LaravelConfigWriter',
+            callChain: array_map(
+                fn ($call) => $this->functionCall($call['function'], [$call['arguments']], true),
+                $callChain,
+            ),
         );
     }
 
-    public function mockFileExists(string $namespace, array $rawCallChain): void 
-    {
-        $callChain = array_map(fn ($path) => $this->functionCall(
-            name: 'file_exists',
-            arguments: [$path],
-            result: true,
-        ), $rawCallChain);
-
-        $this->mockNativeFunction(
-            namespace: $namespace,
-            callChain: $callChain,
-        );
-    }
-    
-    public function mockFileUpdate(string $namespace, array ...$rawChain): void 
+    public function mockFileUpdate(string $namespace, array ...$rawChain): void
     {
         $this->mockFileGetContent($namespace, $rawChain);
         $this->mockFilePutContent($namespace, $rawChain);
     }
 
-    public function mockFileGetContent(string $namespace, array $rawCallChain): void 
+    public function mockFileGetContent(string $namespace, array $rawCallChain): void
     {
         $callChain = array_map(fn ($call) => $this->functionCall(
             name: 'file_get_contents',
@@ -84,7 +83,7 @@ trait InitCommandMockTrait
         );
     }
 
-    public function mockFilePutContent(string $namespace, array $rawCallChain): void 
+    public function mockFilePutContent(string $namespace, array $rawCallChain): void
     {
         $callChain = array_map(fn ($call) => $this->functionCall(
             name: 'file_put_contents',

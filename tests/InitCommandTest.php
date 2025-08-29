@@ -10,9 +10,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
-        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
-
-        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+        $this->mockConfigWriterFilesExist();
 
         $this->mockFileUpdate(
             '\Winter\LaravelConfigWriter', 
@@ -61,9 +59,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
-        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
-
-        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+        $this->mockConfigWriterFilesExist();
 
         $this->mockFileUpdate(
             '\Winter\LaravelConfigWriter', 
@@ -120,9 +116,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
-        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
-
-        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+        $this->mockConfigWriterFilesExist();
 
         $this->mockFileUpdate(
             '\Winter\LaravelConfigWriter', 
@@ -183,9 +177,16 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
-        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development', '.env.development', '.env.example']);
-
-        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+        $this->mockConfigWriterFilesExist(
+            [
+                'function' => 'is_file',
+                'arguments' => '.env.development',
+            ],
+            [
+                'function' => 'is_file',
+                'arguments' => '.env.example',
+            ],
+        );
 
         $this->mockFileUpdate(
             '\Winter\LaravelConfigWriter', 
@@ -372,9 +373,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndPartialReadmeCreation()
     {
-        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
-
-        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+        $this->mockConfigWriterFilesExist();
 
         $this->mockFileUpdate(
             '\Winter\LaravelConfigWriter', 
@@ -506,9 +505,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
-        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
-
-        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+        $this->mockConfigWriterFilesExist();
 
         $this->mockFileUpdate(
             '\Winter\LaravelConfigWriter', 
@@ -674,9 +671,7 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndUsingTelescope()
     {
-        $this->mockIsFile('\Winter\LaravelConfigWriter', ['.env.example', '.env.development']);
-
-        $this->mockFileExists('\Winter\LaravelConfigWriter', [base_path('config/auto-doc.php')]);
+        $this->mockConfigWriterFilesExist();
 
         $this->mockFileUpdate(
             '\Winter\LaravelConfigWriter', 
