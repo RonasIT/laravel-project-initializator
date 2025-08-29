@@ -65,6 +65,9 @@ class InitCommand extends Command implements Isolatable
         'composer require ronasit/laravel-swagger',
         'php artisan vendor:publish --provider="RonasIT\\AutoDoc\\AutoDocServiceProvider"',
         'composer require --dev ronasit/laravel-entity-generator',
+        'composer require --dev laravel/pint',
+        'php artisan vendor:publish --tag=pint-config',
+        'composer require --dev brainmaestro/composer-git-hooks'
     ];
 
     protected string $appName;
@@ -186,6 +189,8 @@ class InitCommand extends Command implements Isolatable
             $this->shellCommands[] = 'composer remove --dev ronasit/laravel-project-initializator';
         }
 
+        $this->setupComposerHooks();
+
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
         }
@@ -193,6 +198,44 @@ class InitCommand extends Command implements Isolatable
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         Artisan::call('migrate');
+    }
+
+    protected function setupComposerHooks(): void
+    {
+        $path = base_path('composer.json');
+
+        $content = file_get_contents($path);
+
+        $data = json_decode($content, true);
+
+        $data = $this->addToArray($data, 'extra.hooks.config.stop-on-failure', 'pre-commit');
+        $data = $this->addToArray($data, 'extra.hooks.pre-commit', 'docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair');
+        $data = $this->addToArray($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
+        $data = $this->addToArray($data, 'scripts.post-update-cmd', 'cghooks update');
+
+        $resultData =json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        file_put_contents($path, $resultData);
+    }
+
+    protected function addToArray(array $data, string $path, string $value): array
+    {
+        $path = explode('.', $path);
+
+        $ref = &$data;
+
+        foreach ($path as $key) {
+            if (!isset($ref[$key]) || !is_array($ref[$key])) {
+                $ref[$key] = [];
+            }
+            $ref = &$ref[$key];
+        }
+
+        if (!in_array($value, $ref)) {
+            $ref[] = $value;
+        }
+
+        return $data;
     }
 
     protected function setAutoDocContactEmail(string $email): void

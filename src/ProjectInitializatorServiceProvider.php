@@ -14,5 +14,9 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
         ]);
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'initializator');
+
+        $this->publishes([
+            __DIR__.'/../resources/pint.json' => base_path('pint.json'),
+        ], 'pint-config');
     }
 }
