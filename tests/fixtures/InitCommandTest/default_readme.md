@@ -1,6 +1,6 @@
-# MyApp
+# My App
 
-This project implements an API for the MyApp Multiplatform app.
+This project implements an API for the My App Multiplatform app.
 
 ## Project Resources & Contacts
 

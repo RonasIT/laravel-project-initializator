@@ -1,6 +1,6 @@
-# MyApp
+# My App
 
-This project implements an API for the MyApp Web app.
+This project implements an API for the My App Web app.
 
 ## Project Resources & Contacts
 

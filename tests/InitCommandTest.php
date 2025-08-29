@@ -129,12 +129,12 @@ class InitCommandTest extends TestCase
             [
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
+                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
+                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
                 'path' => base_path('config/auto-doc.php'),
@@ -164,7 +164,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
@@ -192,12 +192,12 @@ class InitCommandTest extends TestCase
             [
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
+                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
+                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
                 'path' => '.env.development',
@@ -302,7 +302,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
@@ -381,12 +381,12 @@ class InitCommandTest extends TestCase
             [
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
+                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
+                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
                 'path' => base_path('config/auto-doc.php'),
@@ -446,7 +446,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
@@ -515,12 +515,12 @@ class InitCommandTest extends TestCase
             [
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
+                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
+                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
                 'path' => base_path('config/auto-doc.php'),
@@ -607,7 +607,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
@@ -683,12 +683,12 @@ class InitCommandTest extends TestCase
             [
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
+                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
+                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
                 'path' => base_path('config/auto-doc.php'),
@@ -748,7 +748,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
