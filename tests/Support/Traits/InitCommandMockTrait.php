@@ -9,26 +9,6 @@ trait InitCommandMockTrait
 {
     use MockTrait;
 
-    public function mockFilePutContent(
-        string $exampleEnvFixtureName = 'env.example.yml',
-        string $developmentEnvFixtureName = 'env.development.yml',
-        ...$arguments,
-    ): void {
-        $callChain = [
-            ['.env.example', $this->getFixture($exampleEnvFixtureName)],
-            ['.env.development', $this->getFixture($developmentEnvFixtureName)],
-            ...$arguments,
-        ];
-
-        $this->mockNativeFunction(
-            namespace: 'RonasIT\ProjectInitializator\Commands',
-            callChain: array_map(
-                fn ($call) => $this->functionCall('file_put_contents', $call),
-                $callChain,
-            ),
-        );
-    }
-
     public function mockShellExec(array ...$rawCallChain): void
     {
         $callChain = array_map(fn ($call) => $this->functionCall(
@@ -38,20 +18,6 @@ trait InitCommandMockTrait
         ), $rawCallChain);
 
         $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands', $callChain);
-    }
-
-    public function mockFileGetContent(array ...$rawCallChain): void
-    {
-        $callChain = array_map(fn ($call) => $this->functionCall(
-            name: 'file_get_contents',
-            arguments: $call['arguments'],
-            result: $call['result'],
-        ), $rawCallChain);
-
-        $this->mockNativeFunction(
-            namespace: 'RonasIT\ProjectInitializator\Commands',
-            callChain: $callChain,
-        );
     }
 
     protected function mockClassExists(array ...$rawCallChain): void
@@ -70,15 +36,64 @@ trait InitCommandMockTrait
         return file_get_contents(base_path("/resources/md/readme/{$template}"));
     }
 
-    public function mockChangeConfig(string $path, string $initialContent, string $finalContent): void 
+    public function mockConfigWriterFilesExist(array ...$arguments): void
     {
-        $this->mockNativeFunction('\Winter\LaravelConfigWriter', [
-            $this->functionCall('file_exists', [base_path($path)], true),
-            $this->functionCall('file_get_contents', [base_path($path)], $this->getFixture($initialContent)),
-            $this->functionCall('file_put_contents', [
-                base_path($path),
-                $this->getFixture($finalContent),
-            ], 1),
-        ]);  
+        $callChain = [
+            [
+                'function' => 'is_file',
+                'arguments' => '.env.example',
+            ],
+            [
+                'function' => 'is_file',
+                'arguments' => '.env.development',
+            ],
+            [
+                'function' => 'file_exists',
+                'arguments' => base_path('config/auto-doc.php'),
+            ],
+            ...$arguments,
+        ];
+
+        $this->mockNativeFunction(
+            namespace: '\Winter\LaravelConfigWriter',
+            callChain: array_map(
+                fn ($call) => $this->functionCall($call['function'], [$call['arguments']], true),
+                $callChain,
+            ),
+        );
+    }
+
+    public function mockFileUpdate(string $namespace, array ...$rawChain): void
+    {
+        $this->mockFileGetContent($namespace, $rawChain);
+        $this->mockFilePutContent($namespace, $rawChain);
+    }
+
+    public function mockFileGetContent(string $namespace, array $rawCallChain): void
+    {
+        $callChain = array_map(fn ($call) => $this->functionCall(
+            name: 'file_get_contents',
+            arguments: [$call['path']],
+            result: $call['source'],
+        ), $rawCallChain);
+
+        $this->mockNativeFunction(
+            namespace: $namespace,
+            callChain: $callChain,
+        );
+    }
+
+    public function mockFilePutContent(string $namespace, array $rawCallChain): void
+    {
+        $callChain = array_map(fn ($call) => $this->functionCall(
+            name: 'file_put_contents',
+            arguments: [$call['path'], $call['result']],
+            result: 1,
+        ), $rawCallChain);
+
+        $this->mockNativeFunction(
+            namespace: $namespace,
+            callChain: $callChain,
+        );
     }
 }
