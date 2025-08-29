@@ -13,6 +13,8 @@ use PhpParser\Node\Stmt\Use_;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinterAbstract;
 use PhpParser\NodeTraverserInterface;
+use RonasIT\ProjectInitializator\Support\Parser\Visitors\MethodVisitors\AppendPartToMethodVisitor;
+use RonasIT\ProjectInitializator\Support\Parser\Visitors\AddImportsVisitor;
 
 class PhpParser
 {
@@ -47,6 +49,20 @@ class PhpParser
     public function addValueToArrayProperty(array $propertyNames, string $value): self
     {
         $this->traverser->addVisitor(new AddValueToArrayPropertyPropertyArrayVisitor($propertyNames, $value));
+
+        return $this;
+    }
+
+    public function appendPartToMethod(string $methodName, string $variableName, string $callMethodName, ?string $propertyName, Node\Arg ...$args): self
+    {
+        $this->traverser->addVisitor(new AppendPartToMethodVisitor($methodName, $variableName, $callMethodName, $propertyName, ...$args));
+
+        return $this;
+    }
+
+    public function addImports(array $fullClassNames): self
+    {
+        $this->traverser->addVisitor(new AddImportsVisitor($fullClassNames));
 
         return $this;
     }

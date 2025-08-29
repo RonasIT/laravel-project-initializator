@@ -15,6 +15,7 @@ use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use Winter\LaravelConfigWriter\ArrayFile;
 use RonasIT\ProjectInitializator\Support\Parser\PhpParser;
+use RonasIT\ProjectInitializator\Support\Parser\Arguments\ClassConstFetchArgument;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -553,9 +554,30 @@ class InitCommand extends Command implements Isolatable
             path: 'app/Support/Clerk',
         );
 
+        $this->addClerkRepositoryBind();
         $this->modifyUserModel();
     }
 
+    protected function addClerkRepositoryBind(): void
+    {
+        $parser = app(PhpParser::class, ['filePath' => 'app/Providers/AppServiceProvider.php']);
+
+        $parser
+            ->appendPartToMethod(
+                methodName: 'boot',
+                variableName: 'this',
+                callMethodName: 'bind',
+                propertyName: 'app',
+                firstArgument: new ClassConstFetchArgument('UserRepositoryContract'),
+                secondArgument: new ClassConstFetchArgument('ClerkUserRepository'),
+            )
+            ->addImports([
+                'RonasIT\\Clerk\\Contracts\\UserRepositoryContract',
+                'App\\Support\Clerk\\ClerkUserRepository',
+            ])
+            ->save();
+    }
+    
     protected function modifyUserModel(): void
     {
         $parser = app(PhpParser::class, ['filePath' => 'app/Models/User.php']);

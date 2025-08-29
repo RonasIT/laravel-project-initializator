@@ -224,8 +224,17 @@ class InitCommandTest extends TestCase
             [
                 $this->functionCall(
                     name: 'file_get_contents',
+                    arguments: ['app/Providers/AppServiceProvider.php'],
+                    result: $this->getFixture('app_service_provider.php'),
+                ),
+                $this->functionCall(
+                    name: 'file_get_contents',
                     arguments: ['app/Models/User.php'],
                     result: $this->getFixture('user_model.php'),
+                ),
+                $this->functionCall(
+                    name: 'file_put_contents',
+                    arguments: ['app/Providers/AppServiceProvider.php', $this->getFixture('modified_app_service_provider.php')],
                 ),
                 $this->functionCall(
                     name: 'file_put_contents',
@@ -809,8 +818,17 @@ class InitCommandTest extends TestCase
             [
                 $this->functionCall(
                     name: 'file_get_contents',
+                    arguments: ['app/Providers/AppServiceProvider.php'],
+                    result: $this->getFixture('app_service_provider.php'),
+                ),
+                $this->functionCall(
+                    name: 'file_get_contents',
                     arguments: ['app/Models/User.php'],
                     result: $this->getFixture('user_model.php'),
+                ),
+                $this->functionCall(
+                    name: 'file_put_contents',
+                    arguments: ['app/Providers/AppServiceProvider.php', $this->getFixture('modified_app_service_provider.php')],
                 ),
                 $this->functionCall(
                     name: 'file_put_contents',
