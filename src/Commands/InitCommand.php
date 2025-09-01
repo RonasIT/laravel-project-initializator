@@ -103,7 +103,7 @@ class InitCommand extends Command implements Isolatable
             $this->choice(
                 question: 'What type of application will your API serve?',
                 choices: AppTypeEnum::values(),
-                default: AppTypeEnum::Multiplatform->value
+                default: AppTypeEnum::Multiplatform->value,
             )
         );
 
