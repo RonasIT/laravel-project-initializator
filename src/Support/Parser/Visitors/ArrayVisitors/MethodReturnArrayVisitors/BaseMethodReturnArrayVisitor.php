@@ -13,7 +13,8 @@ class BaseMethodReturnArrayVisitor extends BaseArrayVisitor
 {
     protected function isTargetItem(?ArrayItem $item): bool
     {
-        return $item->key instanceof String_
+        return !empty($item)
+            && $item->key instanceof String_
             && $item->key->value === $this->value;
     }
 

@@ -9,7 +9,7 @@ class BasePropertyArrayVisitor extends BaseArrayVisitor
 {
     protected function isTargetItem(?ArrayItem $item): bool
     {
-        return $item !== null
+        return !empty($item)
             && $item->value->value === $this->value;
     }
 }
