@@ -104,7 +104,7 @@ class InitCommand extends Command implements Isolatable
                 question: 'What type of application will your API serve?',
                 choices: AppTypeEnum::values(),
                 default: AppTypeEnum::Multiplatform->value,
-            )
+            ),
         );
 
         $this->authType = AuthTypeEnum::from($this->choice(
