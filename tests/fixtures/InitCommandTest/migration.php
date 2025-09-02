@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use RonasIT\Support\Traits\MigrationTrait;
@@ -11,7 +12,7 @@ class AddDefaultUser extends Migration
 
     public function up()
     {
-        if (config('app.env') !== 'testing') {
+        if (!App::environment('testing')) {
             DB::table('users')->insert([
                 'name' => 'TestAdmin',
                 'email' => 'mail@mail.com',
@@ -23,7 +24,7 @@ class AddDefaultUser extends Migration
 
     public function down()
     {
-        if (config('app.env') !== 'testing') {
+        if (!App::environment('testing')) {
             DB::table('users')
                 ->where('email', 'mail@mail.com')
                 ->delete();

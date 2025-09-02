@@ -48,6 +48,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
@@ -104,6 +105,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
@@ -162,6 +164,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
@@ -307,12 +310,12 @@ class InitCommandTest extends TestCase
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter an admin password', '123456')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
@@ -449,10 +452,10 @@ class InitCommandTest extends TestCase
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Web')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsQuestion('What type of application will your API serve?', 'Web')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
@@ -608,6 +611,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Mobile')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
@@ -615,7 +619,6 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an admin name', 'TestAdmin')
             ->expectsQuestion('Please enter an admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsQuestion('What type of application will your API serve?', 'Mobile')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
@@ -747,10 +750,10 @@ class InitCommandTest extends TestCase
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Web')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsQuestion('What type of application will your API serve?', 'Web')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
@@ -800,6 +803,156 @@ class InitCommandTest extends TestCase
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
             ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsConfirmation('Do you want to install media package?')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->assertExitCode(0);
+    }
+
+    public function testRunWithClerkMobileApp(): void
+    {
+        $this->mockConfigWriterFilesExist();
+
+        $this->mockFileUpdate(
+            '\Winter\LaravelConfigWriter', 
+            [
+                'path' => '.env.example',
+                'source' => $this->getFixture('env.example.yml'),
+                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
+            ],
+            [
+                'path' => '.env.development',
+                'source' => $this->getFixture('env.development.yml'),
+                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
+            ],
+            [
+                'arguments' => ['.env.development'],
+                'result' => $this->getFixture('env.development.yml'),
+            ],
+            [
+                'arguments' => ['.env.example'],
+                'result' => $this->getFixture('env.example.yml'),
+            ],
+            [
+                'path' => base_path('config/auto-doc.php'),
+                'source' => $this->getFixture('auto_doc.php'),
+                'result' => $this->getFixture('auto_doc_after_changes.php'),
+            ],
+        );
+
+        $this->mockFileGetContent(
+            'RonasIT\ProjectInitializator\Commands',
+            [
+                [
+                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md'),
+                    'source' => $this->getTemplate('README.md'),
+                ],
+                [
+                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md'),
+                    'source' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
+                ],
+                [
+                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md'),
+                    'source' => $this->getTemplate('RESOURCES.md'),
+                ],
+                [
+                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md'),
+                    'source' => $this->getTemplate('CONTACTS.md'),
+                ],
+                [
+                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md'),
+                    'source' => $this->getTemplate('ENVIRONMENTS.md'),
+                ],
+                [
+                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md'),
+                    'source' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+                ],
+            ]
+        );
+
+        $this->mockFilePutContent(
+            'RonasIT\ProjectInitializator\Commands',
+            [
+                [
+                    'path' => 'README.md',
+                    'result' =>  $this->getFixture('partial_readme_with_telescope.md'),
+                ],
+            ]
+        );
+
+        $this->mockShellExec(
+            ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
+            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
+            ['arguments' => 'php artisan laravel-clerk:install --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
+            ['arguments' => 'php artisan telescope:install --ansi'],
+        );
+
+        $this
+            ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsOutput('Project initialized successfully!')
+            ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsConfirmation('Do you want to generate an admin user?')
+            ->expectsConfirmation('Do you want to generate a README file?', 'yes')
+            ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
+            ->expectsQuestion(
+                'Are you going to use Issue Tracker? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later'
+            )
+            ->expectsQuestion(
+                'Are you going to use Figma? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later'
+            )
+            ->expectsQuestion(
+                'Are you going to use Sentry? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later'
+            )
+            ->expectsQuestion(
+                'Are you going to use DataDog? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later'
+            )
+            ->expectsQuestion(
+                'Are you going to use ArgoCD? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later'
+            )
+            ->expectsQuestion(
+                'Are you going to use Laravel Telescope? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later'
+            )
+            ->expectsQuestion(
+                'Are you going to use Laravel Nova? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later'
+            )
+            ->expectsQuestion('Please enter a Manager\'s email', '')
+            ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
+            ->expectsConfirmation('Do you need a `Getting Started` part?', 'yes')
+            ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
+            ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
+            ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
+            ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?', 'yes')
+            ->expectsOutput('README generated successfully!')
+            ->expectsOutput('Don`t forget to fill the following empty values:')
+            ->expectsOutput('- Issue Tracker link')
+            ->expectsOutput('- Figma link')
+            ->expectsOutput('- Sentry link')
+            ->expectsOutput('- DataDog link')
+            ->expectsOutput('- ArgoCD link')
+            ->expectsOutput('- Manager\'s email')
+            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
