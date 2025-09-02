@@ -104,8 +104,8 @@ class InitCommand extends Command implements Isolatable
             $this->choice(
                 question: 'What type of application will your API serve?',
                 choices: AppTypeEnum::values(),
-                default: AppTypeEnum::Multiplatform->value
-            )
+                default: AppTypeEnum::Multiplatform->value,
+            ),
         );
 
         $this->authType = AuthTypeEnum::from($this->choice(
@@ -436,7 +436,7 @@ class InitCommand extends Command implements Isolatable
 
             $item = "{$key}{$separator}{$value}";
 
-            if (Str::before($key, '_') === Str::before($previousKey, '_')) {
+            if (!empty($previousKey) && $this->configKeysHaveSamePrefix($key, $previousKey)) {
                 $lines[] = $item;
             } else {
                 $lines[] = "\n{$item}";
@@ -448,6 +448,11 @@ class InitCommand extends Command implements Isolatable
         $ymlSettings = implode("\n", $lines);
 
         file_put_contents($fileName, $ymlSettings);
+    }
+
+    protected function configKeysHaveSamePrefix(string $key, string $previousKey): bool
+    {
+        return Str::before($key, '_') === Str::before($previousKey, '_');
     }
 
     protected function loadReadmePart(string $fileName): string
