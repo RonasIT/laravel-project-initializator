@@ -206,12 +206,12 @@ class InitCommandTest extends TestCase
             [
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_clerk_guard_added.yml'),
+                'result' => $this->getFixture('env.development_clerk_credentials_added.yml'),
             ],
             [
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_clerk_guard_added.yml'),
+                'result' => $this->getFixture('env.example_clerk_credentials_added.yml'),
             ],
             [
                 'path' => base_path('config/auto-doc.php'),
@@ -810,7 +810,16 @@ class InitCommandTest extends TestCase
 
     public function testRunWithClerkMobileApp(): void
     {
-        $this->mockConfigWriterFilesExist();
+        $this->mockConfigWriterFilesExist(
+            [
+                'function' => 'is_file',
+                'arguments' => '.env.development',
+            ],
+            [
+                'function' => 'is_file',
+                'arguments' => '.env.example',
+            ],
+        );
 
         $this->mockFileUpdate(
             '\Winter\LaravelConfigWriter', 
@@ -825,12 +834,14 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
+                'path' => '.env.development',
+                'source' => $this->getFixture('env.development.yml'),
+                'result' => $this->getFixture('env.development_clerk_credentials_added_mobile_app.yml'),
             ],
             [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
+                'path' => '.env.example',
+                'source' => $this->getFixture('env.example.yml'),
+                'result' => $this->getFixture('env.example_clerk_credentials_added_mobile_app.yml'),
             ],
             [
                 'path' => base_path('config/auto-doc.php'),
@@ -859,12 +870,28 @@ class InitCommandTest extends TestCase
                     'source' => $this->getTemplate('CONTACTS.md'),
                 ],
                 [
+                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md'),
+                    'source' => $this->getTemplate('PREREQUISITES.md'),
+                ],
+                [
+                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md'),
+                    'source' => $this->getTemplate('GETTING_STARTED.md'),
+                ],
+                [
                     'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md'),
                     'source' => $this->getTemplate('ENVIRONMENTS.md'),
                 ],
                 [
                     'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md'),
                     'source' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+                ],
+                [
+                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md'),
+                    'source' => $this->getTemplate('CLERK.md'),
+                ],
+                [
+                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md'),
+                    'source' => $this->getTemplate('RENOVATE.md'),
                 ],
             ]
         );
@@ -873,8 +900,24 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Commands',
             [
                 [
+                    'path' => 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
+                    'result' =>  $this->getFixture('users_add_clerk_id_field_migration.php'),
+                ],
+                [
+                    'path' => 'database/migrations/2018_11_11_111111_admins_create_table.php',
+                    'result' =>  $this->getFixture('admins_table_migration.php'),
+                ],
+                [
                     'path' => 'README.md',
-                    'result' =>  $this->getFixture('partial_readme_with_telescope.md'),
+                    'result' =>  $this->getFixture('default_readme_with_mobile_app.md'),
+                ],
+                [
+                    'path' => 'renovate.json',
+                    'result' =>  $this->getFixture('renovate.json'),
+                ],
+                [
+                    'path' => 'README.md',
+                    'result' =>  $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md'),
                 ],
             ]
         );
@@ -897,8 +940,11 @@ class InitCommandTest extends TestCase
             ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?')
+            ->expectsQuestion('What type of application will your API serve?', 'Mobile')
+            ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
+            ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
+            ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
+            ->expectsQuestion('Please enter an admin password', '123456')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
