@@ -243,7 +243,7 @@ class InitCommand extends Command implements Isolatable
     {
         $current = Arr::get($data, $path, []);
 
-        if (!in_array($value, $current, true)) {
+        if (!in_array($value, $current)) {
             $current[] = $value;
             Arr::set($data, $path, $current);
         }
