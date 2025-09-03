@@ -21,11 +21,19 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
+            [
+                'arguments' => [base_path('bootstrap/app.php')],
+                'result' => $this->getFixture('app.php'),
+            ],
         );
 
         $this->mockFilePutContent(
             'env.example_app_name_pascal_case.yml',
             'env.development_app_name_pascal_case.yml',
+            [
+                base_path('bootstrap/app.php'),
+                $this->getFixture('app_after_changes.php'),
+            ],
         );
 
         $this->mockClassExists([
@@ -68,6 +76,10 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
+            [
+                'arguments' => [base_path('bootstrap/app.php')],
+                'result' => $this->getFixture('app.php'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -76,6 +88,10 @@ class InitCommandTest extends TestCase
             [
                 'renovate.json',
                 $this->getFixture('renovate.json'),
+            ],
+            [
+                base_path('bootstrap/app.php'),
+                $this->getFixture('app_after_changes.php'),
             ],
         );
 
@@ -117,6 +133,10 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development.yml'),
             ],
+            [
+                'arguments' => [base_path('bootstrap/app.php')],
+                'result' => $this->getFixture('app.php'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -125,6 +145,10 @@ class InitCommandTest extends TestCase
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
+            ],
+            [
+                base_path('bootstrap/app.php'),
+                $this->getFixture('app_after_changes.php'),
             ],
         );
 
@@ -218,6 +242,10 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
+            [
+                'arguments' => [base_path('bootstrap/app.php')],
+                'result' => $this->getFixture('app.php'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -250,6 +278,10 @@ class InitCommandTest extends TestCase
             [
                 'README.md',
                 $this->getFixture('default_readme_after_using_renovate.md'),
+            ],
+            [
+                base_path('bootstrap/app.php'),
+                $this->getFixture('app_after_changes.php'),
             ],
         );
 
@@ -372,6 +404,10 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
+            [
+                'arguments' => [base_path('bootstrap/app.php')],
+                'result' => $this->getFixture('app.php'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -380,7 +416,11 @@ class InitCommandTest extends TestCase
             [
                 'README.md',
                 $this->getFixture('partial_readme.md'),
-            ]
+            ],
+            [
+                base_path('bootstrap/app.php'),
+                $this->getFixture('app_after_changes.php'),
+            ],
         );
 
         $this->mockShellExec(
@@ -501,6 +541,10 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
+            [
+                'arguments' => [base_path('bootstrap/app.php')],
+                'result' => $this->getFixture('app.php'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -521,6 +565,10 @@ class InitCommandTest extends TestCase
             [
                 'README.md',
                 $this->getFixture('full_readme_after_using_renovate.md'),
+            ],
+            [
+                base_path('bootstrap/app.php'),
+                $this->getFixture('app_after_changes.php'),
             ],
         );
 
@@ -640,6 +688,10 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
+            [
+                'arguments' => [base_path('bootstrap/app.php')],
+                'result' => $this->getFixture('app.php'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -648,7 +700,11 @@ class InitCommandTest extends TestCase
             [
                 'README.md',
                 $this->getFixture('partial_readme_with_telescope.md'),
-            ]
+            ],
+            [
+                base_path('bootstrap/app.php'),
+                $this->getFixture('app_after_changes.php'),
+            ],
         );
 
         $this->mockShellExec(
