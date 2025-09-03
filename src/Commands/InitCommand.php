@@ -241,19 +241,11 @@ class InitCommand extends Command implements Isolatable
 
     protected function addToArray(array $data, string $path, string $value): array
     {
-        $path = explode('.', $path);
+        $current = Arr::get($data, $path, []);
 
-        $ref = &$data;
-
-        foreach ($path as $key) {
-            if (!isset($ref[$key]) || !is_array($ref[$key])) {
-                $ref[$key] = [];
-            }
-            $ref = &$ref[$key];
-        }
-
-        if (!in_array($value, $ref)) {
-            $ref[] = $value;
+        if (!in_array($value, $current, true)) {
+            $current[] = $value;
+            Arr::set($data, $path, $current);
         }
 
         return $data;
