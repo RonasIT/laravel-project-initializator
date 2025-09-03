@@ -213,7 +213,7 @@ class InitCommand extends Command implements Isolatable
         $data = $this->addToArray($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
         $data = $this->addToArray($data, 'scripts.post-update-cmd', 'cghooks update');
 
-        $resultData =json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $resultData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
         file_put_contents($path, $resultData);
     }
