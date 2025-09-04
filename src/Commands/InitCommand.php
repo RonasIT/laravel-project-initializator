@@ -94,6 +94,8 @@ class InitCommand extends Command implements Isolatable
             'APP_URL' => $this->appUrl,
         ]);
 
+        $this->publishWebLogin();
+
         $this->info('Project initialized successfully!');
 
         $this->authType = AuthTypeEnum::from($this->choice(
@@ -513,5 +515,28 @@ class InitCommand extends Command implements Isolatable
             view: view('initializator::users_add_clerk_id_field'),
             migrationName: 'users_add_clerk_id_field',
         );
+    }
+
+    protected function generateWebLoginRoutes(): void
+    {
+        $filePath = base_path() . '/routes/web.php';
+
+        $content = file_get_contents($filePath);
+
+        $pattern = '/\*\/\s*$/';
+
+        $newContent = preg_replace($pattern, "*/\n" . "\nAuth::routes();\n", $content);
+
+        file_put_contents($filePath, $newContent);
+    }
+
+    protected function publishWebLogin(): void
+    {
+        Artisan::call('vendor:publish', [
+            '--tag' => 'initializator',
+            '--force' => true,
+        ]);
+
+        $this->generateWebLoginRoutes();
     }
 }
