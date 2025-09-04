@@ -396,17 +396,17 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
-    protected function publishView(View $view, string $viewName, string $path): void
+    protected function publishClass(View $template, string $fileName, string $filePath): void
     {
-        $viewName = "{$viewName}.php";
+        $fileName = "{$fileName}.php";
 
-        if (!is_dir($path)) {
-            mkdir($path, 0777, true);
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777, true);
         }
 
-        $data = $view->render();
+        $data = $template->render();
 
-        file_put_contents("{$path}/{$viewName}", "<?php\n\n{$data}");
+        file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
     }
 
     protected function publishMigration(View $view, string $migrationName): void
@@ -415,7 +415,7 @@ class InitCommand extends Command implements Isolatable
 
         $migrationName = "{$time}_{$migrationName}";
 
-        $this->publishView($view, $migrationName, "database/migrations");
+        $this->publishClass($view, $migrationName, 'database/migrations');
     }
 
     protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
@@ -555,10 +555,10 @@ class InitCommand extends Command implements Isolatable
             migrationName: 'users_add_clerk_id_field',
         );
 
-        $this-> publishView(
-            view: view('initializator::clerk_user_repository'),
-            viewName: 'ClerkUserRepository',
-            path: 'app/Support/Clerk',
+        $this->publishClass(
+            template: view('initializator::clerk_user_repository'),
+            fileName: 'ClerkUserRepository',
+            filePath: 'app/Support/Clerk',
         );
     }
 }
