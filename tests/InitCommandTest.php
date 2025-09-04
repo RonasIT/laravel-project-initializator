@@ -2,7 +2,6 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
@@ -824,6 +823,10 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
+                'arguments' => [base_path('/routes/web.php')],
+                'result' => $this->getFixture('web.php'),
+            ],
+            [
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development.yml'),
             ],
@@ -831,6 +834,7 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example.yml'),
             ],
+
             [
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
@@ -876,6 +880,10 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example.yml',
             'env.development.yml',
+            [
+                base_path('/routes/web.php'),
+                $this->getFixture('web_with_login.php'),
+            ],
             [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
@@ -986,5 +994,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 }
