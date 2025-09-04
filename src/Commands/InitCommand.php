@@ -14,6 +14,7 @@ use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use Winter\LaravelConfigWriter\ArrayFile;
+use RonasIT\ProjectInitializator\Support\Parser\PhpParser;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -219,7 +220,7 @@ class InitCommand extends Command implements Isolatable
     protected function setAutoDocContactEmail(string $email): void
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
-
+        
         $config->set('info.contact.email', $email);
 
         $config->write();
@@ -245,7 +246,7 @@ class InitCommand extends Command implements Isolatable
 
             $this->publishMigration(
                 view: view('initializator::add_default_user')->with($this->adminCredentials),
-                migrationName: 'add_default_user'
+                migrationName: 'add_default_user',
             );
         }
     }
@@ -396,15 +397,22 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
+    protected function publishView(View $view, string $viewName, string $path): void
+    {
+        $viewName = "{$viewName}.php";
+
+        $data = $view->render();
+
+        file_put_contents("{$path}/{$viewName}", "<?php\n\n{$data}");
+    }
+
     protected function publishMigration(View $view, string $migrationName): void
     {
         $time = Carbon::now()->format('Y_m_d_His');
 
-        $migrationName = "{$time}_{$migrationName}.php";
+        $migrationName = "{$time}_{$migrationName}";
 
-        $data = $view->render();
-
-        file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
+        $this->publishView($view, $migrationName, "database/migrations");
     }
 
     protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
@@ -543,5 +551,24 @@ class InitCommand extends Command implements Isolatable
             view: view('initializator::users_add_clerk_id_field'),
             migrationName: 'users_add_clerk_id_field',
         );
+
+        $this->publishView(
+            view: view('initializator::clerk_user_repository'),
+            viewName: 'ClerkUserRepository',
+            path: 'app/Support/Clerk',
+        );
+
+        $this->modifyUserModel();
+    }
+
+    protected function modifyUserModel(): void
+    {
+        $parser = app(PhpParser::class, ['filePath' => 'app/Models/User.php']);
+
+        $parser
+            ->addValueToArrayProperty(['fillable'], 'clerk_id')
+            ->removeValueFromArrayProperty(['fillable', 'hidden'], 'password')
+            ->removeValueFromMethodReturnArray(['casts'], 'password')
+            ->save();
     }
 }

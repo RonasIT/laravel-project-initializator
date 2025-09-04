@@ -220,12 +220,30 @@ class InitCommandTest extends TestCase
             ],
         );
 
+        $this->mockNativeFunction('RonasIT\ProjectInitializator\Support\Parser',
+            [
+                $this->functionCall(
+                    name: 'file_get_contents',
+                    arguments: ['app/Models/User.php'],
+                    result: $this->getFixture('user_model.php'),
+                ),
+                $this->functionCall(
+                    name: 'file_put_contents',
+                    arguments: ['app/Models/User.php', $this->getFixture('modified_user_model.php')],
+                ),
+            ]
+        );
+
         $this->mockFilePutContent(
             'env.example.yml',
             'env.development.yml',
             [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
+            ],
+            [
+                'app/Support/Clerk/ClerkUserRepository.php',
+                $this->getFixture('clerk_user_repository.php'),
             ],
             [
                 '.env.development',
@@ -787,12 +805,30 @@ class InitCommandTest extends TestCase
             ],
         );
 
+        $this->mockNativeFunction('RonasIT\ProjectInitializator\Support\Parser',
+            [
+                $this->functionCall(
+                    name: 'file_get_contents',
+                    arguments: ['app/Models/User.php'],
+                    result: $this->getFixture('user_model.php'),
+                ),
+                $this->functionCall(
+                    name: 'file_put_contents',
+                    arguments: ['app/Models/User.php', $this->getFixture('modified_user_model.php')],
+                ),
+            ]
+        );
+        
         $this->mockFilePutContent(
             'env.example.yml',
             'env.development.yml',
             [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
+            ],
+            [
+                'app/Support/Clerk/ClerkUserRepository.php',
+                $this->getFixture('clerk_user_repository.php'),
             ],
             [
                 '.env.development',
