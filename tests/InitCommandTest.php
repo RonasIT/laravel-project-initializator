@@ -24,7 +24,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
             [
-                'arguments' => ['/app/tests/../routes/web.php'],
+                'arguments' => [base_path('/routes/web.php')],
                 'result' => $this->getFixture('web.php'),
             ],
         );
@@ -33,7 +33,7 @@ class InitCommandTest extends TestCase
             'env.example_app_name_pascal_case.yml',
             'env.development_app_name_pascal_case.yml',
             [
-                '/app/tests/../routes/web.php',
+                base_path('/routes/web.php'),
                 $this->getFixture('web_with_login.php'),
             ],
         );
@@ -80,7 +80,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
             [
-                'arguments' => ['/app/tests/../routes/web.php'],
+                'arguments' => [base_path('/routes/web.php')],
                 'result' => $this->getFixture('web.php'),
             ],
         );
@@ -89,7 +89,7 @@ class InitCommandTest extends TestCase
             'env.example_app_name_pascal_case.yml',
             'env.development_app_name_pascal_case.yml',
             [
-                '/app/tests/../routes/web.php',
+                base_path('/routes/web.php'),
                 $this->getFixture('web_with_login.php'),
             ],
             [
@@ -138,7 +138,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => ['/app/tests/../routes/web.php'],
+                'arguments' => [base_path('/routes/web.php')],
                 'result' => $this->getFixture('web.php'),
             ],
         );
@@ -147,7 +147,7 @@ class InitCommandTest extends TestCase
             'env.example.yml',
             'env.development.yml',
             [
-                '/app/tests/../routes/web.php',
+                base_path('/routes/web.php'),
                 $this->getFixture('web_with_login.php'),
             ],
             [
@@ -200,7 +200,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => ['/app/tests/../routes/web.php'],
+                'arguments' => [base_path('/routes/web.php')],
                 'result' => $this->getFixture('web.php'),
             ],
             [
@@ -257,7 +257,7 @@ class InitCommandTest extends TestCase
             'env.example.yml',
             'env.development.yml',
             [
-                '/app/tests/../routes/web.php',
+                base_path('/routes/web.php'),
                 $this->getFixture('web_with_login.php'),
             ],
             [
@@ -388,7 +388,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => ['/app/tests/../routes/web.php'],
+                'arguments' => [base_path('/routes/web.php')],
                 'result' => $this->getFixture('web.php'),
             ],
             [
@@ -421,7 +421,7 @@ class InitCommandTest extends TestCase
             'env.example.yml',
             'env.development.yml',
             [
-                '/app/tests/../routes/web.php',
+                base_path('/routes/web.php'),
                 $this->getFixture('web_with_login.php'),
             ],
             [
@@ -515,7 +515,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => ['/app/tests/../routes/web.php'],
+                'arguments' => [base_path('/routes/web.php')],
                 'result' => $this->getFixture('web.php'),
             ],
             [
@@ -560,7 +560,7 @@ class InitCommandTest extends TestCase
             'env.example.yml',
             'env.development.yml',
             [
-                '/app/tests/../routes/web.php',
+                base_path('/routes/web.php'),
                 $this->getFixture('web_with_login.php'),
             ],
             [
@@ -676,7 +676,7 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => ['/app/tests/../routes/web.php'],
+                'arguments' => [base_path('/routes/web.php')],
                 'result' => $this->getFixture('web.php'),
             ],
             [
@@ -709,7 +709,7 @@ class InitCommandTest extends TestCase
             'env.example.yml',
             'env.development.yml',
             [
-                '/app/tests/../routes/web.php',
+                base_path('/routes/web.php'),
                 $this->getFixture('web_with_login.php'),
             ],
             [

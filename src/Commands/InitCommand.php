@@ -519,7 +519,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function generateWebLoginRoutes(): void
     {
-        $filePath = base_path() . '/routes/web.php';
+        $filePath = base_path('/routes/web.php');
 
         $content = file_get_contents($filePath);
 
