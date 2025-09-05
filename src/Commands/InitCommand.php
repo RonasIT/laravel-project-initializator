@@ -229,26 +229,25 @@ class InitCommand extends Command implements Isolatable
 
         $data = json_decode($content, true);
 
-        $data = $this->addToArray($data, 'extra.hooks.config.stop-on-failure', 'pre-commit');
-        $data = $this->addToArray($data, 'extra.hooks.pre-commit', 'docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair');
-        $data = $this->addToArray($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
-        $data = $this->addToArray($data, 'scripts.post-update-cmd', 'cghooks update');
+        $this->addArrayItemIfMissing($data, 'extra.hooks.config.stop-on-failure', 'pre-commit');
+        $this->addArrayItemIfMissing($data, 'extra.hooks.pre-commit', 'docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair');
+        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
+        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', 'cghooks update');
 
         $resultData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
         file_put_contents($path, $resultData);
     }
 
-    protected function addToArray(array $data, string $path, string $value): array
+    protected function addArrayItemIfMissing(array &$data, string $path, string $value): void
     {
         $current = Arr::get($data, $path, []);
 
         if (!in_array($value, $current)) {
             $current[] = $value;
+
             Arr::set($data, $path, $current);
         }
-
-        return $data;
     }
 
     protected function setAutoDocContactEmail(string $email): void

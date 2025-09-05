@@ -32,7 +32,7 @@ class InitCommandTest extends TestCase
             'env.development_app_name_pascal_case.yml',
             [
                 base_path('composer.json'),
-                $this->getFixture('composer_after_changes.json', true),
+                $this->getFixture('composer_with_pint_settings.json'),
             ],
         );
 
@@ -94,7 +94,7 @@ class InitCommandTest extends TestCase
             ],
             [
                 base_path('composer.json'),
-                $this->getFixture('composer_after_changes.json', true),
+                $this->getFixture('composer_with_pint_settings.json'),
             ],
         );
 
@@ -154,7 +154,7 @@ class InitCommandTest extends TestCase
             ],
             [
                 base_path('composer.json'),
-                $this->getFixture('composer_after_changes.json', true),
+                $this->getFixture('composer_with_pint_settings.json'),
             ],
         );
 
@@ -290,7 +290,7 @@ class InitCommandTest extends TestCase
             ],
             [
                 base_path('composer.json'),
-                $this->getFixture('composer_after_changes.json', true),
+                $this->getFixture('composer_with_pint_settings.json'),
             ],
         );
 
@@ -431,7 +431,7 @@ class InitCommandTest extends TestCase
             ],
             [
                 base_path('composer.json'),
-                $this->getFixture('composer_after_changes.json', true),
+                $this->getFixture('composer_with_pint_settings.json'),
             ],
         );
 
@@ -583,7 +583,7 @@ class InitCommandTest extends TestCase
             ],
             [
                 base_path('composer.json'),
-                $this->getFixture('composer_after_changes.json', true),
+                $this->getFixture('composer_with_pint_settings.json'),
             ],
         );
 
@@ -721,7 +721,7 @@ class InitCommandTest extends TestCase
             ],
             [
                 base_path('composer.json'),
-                $this->getFixture('composer_after_changes.json', true),
+                $this->getFixture('composer_with_pint_settings.json'),
             ],
         );
 
@@ -801,7 +801,7 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function testRunWithClerkMobileApp(): void
+    public function testRunWithClerkMobileAppAndPintAlreadyInstalled(): void
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
@@ -864,7 +864,7 @@ class InitCommandTest extends TestCase
             ],
             [
                 'arguments' => [base_path('composer.json')],
-                'result' => $this->getFixture('composer.json'),
+                'result' => $this->getFixture('composer_with_pint_settings.json'),
             ],
         );
 
@@ -901,7 +901,7 @@ class InitCommandTest extends TestCase
             ],
             [
                 base_path('composer.json'),
-                $this->getFixture('composer_after_changes.json', true),
+                $this->getFixture('composer_with_pint_settings.json'),
             ],
         );
 
