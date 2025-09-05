@@ -423,6 +423,7 @@ class InitCommand extends Command implements Isolatable
     {
         $env = EnvFile::open($fileName);
 
+        $env->addEmptyLine();
         $env->set($data);
 
         $env->write();

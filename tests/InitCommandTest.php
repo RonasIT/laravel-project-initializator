@@ -10,7 +10,8 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
-        $this->mockConfigWriterFilesExist();
+        $this->mockIsFile();
+        $this->mockFilesExist();
 
         $this->mockFileUpdate(
             '\Winter\LaravelConfigWriter', 

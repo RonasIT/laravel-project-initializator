@@ -36,7 +36,7 @@ trait InitCommandMockTrait
         return file_get_contents(base_path("/resources/md/readme/{$template}"));
     }
 
-    public function mockConfigWriterFilesExist(array ...$arguments): void
+    public function mockIsFile(array ...$arguments): void
     {
         $callChain = [
             [
@@ -47,6 +47,21 @@ trait InitCommandMockTrait
                 'function' => 'is_file',
                 'arguments' => '.env.development',
             ],
+            ...$arguments,
+        ];
+
+        $this->mockNativeFunction(
+            namespace: '\Winter\LaravelConfigWriter',
+            callChain: array_map(
+                fn ($call) => $this->functionCall($call['function'], [$call['arguments']], true),
+                $callChain,
+            ),
+        );
+    }
+
+    public function mockFilesExist(array ...$arguments): void
+    {
+        $callChain = [
             [
                 'function' => 'file_exists',
                 'arguments' => base_path('config/auto-doc.php'),
