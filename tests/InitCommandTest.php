@@ -21,11 +21,19 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
+            [
+                'arguments' => [base_path('composer.json')],
+                'result' => $this->getFixture('composer.json'),
+            ],
         );
 
         $this->mockFilePutContent(
             'env.example_app_name_pascal_case.yml',
             'env.development_app_name_pascal_case.yml',
+            [
+                base_path('composer.json'),
+                $this->getFixture('composer_with_pint_settings.json'),
+            ],
         );
 
         $this->mockClassExists([
@@ -37,6 +45,9 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require --dev laravel/pint --ansi'],
+            ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
+            ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
         );
 
         $this
@@ -68,6 +79,10 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
+            [
+                'arguments' => [base_path('composer.json')],
+                'result' => $this->getFixture('composer.json'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -77,6 +92,10 @@ class InitCommandTest extends TestCase
                 'renovate.json',
                 $this->getFixture('renovate.json'),
             ],
+            [
+                base_path('composer.json'),
+                $this->getFixture('composer_with_pint_settings.json'),
+            ],
         );
 
         $this->mockShellExec(
@@ -84,6 +103,9 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require --dev laravel/pint --ansi'],
+            ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
+            ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
@@ -117,6 +139,10 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development.yml'),
             ],
+            [
+                'arguments' => [base_path('composer.json')],
+                'result' => $this->getFixture('composer.json'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -126,6 +152,10 @@ class InitCommandTest extends TestCase
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
             ],
+            [
+                base_path('composer.json'),
+                $this->getFixture('composer_with_pint_settings.json'),
+            ],
         );
 
         $this->mockShellExec(
@@ -133,6 +163,9 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require --dev laravel/pint --ansi'],
+            ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
+            ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
@@ -218,6 +251,10 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
+            [
+                'arguments' => [base_path('composer.json')],
+                'result' => $this->getFixture('composer.json'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -251,6 +288,10 @@ class InitCommandTest extends TestCase
                 'README.md',
                 $this->getFixture('default_readme_after_using_renovate.md'),
             ],
+            [
+                base_path('composer.json'),
+                $this->getFixture('composer_with_pint_settings.json'),
+            ],
         );
 
         $this->mockShellExec(
@@ -259,6 +300,9 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require --dev laravel/pint --ansi'],
+            ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
+            ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
             ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
             ['arguments' => 'php artisan laravel-clerk:install --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
@@ -372,6 +416,10 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
+            [
+                'arguments' => [base_path('composer.json')],
+                'result' => $this->getFixture('composer.json'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -380,7 +428,11 @@ class InitCommandTest extends TestCase
             [
                 'README.md',
                 $this->getFixture('partial_readme.md'),
-            ]
+            ],
+            [
+                base_path('composer.json'),
+                $this->getFixture('composer_with_pint_settings.json'),
+            ],
         );
 
         $this->mockShellExec(
@@ -388,6 +440,9 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require --dev laravel/pint --ansi'],
+            ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
+            ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
@@ -501,6 +556,10 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
+            [
+                'arguments' => [base_path('composer.json')],
+                'result' => $this->getFixture('composer.json'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -522,6 +581,10 @@ class InitCommandTest extends TestCase
                 'README.md',
                 $this->getFixture('full_readme_after_using_renovate.md'),
             ],
+            [
+                base_path('composer.json'),
+                $this->getFixture('composer_with_pint_settings.json'),
+            ],
         );
 
         $this->mockShellExec(
@@ -530,6 +593,9 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require --dev laravel/pint --ansi'],
+            ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
+            ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
             ['arguments' => 'composer require ronasit/laravel-media --ansi'],
@@ -640,6 +706,10 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
+            [
+                'arguments' => [base_path('composer.json')],
+                'result' => $this->getFixture('composer.json'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -648,7 +718,11 @@ class InitCommandTest extends TestCase
             [
                 'README.md',
                 $this->getFixture('partial_readme_with_telescope.md'),
-            ]
+            ],
+            [
+                base_path('composer.json'),
+                $this->getFixture('composer_with_pint_settings.json'),
+            ],
         );
 
         $this->mockShellExec(
@@ -656,6 +730,9 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require --dev laravel/pint --ansi'],
+            ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
+            ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
@@ -724,7 +801,7 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function testRunWithClerkMobileApp(): void
+    public function testRunWithClerkMobileAppAndPintAlreadyInstalled(): void
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
@@ -785,6 +862,10 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
+            [
+                'arguments' => [base_path('composer.json')],
+                'result' => $this->getFixture('composer_with_pint_settings.json'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -818,6 +899,10 @@ class InitCommandTest extends TestCase
                 'README.md',
                 $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md'),
             ],
+            [
+                base_path('composer.json'),
+                $this->getFixture('composer_with_pint_settings.json'),
+            ],
         );
 
         $this->mockShellExec(
@@ -826,6 +911,9 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
             ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
             ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require --dev laravel/pint --ansi'],
+            ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
+            ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
             ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
             ['arguments' => 'php artisan laravel-clerk:install --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
