@@ -29,4 +29,20 @@ class TestCase extends BaseTestCase
             ProjectInitializatorServiceProvider::class,
         ];
     }
+
+    protected function assertEqualsFixture(string $fixture, $data, bool $exportMode = false): void
+    {
+        if ($this->globalExportMode || $exportMode) {
+            $this->exportJson($fixture, $data);
+        }
+
+        $fixturePath = $this->prepareFixtureName($this->getFixturePath($fixture));
+        $assertFailedMessage = "Failed asserting that the provided data equal to fixture: {$fixturePath}";
+
+        $this->assertEquals(
+            expected: $this->getFixture($fixture),
+            actual: $data,
+            message: $assertFailedMessage,
+        );
+    }
 }
