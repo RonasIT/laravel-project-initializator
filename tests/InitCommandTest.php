@@ -22,10 +22,6 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
-            [
-                'arguments' => [base_path('/routes/web.php')],
-                'result' => $this->getFixture('web.php'),
-            ],
         );
 
         $this->mockFilePutContent(
@@ -33,7 +29,8 @@ class InitCommandTest extends TestCase
             'env.development_app_name_pascal_case.yml',
             [
                 base_path('/routes/web.php'),
-                $this->getFixture('web_with_login.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
             ],
         );
 
@@ -79,10 +76,6 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
-            [
-                'arguments' => [base_path('/routes/web.php')],
-                'result' => $this->getFixture('web.php'),
-            ],
         );
 
         $this->mockFilePutContent(
@@ -90,7 +83,8 @@ class InitCommandTest extends TestCase
             'env.development_app_name_pascal_case.yml',
             [
                 base_path('/routes/web.php'),
-                $this->getFixture('web_with_login.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
             ],
             [
                 'renovate.json',
@@ -138,10 +132,6 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development.yml'),
             ],
-            [
-                'arguments' => [base_path('/routes/web.php')],
-                'result' => $this->getFixture('web.php'),
-            ],
         );
 
         $this->mockFilePutContent(
@@ -149,7 +139,8 @@ class InitCommandTest extends TestCase
             'env.development.yml',
             [
                 base_path('/routes/web.php'),
-                $this->getFixture('web_with_login.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
             ],
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
@@ -200,10 +191,6 @@ class InitCommandTest extends TestCase
             [
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
-                'arguments' => [base_path('/routes/web.php')],
-                'result' => $this->getFixture('web.php'),
             ],
             [
                 'arguments' => ['.env.development'],
@@ -260,7 +247,8 @@ class InitCommandTest extends TestCase
             'env.development.yml',
             [
                 base_path('/routes/web.php'),
-                $this->getFixture('web_with_login.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
             ],
             [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
@@ -390,10 +378,6 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => [base_path('/routes/web.php')],
-                'result' => $this->getFixture('web.php'),
-            ],
-            [
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
@@ -424,7 +408,8 @@ class InitCommandTest extends TestCase
             'env.development.yml',
             [
                 base_path('/routes/web.php'),
-                $this->getFixture('web_with_login.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
             ],
             [
                 'README.md',
@@ -517,10 +502,6 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => [base_path('/routes/web.php')],
-                'result' => $this->getFixture('web.php'),
-            ],
-            [
                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
@@ -563,7 +544,8 @@ class InitCommandTest extends TestCase
             'env.development.yml',
             [
                 base_path('/routes/web.php'),
-                $this->getFixture('web_with_login.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
             ],
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
@@ -678,10 +660,6 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => [base_path('/routes/web.php')],
-                'result' => $this->getFixture('web.php'),
-            ],
-            [
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
             ],
@@ -712,7 +690,8 @@ class InitCommandTest extends TestCase
             'env.development.yml',
             [
                 base_path('/routes/web.php'),
-                $this->getFixture('web_with_login.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
             ],
             [
                 'README.md',
@@ -823,10 +802,6 @@ class InitCommandTest extends TestCase
                 'result' => $this->getFixture('env.development.yml'),
             ],
             [
-                'arguments' => [base_path('/routes/web.php')],
-                'result' => $this->getFixture('web.php'),
-            ],
-            [
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development.yml'),
             ],
@@ -882,7 +857,8 @@ class InitCommandTest extends TestCase
             'env.development.yml',
             [
                 base_path('/routes/web.php'),
-                $this->getFixture('web_with_login.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
             ],
             [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',

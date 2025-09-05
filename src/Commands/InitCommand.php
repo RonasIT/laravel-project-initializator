@@ -547,19 +547,6 @@ class InitCommand extends Command implements Isolatable
         );
     }
 
-    protected function generateWebLoginRoutes(): void
-    {
-        $filePath = base_path('/routes/web.php');
-
-        $content = file_get_contents($filePath);
-
-        $pattern = '/\*\/\s*$/';
-
-        $newContent = preg_replace($pattern, "*/\n" . "\nAuth::routes();\n", $content);
-
-        file_put_contents($filePath, $newContent);
-    }
-
     protected function publishWebLogin(): void
     {
         Artisan::call('vendor:publish', [
@@ -567,6 +554,6 @@ class InitCommand extends Command implements Isolatable
             '--force' => true,
         ]);
 
-        $this->generateWebLoginRoutes();
+        file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
     }
 }
