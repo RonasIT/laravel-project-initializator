@@ -256,6 +256,10 @@ class InitCommandTest extends TestCase
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
             ],
             [
+                'app/Support/Clerk/ClerkUserRepository.php',
+                $this->getFixture('clerk_user_repository.php'),
+            ],
+            [
                 'database/migrations/2018_11_11_111111_admins_create_table.php',
                 $this->getFixture('admins_table_migration.php'),
             ],
@@ -853,6 +857,18 @@ class InitCommandTest extends TestCase
             [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
+            ],
+            [
+                'app/Support/Clerk/ClerkUserRepository.php',
+                $this->getFixture('clerk_user_repository.php'),
+            ],
+            [
+                '.env.development',
+                $this->getFixture('env.development_clerk_credentials_added_mobile_app.yml'),
+            ],
+            [
+                '.env.example',
+                $this->getFixture('env.example_clerk_credentials_added_mobile_app.yml'),
             ],
             [
                 'database/migrations/2018_11_11_111111_admins_create_table.php',

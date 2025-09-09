@@ -231,7 +231,7 @@ class InitCommand extends Command implements Isolatable
     protected function setAutoDocContactEmail(string $email): void
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
-
+        
         $config->set('info.contact.email', $email);
 
         $config->write();
@@ -257,7 +257,7 @@ class InitCommand extends Command implements Isolatable
 
             $this->publishMigration(
                 view: view('initializator::add_default_user')->with($this->adminCredentials),
-                migrationName: 'add_default_user'
+                migrationName: 'add_default_user',
             );
         }
     }
@@ -408,15 +408,26 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
+    protected function publishClass(View $template, string $fileName, string $filePath): void
+    {
+        $fileName = "{$fileName}.php";
+
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777, true);
+        }
+
+        $data = $template->render();
+
+        file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
+    }
+
     protected function publishMigration(View $view, string $migrationName): void
     {
         $time = Carbon::now()->format('Y_m_d_His');
 
-        $migrationName = "{$time}_{$migrationName}.php";
+        $migrationName = "{$time}_{$migrationName}";
 
-        $data = $view->render();
-
-        file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
+        $this->publishClass($view, $migrationName, 'database/migrations');
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
@@ -529,6 +540,12 @@ class InitCommand extends Command implements Isolatable
         $this->publishMigration(
             view: view('initializator::users_add_clerk_id_field'),
             migrationName: 'users_add_clerk_id_field',
+        );
+
+        $this->publishClass(
+            template: view('initializator::clerk_user_repository'),
+            fileName: 'ClerkUserRepository',
+            filePath: 'app/Support/Clerk',
         );
     }
 }
