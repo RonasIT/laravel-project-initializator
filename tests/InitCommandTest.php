@@ -10,22 +10,21 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
-        $this->mockIsFile();
-        $this->mockFilesExist();
-
-        $this->mockFileUpdate(
-            '\Winter\LaravelConfigWriter', 
+        $this->mockLaravelConfigWriter(
             [
+                'function' => 'is_file',
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
                 'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
             [
+                'function' => 'file_exists',
                 'path' => base_path('config/auto-doc.php'),
                 'source' => $this->getFixture('auto_doc.php'),
                 'result' => $this->getFixture('auto_doc_after_changes.php'),
@@ -61,35 +60,32 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
-        $this->mockConfigWriterFilesExist();
-
-        $this->mockFileUpdate(
-            '\Winter\LaravelConfigWriter', 
+        $this->mockLaravelConfigWriter(
             [
+                'function' => 'is_file',
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
                 'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
             [
+                'function' => 'file_exists',
                 'path' => base_path('config/auto-doc.php'),
                 'source' => $this->getFixture('auto_doc.php'),
                 'result' => $this->getFixture('auto_doc_after_changes.php'),
             ],
         );
 
-        $this->mockFilePutContent(
-            'RonasIT\ProjectInitializator\Commands', 
+        $this->mockFilePutContent( 
             [
-                [
-                    'path' => 'renovate.json',
-                    'result' => $this->getFixture('renovate.json'),
-                ],
-            ]
+                'renovate.json',
+                $this->getFixture('renovate.json'),
+            ],
         );
 
         $this->mockShellExec(
@@ -119,21 +115,21 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
-        $this->mockConfigWriterFilesExist();
-
-        $this->mockFileUpdate(
-            '\Winter\LaravelConfigWriter', 
+        $this->mockLaravelConfigWriter(
             [
+                'function' => 'is_file',
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
                 'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'file_exists',
                 'path' => base_path('config/auto-doc.php'),
                 'source' => $this->getFixture('auto_doc.php'),
                 'result' => $this->getFixture('auto_doc_after_changes.php'),
@@ -141,13 +137,10 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockFilePutContent(
-            'RonasIT\ProjectInitializator\Commands', 
             [
-                [
-                    'path' => 'database/migrations/2018_11_11_111111_add_default_user.php',
-                    'result' => $this->getFixture('migration.php'),
-                ],
-            ]
+                'database/migrations/2018_11_11_111111_add_default_user.php',
+                $this->getFixture('migration.php'),
+            ],
         );
 
         $this->mockShellExec(
@@ -181,40 +174,33 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
-        $this->mockConfigWriterFilesExist(
+        $this->mockLaravelConfigWriter(
             [
                 'function' => 'is_file',
-                'arguments' => '.env.development',
-            ],
-            [
-                'function' => 'is_file',
-                'arguments' => '.env.example',
-            ],
-        );
-
-        $this->mockFileUpdate(
-            '\Winter\LaravelConfigWriter', 
-            [
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
                 'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_clerk_credentials_added.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
                 'result' => $this->getFixture('env.example_clerk_credentials_added.yml'),
             ],
             [
+                'function' => 'file_exists',
                 'path' => base_path('config/auto-doc.php'),
                 'source' => $this->getFixture('auto_doc.php'),
                 'result' => $this->getFixture('auto_doc_after_changes.php'),
@@ -222,75 +208,69 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockFileGetContent(
-            'RonasIT\ProjectInitializator\Commands',
             [
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md'),
-                    'source' => $this->getTemplate('README.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md'),
-                    'source' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md'),
-                    'source' => $this->getTemplate('RESOURCES.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md'),
-                    'source' => $this->getTemplate('CONTACTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md'),
-                    'source' => $this->getTemplate('PREREQUISITES.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md'),
-                    'source' => $this->getTemplate('GETTING_STARTED.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md'),
-                    'source' => $this->getTemplate('ENVIRONMENTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md'),
-                    'source' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md'),
-                    'source' => $this->getTemplate('CLERK.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md'),
-                    'source' => $this->getTemplate('RENOVATE.md'),
-                ],
-            ]
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
+                'result' => $this->getTemplate('README.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
+                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
+                'result' => $this->getTemplate('RESOURCES.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
+                'result' => $this->getTemplate('CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
+                'result' => $this->getTemplate('PREREQUISITES.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
+                'result' => $this->getTemplate('GETTING_STARTED.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
+                'result' => $this->getTemplate('ENVIRONMENTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
+                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md')],
+                'result' => $this->getTemplate('CLERK.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
+                'result' => $this->getTemplate('RENOVATE.md'),
+            ],
         );
 
         $this->mockFilePutContent(
-            'RonasIT\ProjectInitializator\Commands',
             [
-                [
-                    'path' => 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
-                    'result' => $this->getFixture('users_add_clerk_id_field_migration.php'),
-                ],
-                [
-                    'path' => 'database/migrations/2018_11_11_111111_admins_create_table.php',
-                    'result' =>  $this->getFixture('admins_table_migration.php'),
-                ],
-                [
-                    'path' => 'README.md',
-                    'result' =>  $this->getFixture('default_readme.md'),
-                ],
-                [
-                    'path' => 'renovate.json',
-                    'result' =>  $this->getFixture('renovate.json'),
-                ],
-                [
-                    'path' => 'README.md',
-                    'result' =>  $this->getFixture('default_readme_after_using_renovate.md'),
-                ],
-            ]
+                'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
+                $this->getFixture('users_add_clerk_id_field_migration.php'),
+            ],
+            [
+                'database/migrations/2018_11_11_111111_admins_create_table.php',
+                $this->getFixture('admins_table_migration.php'),
+            ],
+            [
+                'README.md',
+                $this->getFixture('default_readme.md'),
+            ],
+            [
+                'renovate.json',
+                $this->getFixture('renovate.json'),
+            ],
+            [
+                'README.md',
+                $this->getFixture('default_readme_after_using_renovate.md'),
+            ],
         );
 
         $this->mockShellExec(
@@ -377,21 +357,21 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndPartialReadmeCreation()
     {
-        $this->mockConfigWriterFilesExist();
-
-        $this->mockFileUpdate(
-            '\Winter\LaravelConfigWriter', 
+        $this->mockLaravelConfigWriter(
             [
+                'function' => 'is_file',
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
                 'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'file_exists',
                 'path' => base_path('config/auto-doc.php'),
                 'source' => $this->getFixture('auto_doc.php'),
                 'result' => $this->getFixture('auto_doc_after_changes.php'),
@@ -399,43 +379,37 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockFileGetContent(
-            'RonasIT\ProjectInitializator\Commands',
             [
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md'),
-                    'source' => $this->getTemplate('README.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md'),
-                    'source' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md'),
-                    'source' => $this->getTemplate('RESOURCES.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md'),
-                    'source' => $this->getTemplate('CONTACTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md'),
-                    'source' => $this->getTemplate('ENVIRONMENTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md'),
-                    'source' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-                ],
-            ]
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
+                'result' => $this->getTemplate('README.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
+                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
+                'result' => $this->getTemplate('RESOURCES.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
+                'result' => $this->getTemplate('CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
+                'result' => $this->getTemplate('ENVIRONMENTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
+                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+            ],
         );
 
         $this->mockFilePutContent(
-            'RonasIT\ProjectInitializator\Commands',
             [
-                [
-                    'path' => 'README.md',
-                    'result' =>  $this->getFixture('partial_readme.md'),
-                ],
-            ]
+                'README.md',
+                $this->getFixture('partial_readme.md'),
+            ],
         );
 
         $this->mockShellExec(
@@ -509,21 +483,21 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
-        $this->mockConfigWriterFilesExist();
-
-        $this->mockFileUpdate(
-            '\Winter\LaravelConfigWriter', 
+        $this->mockLaravelConfigWriter(
             [
+                'function' => 'is_file',
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
                 'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'file_exists',
                 'path' => base_path('config/auto-doc.php'),
                 'source' => $this->getFixture('auto_doc.php'),
                 'result' => $this->getFixture('auto_doc_after_changes.php'),
@@ -531,67 +505,61 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockFileGetContent(
-            'RonasIT\ProjectInitializator\Commands',
             [
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md'),
-                    'source' => $this->getTemplate('README.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md'),
-                    'source' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md'),
-                    'source' => $this->getTemplate('RESOURCES.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md'),
-                    'source' => $this->getTemplate('CONTACTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md'),
-                    'source' => $this->getTemplate('PREREQUISITES.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md'),
-                    'source' => $this->getTemplate('GETTING_STARTED.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md'),
-                    'source' => $this->getTemplate('ENVIRONMENTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md'),
-                    'source' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md'),
-                    'source' => $this->getTemplate('RENOVATE.md'),
-                ],
-            ]
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
+                'result' => $this->getTemplate('README.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
+                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
+                'result' => $this->getTemplate('RESOURCES.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
+                'result' => $this->getTemplate('CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
+                'result' => $this->getTemplate('PREREQUISITES.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
+                'result' => $this->getTemplate('GETTING_STARTED.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
+                'result' => $this->getTemplate('ENVIRONMENTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
+                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
+                'result' => $this->getTemplate('RENOVATE.md'),
+            ],
         );
 
         $this->mockFilePutContent(
-            'RonasIT\ProjectInitializator\Commands',
             [
-                [
-                    'path' => 'database/migrations/2018_11_11_111111_add_default_user.php',
-                    'result' =>  $this->getFixture('migration.php'),
-                ],
-                [
-                    'path' => 'README.md',
-                    'result' =>  $this->getFixture('full_readme.md'),
-                ],
-                [
-                    'path' => 'renovate.json',
-                    'result' =>  $this->getFixture('renovate.json'),
-                ],
-                [
-                    'path' => 'README.md',
-                    'result' =>  $this->getFixture('full_readme_after_using_renovate.md'),
-                ],
-            ]
+                'database/migrations/2018_11_11_111111_add_default_user.php',
+                $this->getFixture('migration.php'),
+            ],
+            [
+                'README.md',
+                $this->getFixture('full_readme.md'),
+            ],
+            [
+                'renovate.json',
+                $this->getFixture('renovate.json'),
+            ],
+            [
+                'README.md',
+                $this->getFixture('full_readme_after_using_renovate.md'),
+            ],
         );
 
         $this->mockShellExec(
@@ -675,21 +643,21 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndUsingTelescope()
     {
-        $this->mockConfigWriterFilesExist();
-
-        $this->mockFileUpdate(
-            '\Winter\LaravelConfigWriter', 
+        $this->mockLaravelConfigWriter(
             [
+                'function' => 'is_file',
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
                 'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'file_exists',
                 'path' => base_path('config/auto-doc.php'),
                 'source' => $this->getFixture('auto_doc.php'),
                 'result' => $this->getFixture('auto_doc_after_changes.php'),
@@ -697,43 +665,37 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockFileGetContent(
-            'RonasIT\ProjectInitializator\Commands',
             [
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md'),
-                    'source' => $this->getTemplate('README.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md'),
-                    'source' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md'),
-                    'source' => $this->getTemplate('RESOURCES.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md'),
-                    'source' => $this->getTemplate('CONTACTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md'),
-                    'source' => $this->getTemplate('ENVIRONMENTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md'),
-                    'source' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-                ],
-            ]
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
+                'result' => $this->getTemplate('README.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
+                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
+                'result' => $this->getTemplate('RESOURCES.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
+                'result' => $this->getTemplate('CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
+                'result' => $this->getTemplate('ENVIRONMENTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
+                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+            ],
         );
 
         $this->mockFilePutContent(
-            'RonasIT\ProjectInitializator\Commands',
             [
-                [
-                    'path' => 'README.md',
-                    'result' =>  $this->getFixture('partial_readme_with_telescope.md'),
-                ],
-            ]
+                'README.md',
+                $this->getFixture('partial_readme_with_telescope.md'),
+            ],
         );
 
         $this->mockShellExec(
@@ -811,40 +773,33 @@ class InitCommandTest extends TestCase
 
     public function testRunWithClerkMobileApp(): void
     {
-        $this->mockConfigWriterFilesExist(
+        $this->mockLaravelConfigWriter(
             [
                 'function' => 'is_file',
-                'arguments' => '.env.development',
-            ],
-            [
-                'function' => 'is_file',
-                'arguments' => '.env.example',
-            ],
-        );
-
-        $this->mockFileUpdate(
-            '\Winter\LaravelConfigWriter', 
-            [
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
                 'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.development',
                 'source' => $this->getFixture('env.development.yml'),
                 'result' => $this->getFixture('env.development_clerk_credentials_added_mobile_app.yml'),
             ],
             [
+                'function' => 'is_file',
                 'path' => '.env.example',
                 'source' => $this->getFixture('env.example.yml'),
                 'result' => $this->getFixture('env.example_clerk_credentials_added_mobile_app.yml'),
             ],
             [
+                'function' => 'file_exists',
                 'path' => base_path('config/auto-doc.php'),
                 'source' => $this->getFixture('auto_doc.php'),
                 'result' => $this->getFixture('auto_doc_after_changes.php'),
@@ -852,75 +807,69 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockFileGetContent(
-            'RonasIT\ProjectInitializator\Commands',
             [
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md'),
-                    'source' => $this->getTemplate('README.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md'),
-                    'source' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md'),
-                    'source' => $this->getTemplate('RESOURCES.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md'),
-                    'source' => $this->getTemplate('CONTACTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md'),
-                    'source' => $this->getTemplate('PREREQUISITES.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md'),
-                    'source' => $this->getTemplate('GETTING_STARTED.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md'),
-                    'source' => $this->getTemplate('ENVIRONMENTS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md'),
-                    'source' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md'),
-                    'source' => $this->getTemplate('CLERK.md'),
-                ],
-                [
-                    'path' => base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md'),
-                    'source' => $this->getTemplate('RENOVATE.md'),
-                ],
-            ]
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
+                'result' => $this->getTemplate('README.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
+                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
+                'result' => $this->getTemplate('RESOURCES.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
+                'result' => $this->getTemplate('CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
+                'result' => $this->getTemplate('PREREQUISITES.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
+                'result' => $this->getTemplate('GETTING_STARTED.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
+                'result' => $this->getTemplate('ENVIRONMENTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
+                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md')],
+                'result' => $this->getTemplate('CLERK.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
+                'result' => $this->getTemplate('RENOVATE.md'),
+            ],
         );
 
         $this->mockFilePutContent(
-            'RonasIT\ProjectInitializator\Commands',
             [
-                [
-                    'path' => 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
-                    'result' =>  $this->getFixture('users_add_clerk_id_field_migration.php'),
-                ],
-                [
-                    'path' => 'database/migrations/2018_11_11_111111_admins_create_table.php',
-                    'result' =>  $this->getFixture('admins_table_migration.php'),
-                ],
-                [
-                    'path' => 'README.md',
-                    'result' =>  $this->getFixture('default_readme_with_mobile_app.md'),
-                ],
-                [
-                    'path' => 'renovate.json',
-                    'result' =>  $this->getFixture('renovate.json'),
-                ],
-                [
-                    'path' => 'README.md',
-                    'result' =>  $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md'),
-                ],
-            ]
+                'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
+                $this->getFixture('users_add_clerk_id_field_migration.php'),
+            ],
+            [
+                'database/migrations/2018_11_11_111111_admins_create_table.php',
+                $this->getFixture('admins_table_migration.php'),
+            ],
+            [
+                'README.md',
+                $this->getFixture('default_readme_with_mobile_app.md'),
+            ],
+            [
+                'renovate.json',
+                $this->getFixture('renovate.json'),
+            ],
+            [
+                'README.md',
+                $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md'),
+            ],
         );
 
         $this->mockShellExec(
