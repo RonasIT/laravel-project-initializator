@@ -863,14 +863,6 @@ class InitCommandTest extends TestCase
                 $this->getFixture('clerk_user_repository.php'),
             ],
             [
-                '.env.development',
-                $this->getFixture('env.development_clerk_credentials_added_mobile_app.yml'),
-            ],
-            [
-                '.env.example',
-                $this->getFixture('env.example_clerk_credentials_added_mobile_app.yml'),
-            ],
-            [
                 'database/migrations/2018_11_11_111111_admins_create_table.php',
                 $this->getFixture('admins_table_migration.php'),
             ],
