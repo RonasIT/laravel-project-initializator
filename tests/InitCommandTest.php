@@ -782,8 +782,8 @@ class InitCommandTest extends TestCase
         $this->assertFileEqualsFixture('app.blade.php', resource_path('views/layouts/app.blade.php'));
         $this->assertFileEqualsFixture('login.blade.php', resource_path('views/auth/login.blade.php'));
 
-        File::deleteDirectory('app');
-        File::deleteDirectory('public');
+        File::deleteDirectory(app_path());
+        File::deleteDirectory(public_path());
         File::deleteDirectory(resource_path('views/layouts'));
         File::deleteDirectory(resource_path('views/auth'));
     }
@@ -809,7 +809,6 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example.yml'),
             ],
-
             [
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
                 'result' => $this->getTemplate('README.md'),
