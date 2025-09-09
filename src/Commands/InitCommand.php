@@ -550,7 +550,7 @@ class InitCommand extends Command implements Isolatable
     protected function publishWebLogin(): void
     {
         Artisan::call('vendor:publish', [
-            '--tag' => 'initializator',
+            '--tag' => 'initializator-web-login',
             '--force' => true,
         ]);
 

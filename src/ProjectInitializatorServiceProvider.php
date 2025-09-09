@@ -19,7 +19,7 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
             __DIR__ . '/../stubs/assets/js/app.js' => public_path('app.js'),
             __DIR__ . '/../stubs/views/app.blade.php' => resource_path('views/layouts/app.blade.php'),
             __DIR__ . '/../stubs/views/login.blade.php' => resource_path('views/auth/login.blade.php'),
-        ], 'initializator');
+        ], 'initializator-web-login');
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'initializator');
     }
