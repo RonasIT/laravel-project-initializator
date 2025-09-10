@@ -1,5 +1,3 @@
-<?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\App;
@@ -8,7 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use RonasIT\Support\Traits\MigrationTrait;
 
-class CreateOrAddTelescopeAdminTable extends Migration
+class CreateOrAdd{{ ucfirst($credentialItem) }}AdminTable extends Migration
 {
     use MigrationTrait;
 
@@ -24,8 +22,8 @@ class CreateOrAddTelescopeAdminTable extends Migration
 
         if (!App::environment('testing')) {
             DB::table('admins')->insert([
-                'email' => 'telescope_mail@mail.com',
-                'password' => Hash::make('654321'),
+                'email' => '{{ $email }}',
+                'password' => Hash::make('{{ $password }}'),
             ]);
         }
     }

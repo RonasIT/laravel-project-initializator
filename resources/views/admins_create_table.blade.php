@@ -12,13 +12,11 @@ class AdminsCreateTable extends Migration
 
     public function up()
     {
-        if (!Schema::hasTable('admins')) {
-            Schema::create('admins', function (Blueprint $table) {
-                $table->increments('id');
-                $table->string('email')->unique();
-                $table->string('password');
-            });
-        }
+        Schema::create('admins', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('email')->unique();
+            $table->string('password');
+        });
 
         if (!App::environment('testing')) {
             DB::table('admins')->insert([

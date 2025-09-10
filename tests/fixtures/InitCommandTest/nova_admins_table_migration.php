@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use RonasIT\Support\Traits\MigrationTrait;
 
-class AdminsCreateTable extends Migration
+class CreateOrAddNovaAdminTable extends Migration
 {
     use MigrationTrait;
 

@@ -376,8 +376,12 @@ class InitCommand extends Command implements Isolatable
                 $password = $this->ask("Please enter a {$title}'s admin password", $defaultPassword);
 
                 $this->publishMigration(
-                    view: view('initializator::admins_create_table')->with(['email' => $email, 'password' => $password]),
-                    migrationName: 'admins_create_table',
+                    view: view('initializator::admins_create_or_add_additional_admins')->with([
+                        'email' => $email,
+                        'password' => $password,
+                        'credentialItem' => $key,
+                    ]),
+                    migrationName: "admins_create_table_or_add_{$key}_admin",
                 );
             }
 
