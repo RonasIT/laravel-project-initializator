@@ -374,6 +374,11 @@ class InitCommand extends Command implements Isolatable
 
                 $email = $this->ask("Please enter a {$title}'s admin email", "admin@{$kebabName}.com");
                 $password = $this->ask("Please enter a {$title}'s admin password", $defaultPassword);
+
+                $this->publishMigration(
+                    view: view('initializator::admins_create_table')->with(['email' => $email, 'password' => $password]),
+                    migrationName: 'admins_create_table',
+                );
             }
 
             $this->setReadmeValue($filePart, "{$key}_email", $email);

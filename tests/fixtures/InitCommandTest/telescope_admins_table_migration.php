@@ -1,3 +1,5 @@
+<?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\App;
@@ -22,8 +24,8 @@ class AdminsCreateTable extends Migration
 
         if (!App::environment('testing')) {
             DB::table('admins')->insert([
-                'email' => '{{ $email }}',
-                'password' => Hash::make('{{ $password }}'),
+                'email' => 'telescope_mail@mail.com',
+                'password' => Hash::make('654321'),
             ]);
         }
     }

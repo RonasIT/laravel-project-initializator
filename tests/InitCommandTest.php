@@ -515,6 +515,10 @@ class InitCommandTest extends TestCase
                 $this->getFixture('migration.php'),
             ],
             [
+                'database/migrations/2018_11_11_111111_admins_create_table.php',
+                $this->getFixture('nova_admins_table_migration.php'),
+            ],
+            [
                 'README.md',
                 $this->getFixture('full_readme.md'),
             ],
@@ -650,9 +654,17 @@ class InitCommandTest extends TestCase
             'env.example.yml',
             'env.development.yml',
             [
+                'database/migrations/2018_11_11_111111_admins_create_table.php',
+                $this->getFixture('telescope_admins_table_migration.php'),
+            ],
+            [
+                'database/migrations/2018_11_11_111111_admins_create_table.php',
+                $this->getFixture('nova_admins_table_migration.php'),
+            ],
+            [
                 'README.md',
                 $this->getFixture('partial_readme_with_telescope.md'),
-            ]
+            ],
         );
 
         $this->mockShellExec(
