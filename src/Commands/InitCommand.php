@@ -232,7 +232,7 @@ class InitCommand extends Command implements Isolatable
             }
         }
 
-        $codeToAdd = view('project-initialisator::default_http_exception')->render();
+        $codeToAdd = view('project-initializator::default_http_exception')->render();
 
         $baseIndent = '    ';
 
