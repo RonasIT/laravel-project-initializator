@@ -16,15 +16,13 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockClassExists([
-            'arguments' => ['Laravel\Telescope\TelescopeServiceProvider', true],
-        ]);
+        $this->mockNamespaceFunctions(
+            $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
-        $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
         );
 
         $this
@@ -51,20 +49,15 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockFilePutContent( 
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-        );
+        $this->mockNamespaceFunctions(
+            $this->callFilePutContent('renovate.json', 'renovate.json'),
 
-        $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
         );
 
         $this
@@ -91,20 +84,14 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockFilePutContent(
-            [
-                'database/migrations/2018_11_11_111111_add_default_user.php',
-                $this->getFixture('migration.php'),
-            ],
-        );
-
-        $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+        $this->mockNamespaceFunctions(
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', 'migration.php'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
         );
 
         $this
@@ -137,86 +124,34 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockFileGetContent(
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
-                'result' => $this->getTemplate('README.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
-                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
-                'result' => $this->getTemplate('RESOURCES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
-                'result' => $this->getTemplate('CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
-                'result' => $this->getTemplate('PREREQUISITES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
-                'result' => $this->getTemplate('GETTING_STARTED.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
-                'result' => $this->getTemplate('ENVIRONMENTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
-                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md')],
-                'result' => $this->getTemplate('CLERK.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
-                'result' => $this->getTemplate('RENOVATE.md'),
-            ],
-        );
+        $this->mockNamespaceFunctions(
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', 'README.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', 'RESOURCES_AND_CONTACTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', 'RESOURCES.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md', 'CONTACTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md', 'PREREQUISITES.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md', 'GETTING_STARTED.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', 'ENVIRONMENTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md', 'CLERK.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', 'RENOVATE.md'),
 
-        $this->mockFilePutContent(
-            [
-                'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
-                $this->getFixture('users_add_clerk_id_field_migration.php'),
-            ],
-            [
-                'app/Support/Clerk/ClerkUserRepository.php',
-                $this->getFixture('clerk_user_repository.php'),
-            ],
-            [
-                'database/migrations/2018_11_11_111111_admins_create_table.php',
-                $this->getFixture('admins_table_migration.php'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme.md'),
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme_after_using_renovate.md'),
-            ],
-        );
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', 'users_add_clerk_id_field_migration.php'),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', 'clerk_user_repository.php'),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', 'admins_table_migration.php'),
+            $this->callFilePutContent('README.md', 'default_readme.md'),
+            $this->callFilePutContent('renovate.json', 'renovate.json'),
+            $this->callFilePutContent('README.md', 'default_readme_after_using_renovate.md'),
 
-        $this->mockShellExec(
-            ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
-            ['arguments' => 'php artisan laravel-clerk:install --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
+            $this->callShellExec('php artisan laravel-clerk:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
         );
 
         $this
@@ -297,47 +232,22 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockFileGetContent(
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
-                'result' => $this->getTemplate('README.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
-                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
-                'result' => $this->getTemplate('RESOURCES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
-                'result' => $this->getTemplate('CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
-                'result' => $this->getTemplate('ENVIRONMENTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
-                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-            ],
-        );
+        $this->mockNamespaceFunctions(
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', 'README.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', 'RESOURCES_AND_CONTACTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', 'RESOURCES.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md', 'CONTACTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', 'ENVIRONMENTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
 
-        $this->mockFilePutContent(
-            [
-                'README.md',
-                $this->getFixture('partial_readme.md'),
-            ],
-        );
+            $this->callFilePutContent('README.md', 'partial_readme.md'),
 
-        $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
         );
 
         $this
@@ -408,74 +318,31 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockFileGetContent(
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
-                'result' => $this->getTemplate('README.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
-                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
-                'result' => $this->getTemplate('RESOURCES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
-                'result' => $this->getTemplate('CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
-                'result' => $this->getTemplate('PREREQUISITES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
-                'result' => $this->getTemplate('GETTING_STARTED.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
-                'result' => $this->getTemplate('ENVIRONMENTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
-                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
-                'result' => $this->getTemplate('RENOVATE.md'),
-            ],
-        );
+        $this->mockNamespaceFunctions(
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', 'README.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', 'RESOURCES_AND_CONTACTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', 'RESOURCES.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md', 'CONTACTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md', 'PREREQUISITES.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md', 'GETTING_STARTED.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', 'ENVIRONMENTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', 'RENOVATE.md'),
 
-        $this->mockFilePutContent(
-            [
-                'database/migrations/2018_11_11_111111_add_default_user.php',
-                $this->getFixture('migration.php'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('full_readme.md'),
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('full_readme_after_using_renovate.md'),
-            ],
-        );
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', 'migration.php'),
+            $this->callFilePutContent('README.md', 'full_readme.md'),
+            $this->callFilePutContent('renovate.json', 'renovate.json'),
+            $this->callFilePutContent('README.md', 'full_readme_after_using_renovate.md'),
 
-        $this->mockShellExec(
-            ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-media --ansi'],
-            ['arguments' => 'composer remove --dev ronasit/laravel-project-initializator --ansi'],
+            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-media --ansi'),
+            $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
         );
 
         $this
@@ -553,47 +420,22 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockFileGetContent(
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
-                'result' => $this->getTemplate('README.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
-                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
-                'result' => $this->getTemplate('RESOURCES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
-                'result' => $this->getTemplate('CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
-                'result' => $this->getTemplate('ENVIRONMENTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
-                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-            ],
-        );
+        $this->mockNamespaceFunctions(
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', 'README.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', 'RESOURCES_AND_CONTACTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', 'RESOURCES.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md', 'CONTACTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', 'ENVIRONMENTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
 
-        $this->mockFilePutContent(
-            [
-                'README.md',
-                $this->getFixture('partial_readme_with_telescope.md'),
-            ],
-        );
+            $this->callFilePutContent('README.md', 'partial_readme_with_telescope.md'),
 
-        $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
         );
 
         $this
@@ -670,86 +512,34 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockFileGetContent(
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
-                'result' => $this->getTemplate('README.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
-                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
-                'result' => $this->getTemplate('RESOURCES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
-                'result' => $this->getTemplate('CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
-                'result' => $this->getTemplate('PREREQUISITES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
-                'result' => $this->getTemplate('GETTING_STARTED.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
-                'result' => $this->getTemplate('ENVIRONMENTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
-                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md')],
-                'result' => $this->getTemplate('CLERK.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
-                'result' => $this->getTemplate('RENOVATE.md'),
-            ],
-        );
+        $this->mockNamespaceFunctions(
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', 'README.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', 'RESOURCES_AND_CONTACTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', 'RESOURCES.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md', 'CONTACTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md', 'PREREQUISITES.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md', 'GETTING_STARTED.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', 'ENVIRONMENTS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md', 'CLERK.md'),
+            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', 'RENOVATE.md'),
 
-        $this->mockFilePutContent(
-            [
-                'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
-                $this->getFixture('users_add_clerk_id_field_migration.php'),
-            ],
-            [
-                'app/Support/Clerk/ClerkUserRepository.php',
-                $this->getFixture('clerk_user_repository.php'),
-            ],
-            [
-                'database/migrations/2018_11_11_111111_admins_create_table.php',
-                $this->getFixture('admins_table_migration.php'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme_with_mobile_app.md'),
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md'),
-            ],
-        );
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', 'users_add_clerk_id_field_migration.php'),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', 'clerk_user_repository.php'),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', 'admins_table_migration.php'),
+            $this->callFilePutContent('README.md', 'default_readme_with_mobile_app.md'),
+            $this->callFilePutContent('renovate.json', 'renovate.json'),
+            $this->callFilePutContent('README.md', 'default_readme_with_mobile_app_after_using_renovate.md'),
 
-        $this->mockShellExec(
-            ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
-            ['arguments' => 'php artisan laravel-clerk:install --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
+            $this->callShellExec('php artisan laravel-clerk:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
         );
 
         $this
