@@ -845,6 +845,10 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
+            [
+                'arguments' => [base_path('bootstrap/app.php')],
+                'result' => $this->getFixture('app.php'),
+            ],
         );
 
         $this->mockFilePutContent(
@@ -881,6 +885,10 @@ class InitCommandTest extends TestCase
             [
                 'README.md',
                 $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md'),
+            ],
+            [
+                base_path('bootstrap/app.php'),
+                $this->getFixture('app_after_changes.php'),
             ],
         );
 
