@@ -14,5 +14,6 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
         ]);
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'initializator');
+        $this->loadViewsFrom(__DIR__ . '/../stubs', 'project-initialisator');
     }
 }

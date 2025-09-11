@@ -21,6 +21,5 @@ return Application::configure(basePath: dirname(__DIR__))
                 ? response()->json(['error' => $exception->getMessage()], $exception->getStatusCode())
                 : null;
         });
-
         //
     })->create();

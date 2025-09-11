@@ -232,19 +232,19 @@ class InitCommand extends Command implements Isolatable
             }
         }
 
-        $codeToAdd = <<<'PHP'
-                $exceptions->render(function (HttpException $exception, Request $request) {
-                    return ($request->expectsJson())
-                        ? response()->json(['error' => $exception->getMessage()], $exception->getStatusCode())
-                        : null;
-                });
-        PHP;
+        $codeToAdd = view('project-initialisator::default_http_exception')->render();
 
-        $content = preg_replace(
-            '/(->withExceptions\(function \(Exceptions \$exceptions\)(?:\: void)? \{)/',
-            "$1\n" . $codeToAdd . "\n",
-            $content,
-            1
+        $baseIndent = '    ';
+
+        $content = preg_replace_callback(
+            pattern: '/^([ \t]*)(->withExceptions\(function \(Exceptions \$exceptions\)(?:\: void)? \{)/m',
+            callback: function ($matches) use ($codeToAdd, $baseIndent) {
+                $currentIndent = $matches[1];
+                $indentedCode = preg_replace('/^/m', $currentIndent . $baseIndent, $codeToAdd);
+                return $matches[0] . "\n" . $indentedCode;
+            },
+            subject: $content,
+            limit: 1
         );
 
         file_put_contents($file, $content);
