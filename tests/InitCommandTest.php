@@ -11,24 +11,9 @@ class InitCommandTest extends TestCase
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
         $this->mockLaravelConfigWriter(
-            [
-                'function' => 'is_file',
-                'path' => '.env.example',
-                'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.development',
-                'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
-            ],
-            [
-                'function' => 'file_exists',
-                'path' => base_path('config/auto-doc.php'),
-                'source' => $this->getFixture('auto_doc.php'),
-                'result' => $this->getFixture('auto_doc_after_changes.php'),
-            ],
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
+            $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockClassExists([
@@ -61,24 +46,9 @@ class InitCommandTest extends TestCase
     public function testRunWithoutAdminAndReadmeCreation()
     {
         $this->mockLaravelConfigWriter(
-            [
-                'function' => 'is_file',
-                'path' => '.env.example',
-                'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.development',
-                'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
-            ],
-            [
-                'function' => 'file_exists',
-                'path' => base_path('config/auto-doc.php'),
-                'source' => $this->getFixture('auto_doc.php'),
-                'result' => $this->getFixture('auto_doc_after_changes.php'),
-            ],
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
+            $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockFilePutContent( 
@@ -116,24 +86,9 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
         $this->mockLaravelConfigWriter(
-            [
-                'function' => 'is_file',
-                'path' => '.env.example',
-                'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.development',
-                'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'file_exists',
-                'path' => base_path('config/auto-doc.php'),
-                'source' => $this->getFixture('auto_doc.php'),
-                'result' => $this->getFixture('auto_doc_after_changes.php'),
-            ],
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockFilePutContent(
@@ -175,36 +130,11 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
         $this->mockLaravelConfigWriter(
-            [
-                'function' => 'is_file',
-                'path' => '.env.example',
-                'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.development',
-                'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.development',
-                'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_clerk_credentials_added.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.example',
-                'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_clerk_credentials_added.yml'),
-            ],
-            [
-                'function' => 'file_exists',
-                'path' => base_path('config/auto-doc.php'),
-                'source' => $this->getFixture('auto_doc.php'),
-                'result' => $this->getFixture('auto_doc_after_changes.php'),
-            ],
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
+            $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockFileGetContent(
@@ -362,24 +292,9 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndPartialReadmeCreation()
     {
         $this->mockLaravelConfigWriter(
-            [
-                'function' => 'is_file',
-                'path' => '.env.example',
-                'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.development',
-                'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'file_exists',
-                'path' => base_path('config/auto-doc.php'),
-                'source' => $this->getFixture('auto_doc.php'),
-                'result' => $this->getFixture('auto_doc_after_changes.php'),
-            ],
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockFileGetContent(
@@ -488,24 +403,9 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
         $this->mockLaravelConfigWriter(
-            [
-                'function' => 'is_file',
-                'path' => '.env.example',
-                'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.development',
-                'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'file_exists',
-                'path' => base_path('config/auto-doc.php'),
-                'source' => $this->getFixture('auto_doc.php'),
-                'result' => $this->getFixture('auto_doc_after_changes.php'),
-            ],
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockFileGetContent(
@@ -648,24 +548,9 @@ class InitCommandTest extends TestCase
     public function testRunWithoutAdminAndUsingTelescope()
     {
         $this->mockLaravelConfigWriter(
-            [
-                'function' => 'is_file',
-                'path' => '.env.example',
-                'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.development',
-                'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'file_exists',
-                'path' => base_path('config/auto-doc.php'),
-                'source' => $this->getFixture('auto_doc.php'),
-                'result' => $this->getFixture('auto_doc_after_changes.php'),
-            ],
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockFileGetContent(
@@ -778,36 +663,11 @@ class InitCommandTest extends TestCase
     public function testRunWithClerkMobileApp(): void
     {
         $this->mockLaravelConfigWriter(
-            [
-                'function' => 'is_file',
-                'path' => '.env.example',
-                'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.development',
-                'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_app_name_not_pascal_case.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.development',
-                'source' => $this->getFixture('env.development.yml'),
-                'result' => $this->getFixture('env.development_clerk_credentials_added_mobile_app.yml'),
-            ],
-            [
-                'function' => 'is_file',
-                'path' => '.env.example',
-                'source' => $this->getFixture('env.example.yml'),
-                'result' => $this->getFixture('env.example_clerk_credentials_added_mobile_app.yml'),
-            ],
-            [
-                'function' => 'file_exists',
-                'path' => base_path('config/auto-doc.php'),
-                'source' => $this->getFixture('auto_doc.php'),
-                'result' => $this->getFixture('auto_doc_after_changes.php'),
-            ],
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
+            $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockFileGetContent(

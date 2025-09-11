@@ -61,49 +61,29 @@ trait InitCommandMockTrait
         return file_get_contents(base_path("/resources/md/readme/{$template}"));
     }
 
-    public function mockLaravelConfigWriter(...$arguments): void
+    protected function changeEnvFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
     {
-        $this->mockLaravelConfigWriterCheckFile($arguments);
-        $this->mockLaravelConfigWriterFileGetContent($arguments);
-        $this->mockLaravelConfigWriterFilePutContent($arguments);
+        return [
+            $this->functionCall('is_file', [$fileName]),
+            $this->functionCall('file_get_contents', [$fileName], $this->getFixture($sourceFixture)),
+            $this->functionCall('file_put_contents', [$fileName, $this->getFixture($resultFixture)]),
+        ];
     }
 
-    public function mockLaravelConfigWriterCheckFile(array $arguments): void
+    protected function changeConfigFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
+    {
+        return [
+            $this->functionCall('file_exists', [$fileName]),
+            $this->functionCall('file_get_contents', [$fileName], $this->getFixture($sourceFixture)),
+            $this->functionCall('file_put_contents', [$fileName, $this->getFixture($resultFixture)]),
+        ];
+    }
+
+    public function mockLaravelConfigWriter(...$calls): void
     {
         $this->mockNativeFunction(
             namespace: '\Winter\LaravelConfigWriter',
-            callChain: array_map(
-                fn ($call) => $this->functionCall($call['function'], [$call['path']], true),
-                $arguments,
-            ),
-        );
-    }
-
-    public function mockLaravelConfigWriterFileGetContent(array $rawCallChain): void
-    {
-        $callChain = array_map(fn ($call) => $this->functionCall(
-            name: 'file_get_contents',
-            arguments: [$call['path']],
-            result: $call['source'],
-        ), $rawCallChain);
-
-        $this->mockNativeFunction(
-            namespace: '\Winter\LaravelConfigWriter',
-            callChain: $callChain,
-        );
-    }
-
-    public function mockLaravelConfigWriterFilePutContent(array $rawCallChain): void
-    {
-        $callChain = array_map(fn ($call) => $this->functionCall(
-            name: 'file_put_contents',
-            arguments: [$call['path'], $call['result']],
-            result: 1,
-        ), $rawCallChain);
-
-        $this->mockNativeFunction(
-            namespace: '\Winter\LaravelConfigWriter',
-            callChain: $callChain,
+            callChain: array_merge(...$calls),
         );
     }
 }
