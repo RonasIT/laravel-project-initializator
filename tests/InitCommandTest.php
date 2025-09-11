@@ -2,7 +2,6 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
-use Illuminate\Support\Facades\File;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
