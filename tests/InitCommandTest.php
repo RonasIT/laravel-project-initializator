@@ -958,7 +958,7 @@ class InitCommandTest extends TestCase
         $this->assertWebLoginPublished();
     }
 
-protected function assertWebLoginPublished(): void
+    protected function assertWebLoginPublished(): void
     {
         $this->assertFileEqualsFixture('login_controller.php', app_path('Http/Controllers/Auth/LoginController.php'));
         $this->assertFileEqualsFixture('app.css', public_path('app.css'));
