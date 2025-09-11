@@ -966,6 +966,7 @@ class InitCommandTest extends TestCase
         $this->assertFileEqualsFixture('app.js', public_path('app.js'));
         $this->assertFileEqualsFixture('app.blade.php', resource_path('views/layouts/app.blade.php'));
         $this->assertFileEqualsFixture('login.blade.php', resource_path('views/auth/login.blade.php'));
+
         File::deleteDirectory(app_path());
         File::deleteDirectory(public_path());
         File::deleteDirectory(resource_path('views/layouts'));
