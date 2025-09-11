@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
+use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use Winter\LaravelConfigWriter\ArrayFile;
 
 class InitCommand extends Command implements Isolatable
@@ -69,6 +70,8 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appName;
 
+    protected AppTypeEnum $appType;
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -80,7 +83,7 @@ class InitCommand extends Command implements Isolatable
             field: 'email of code owner / team lead',
             rules: 'required|email',
         );
-        
+
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$kebabName}.com");
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
@@ -96,6 +99,14 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
+        $this->appType = AppTypeEnum::from(
+            $this->choice(
+                question: 'What type of application will your API serve?',
+                choices: AppTypeEnum::values(),
+                default: AppTypeEnum::Multiplatform->value,
+            ),
+        );
+
         $this->authType = AuthTypeEnum::from($this->choice(
             question: 'Please choose the authentication type',
             choices: AuthTypeEnum::values(),
@@ -105,13 +116,23 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->enableClerk();
 
-            $this->createOrUpdateConfigFile('.env.development', '=', [
+            $data = [
                 'AUTH_GUARD' => 'clerk',
-            ]);
+                'CLERK_ALLOWED_ISSUER' => '',
+                'CLERK_SECRET_KEY' => '',
+                'CLERK_SIGNER_KEY_PATH' => '',
+            ];
 
-            $this->createOrUpdateConfigFile($envFile, '=', [
-                'AUTH_GUARD' => 'clerk',
-            ]);
+            if ($this->appType !== AppTypeEnum::Mobile) {
+                $data['CLERK_ALLOWED_ORIGINS'] = '';
+            }
+
+            $this->createOrUpdateConfigFile('.env.development', '=', $data);
+            $this->createOrUpdateConfigFile('.env.example', '=', $data);
+
+            if ($envFile === '.env') {
+                $this->createOrUpdateConfigFile($envFile, '=', $data);
+            }
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -270,7 +291,7 @@ class InitCommand extends Command implements Isolatable
 
             $this->publishMigration(
                 view: view('initializator::add_default_user')->with($this->adminCredentials),
-                migrationName: 'add_default_user'
+                migrationName: 'add_default_user',
             );
         }
     }
@@ -281,13 +302,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->setReadmeValue($file, 'project_name', $this->appName);
 
-        $type = $this->choice(
-            question: 'What type of application will your API serve?',
-            choices: ['Mobile', 'Web', 'Multiplatform'],
-            default: 'Multiplatform'
-        );
-
-        $this->setReadmeValue($file, 'type', $type);
+        $this->setReadmeValue($file, 'type', $this->appType->value);
 
         $this->readmeContent = $file;
     }
@@ -346,9 +361,9 @@ class InitCommand extends Command implements Isolatable
 
             $this->removeTag($filePart, $key);
         }
-        
+
         $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
-                
+
         $this->updateReadmeFile($filePart);
     }
 
@@ -427,15 +442,26 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
+    protected function publishClass(View $template, string $fileName, string $filePath): void
+    {
+        $fileName = "{$fileName}.php";
+
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777, true);
+        }
+
+        $data = $template->render();
+
+        file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
+    }
+
     protected function publishMigration(View $view, string $migrationName): void
     {
         $time = Carbon::now()->format('Y_m_d_His');
 
-        $migrationName = "{$time}_{$migrationName}.php";
+        $migrationName = "{$time}_{$migrationName}";
 
-        $data = $view->render();
-
-        file_put_contents("database/migrations/{$migrationName}", "<?php\n\n{$data}");
+        $this->publishClass($view, $migrationName, 'database/migrations');
     }
 
     protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
@@ -443,6 +469,8 @@ class InitCommand extends Command implements Isolatable
         $parsed = file_get_contents($fileName);
 
         $lines = explode("\n", $parsed);
+
+        $previousKey = null;
 
         foreach ($data as $key => $value) {
             $value = $this->addQuotes($value);
@@ -455,12 +483,25 @@ class InitCommand extends Command implements Isolatable
                 }
             }
 
-            $lines[] = "\n{$key}{$separator}{$value}";
+            $item = "{$key}{$separator}{$value}";
+
+            if (!empty($previousKey) && $this->configKeysHaveSamePrefix($key, $previousKey)) {
+                $lines[] = $item;
+            } else {
+                $lines[] = "\n{$item}";
+            }
+
+            $previousKey = $key;
         }
 
         $ymlSettings = implode("\n", $lines);
 
         file_put_contents($fileName, $ymlSettings);
+    }
+
+    protected function configKeysHaveSamePrefix(string $key, string $previousKey): bool
+    {
+        return Str::before($key, '_') === Str::before($previousKey, '_');
     }
 
     protected function loadReadmePart(string $fileName): string
@@ -558,6 +599,12 @@ class InitCommand extends Command implements Isolatable
         $this->publishMigration(
             view: view('initializator::users_add_clerk_id_field'),
             migrationName: 'users_add_clerk_id_field',
+        );
+
+        $this->publishClass(
+            template: view('initializator::clerk_user_repository'),
+            fileName: 'ClerkUserRepository',
+            filePath: 'app/Support/Clerk',
         );
     }
 }
