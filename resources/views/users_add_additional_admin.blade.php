@@ -1,12 +1,10 @@
-<?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use RonasIT\Support\Traits\MigrationTrait;
 
-class AddNovaAdmin extends Migration
+class Add{{ ucfirst($credentialName) }}Admin extends Migration
 {
     use MigrationTrait;
 
@@ -14,10 +12,10 @@ class AddNovaAdmin extends Migration
     {
         if (!App::environment('testing')) {
             DB::table('users')->insert([
-                'name' => 'Nova Admin',
-                'email' => 'nova_mail@mail.com',
-                'password' => Hash::make('654321'),
-                'role_id' => 1,
+                'name' => '{{ $name }}',
+                'email' => '{{ $email }}',
+                'password' => Hash::make('{{ $password }}'),
+                'role_id' => {{ $roleID }},
             ]);
         }
     }
@@ -26,7 +24,7 @@ class AddNovaAdmin extends Migration
     {
         if (!App::environment('testing')) {
             DB::table('users')
-                ->where('email', 'nova_mail@mail.com')
+                ->where('email', '{{ $email }}')
                 ->delete();
         }
     }

@@ -13,11 +13,9 @@ class AddNovaAdmin extends Migration
     public function up(): void
     {
         if (!App::environment('testing')) {
-            DB::table('users')->insert([
-                'name' => 'Nova Admin',
-                'email' => 'nova_mail@mail.com',
-                'password' => Hash::make('654321'),
-                'role_id' => 1,
+            DB::table('admins')->insert([
+                'email' => 'mail@mail.com',
+                'password' => Hash::make('123456'),
             ]);
         }
     }
@@ -25,8 +23,8 @@ class AddNovaAdmin extends Migration
     public function down(): void
     {
         if (!App::environment('testing')) {
-            DB::table('users')
-                ->where('email', 'nova_mail@mail.com')
+            DB::table('admins')
+                ->where('email', 'mail@mail.com')
                 ->delete();
         }
     }

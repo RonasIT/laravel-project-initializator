@@ -53,6 +53,8 @@ class InitCommand extends Command implements Isolatable
 
     protected array $adminCredentials = [];
 
+    protected bool $isAdminsTableCreated = false;
+
     protected AuthTypeEnum $authType;
 
     protected string $appUrl;
@@ -239,6 +241,8 @@ class InitCommand extends Command implements Isolatable
                 view: view('initializator::admins_create_table')->with($this->adminCredentials),
                 migrationName: 'admins_create_table',
             );
+
+            $this->isAdminsTableCreated = true;
         } else {
             $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
             $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
@@ -372,17 +376,10 @@ class InitCommand extends Command implements Isolatable
             } else {
                 $defaultPassword = substr(md5(uniqid()), 0, 8);
 
-                $email = $this->ask("Please enter a {$title}'s admin email", "admin@{$kebabName}.com");
+                $email = $this->ask("Please enter a {$title}'s admin email", "{$key}_admin@{$kebabName}.com");
                 $password = $this->ask("Please enter a {$title}'s admin password", $defaultPassword);
 
-                $this->publishMigration(
-                    view: view('initializator::admins_create_or_add_additional_admins')->with([
-                        'email' => $email,
-                        'password' => $password,
-                        'credentialItem' => $key,
-                    ]),
-                    migrationName: "admins_create_table_or_add_{$key}_admin",
-                );
+                $this->publishAdditionalAdminMigration($title, $key, $email, $password);
             }
 
             $this->setReadmeValue($filePart, "{$key}_email", $email);
@@ -569,5 +566,40 @@ class InitCommand extends Command implements Isolatable
             fileName: 'ClerkUserRepository',
             filePath: 'app/Support/Clerk',
         );
+    }
+
+    protected function publishAdditionalAdminMigration(
+        string $credentialTitle,
+        string $credentialName,
+        string $adminEmail,
+        string $adminPassword,
+    ): void {
+        if ($this->authType === AuthTypeEnum::None) {
+            $name = $this->ask("Please enter a {$credentialTitle}'s admin name", 'Admin');
+            $roleID = $this->ask("Please enter a {$credentialTitle}'s admin role id", RoleEnum::Admin->value);
+
+            $this->publishMigration(
+                view: view('initializator::users_add_additional_admin')->with([
+                    'email' => $adminEmail,
+                    'password' => $adminPassword,
+                    'name' => $name,
+                    'roleID' => $roleID,
+                    'credentialName' => $credentialName,
+                ]),
+                migrationName: "users_add_{$credentialName}_admin",
+            );
+        } elseif ($this->authType === AuthTypeEnum::Clerk) {
+            $this->publishMigration(
+                view: view('initializator::admins_create_or_add_additional_admin')->with([
+                    'email' => $adminEmail,
+                    'password' => $adminPassword,
+                    'credentialName' => $credentialName,
+                    'isAdminsCreated' => $this->isAdminsTableCreated,
+                ]),
+                migrationName: "admins_add_{$credentialName}_admin",
+            );
+
+            $this->isAdminsTableCreated = true;
+        }
     }
 }
