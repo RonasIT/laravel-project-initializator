@@ -774,20 +774,6 @@ class InitCommandTest extends TestCase
         $this->assertWebLoginPublished();
     }
 
-    protected function assertWebLoginPublished(): void
-    {
-        $this->assertFileEqualsFixture('login_controller.php', app_path('Http/Controllers/Auth/LoginController.php'));
-        $this->assertFileEqualsFixture('app.css', public_path('app.css'));
-        $this->assertFileEqualsFixture('app.js', public_path('app.js'));
-        $this->assertFileEqualsFixture('app.blade.php', resource_path('views/layouts/app.blade.php'));
-        $this->assertFileEqualsFixture('login.blade.php', resource_path('views/auth/login.blade.php'));
-
-        File::deleteDirectory(app_path());
-        File::deleteDirectory(public_path());
-        File::deleteDirectory(resource_path('views/layouts'));
-        File::deleteDirectory(resource_path('views/auth'));
-    }
-
     public function testRunWithClerkMobileApp(): void
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
@@ -971,5 +957,18 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertWebLoginPublished();
+    }
+
+protected function assertWebLoginPublished(): void
+    {
+        $this->assertFileEqualsFixture('login_controller.php', app_path('Http/Controllers/Auth/LoginController.php'));
+        $this->assertFileEqualsFixture('app.css', public_path('app.css'));
+        $this->assertFileEqualsFixture('app.js', public_path('app.js'));
+        $this->assertFileEqualsFixture('app.blade.php', resource_path('views/layouts/app.blade.php'));
+        $this->assertFileEqualsFixture('login.blade.php', resource_path('views/auth/login.blade.php'));
+        File::deleteDirectory(app_path());
+        File::deleteDirectory(public_path());
+        File::deleteDirectory(resource_path('views/layouts'));
+        File::deleteDirectory(resource_path('views/auth'));
     }
 }
