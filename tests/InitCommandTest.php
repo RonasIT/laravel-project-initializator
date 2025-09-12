@@ -244,7 +244,7 @@ class InitCommandTest extends TestCase
                 $this->getFixture('admins_table_migration.php'),
             ],
             [
-                'database/migrations/2018_11_11_111111_admins_add_nova_admin.php',
+                'database/migrations/2018_11_11_111111_add_nova_admin.php',
                 $this->getFixture('admins_add_nova_admin_migration.php'),
             ],
             [
@@ -521,7 +521,7 @@ class InitCommandTest extends TestCase
                 $this->getFixture('migration.php'),
             ],
             [
-                'database/migrations/2018_11_11_111111_users_add_nova_admin.php',
+                'database/migrations/2018_11_11_111111_add_nova_admin.php',
                 $this->getFixture('nova_admins_table_migration.php'),
             ],
             [
@@ -662,11 +662,11 @@ class InitCommandTest extends TestCase
             'env.example.yml',
             'env.development.yml',
             [
-                'database/migrations/2018_11_11_111111_users_add_telescope_admin.php',
+                'database/migrations/2018_11_11_111111_add_telescope_admin.php',
                 $this->getFixture('telescope_admins_table_migration.php'),
             ],
             [
-                'database/migrations/2018_11_11_111111_users_add_nova_admin.php',
+                'database/migrations/2018_11_11_111111_add_nova_admin.php',
                 $this->getFixture('nova_admins_table_migration.php'),
             ],
             [
@@ -1001,11 +1001,11 @@ class InitCommandTest extends TestCase
                 $this->getFixture('env.example_clerk_credentials_added.yml'),
             ],
             [
-                'database/migrations/2018_11_11_111111_admins_add_telescope_admin.php',
+                'database/migrations/2018_11_11_111111_add_telescope_admin.php',
                 $this->getFixture('telescope_clerk_admin_migration.php'),
             ],
             [
-                'database/migrations/2018_11_11_111111_admins_add_nova_admin.php',
+                'database/migrations/2018_11_11_111111_add_nova_admin.php',
                 $this->getFixture('admins_add_nova_admin_migration.php'),
             ],
             [

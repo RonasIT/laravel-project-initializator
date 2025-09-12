@@ -586,7 +586,7 @@ class InitCommand extends Command implements Isolatable
                     'roleID' => $roleID,
                     'credentialName' => $credentialName,
                 ]),
-                migrationName: "users_add_{$credentialName}_admin",
+                migrationName: "add_{$credentialName}_admin",
             );
         } elseif ($this->authType === AuthTypeEnum::Clerk) {
             $this->publishMigration(
@@ -596,7 +596,7 @@ class InitCommand extends Command implements Isolatable
                     'credentialName' => $credentialName,
                     'isAdminsCreated' => $this->isAdminsTableCreated,
                 ]),
-                migrationName: "admins_add_{$credentialName}_admin",
+                migrationName: "add_{$credentialName}_admin",
             );
 
             $this->isAdminsTableCreated = true;
