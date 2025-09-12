@@ -99,6 +99,8 @@ class InitCommand extends Command implements Isolatable
             'APP_URL' => $this->appUrl,
         ]);
 
+        $this->publishWebLogin();
+
         $this->info('Project initialized successfully!');
 
         $this->appType = AppTypeEnum::from(
@@ -566,6 +568,16 @@ class InitCommand extends Command implements Isolatable
             fileName: 'ClerkUserRepository',
             filePath: 'app/Support/Clerk',
         );
+    }
+
+    protected function publishWebLogin(): void
+    {
+        Artisan::call('vendor:publish', [
+            '--tag' => 'initializator-web-login',
+            '--force' => true,
+        ]);
+
+        file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
     }
 
     protected function publishAdditionalAdminMigration(

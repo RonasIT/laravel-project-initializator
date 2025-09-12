@@ -2,6 +2,7 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use Illuminate\Support\Facades\File;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
@@ -26,6 +27,11 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example_app_name_pascal_case.yml',
             'env.development_app_name_pascal_case.yml',
+            [
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            ],
         );
 
         $this->mockClassExists([
@@ -53,6 +59,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithoutAdminAndReadmeCreation()
@@ -73,6 +81,11 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example_app_name_pascal_case.yml',
             'env.development_app_name_pascal_case.yml',
+            [
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            ],
             [
                 'renovate.json',
                 $this->getFixture('renovate.json'),
@@ -102,6 +115,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndWithoutReadmeCreation()
@@ -122,6 +137,11 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example.yml',
             'env.development.yml',
+            [
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            ],
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
@@ -155,6 +175,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndDefaultReadmeCreation()
@@ -223,6 +245,11 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example.yml',
             'env.development.yml',
+            [
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            ],
             [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
@@ -343,6 +370,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndPartialReadmeCreation()
@@ -388,9 +417,14 @@ class InitCommandTest extends TestCase
             'env.example.yml',
             'env.development.yml',
             [
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            ],
+            [
                 'README.md',
                 $this->getFixture('partial_readme.md'),
-            ]
+            ],
         );
 
         $this->mockShellExec(
@@ -460,6 +494,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
@@ -516,6 +552,11 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example.yml',
             'env.development.yml',
+            [
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            ],
             [
                 'database/migrations/2018_11_11_111111_add_default_user.php',
                 $this->getFixture('migration.php'),
@@ -617,6 +658,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?', 'yes')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithoutAdminAndUsingTelescope()
@@ -661,6 +704,11 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example.yml',
             'env.development.yml',
+            [
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            ],
             [
                 'database/migrations/2018_11_11_111111_add_telescope_admin.php',
                 $this->getFixture('telescope_admins_table_migration.php'),
@@ -750,6 +798,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithClerkMobileApp(): void
@@ -818,6 +868,11 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example.yml',
             'env.development.yml',
+            [
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            ],
             [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
@@ -932,6 +987,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithClerkAdditionalAdminsWithoutDefaultAdmin(): void
@@ -984,6 +1041,11 @@ class InitCommandTest extends TestCase
         $this->mockFilePutContent(
             'env.example.yml',
             'env.development.yml',
+            [
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            ],
             [
                 'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
                 $this->getFixture('users_add_clerk_id_field_migration.php'),
@@ -1086,5 +1148,21 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
+    }
+
+    protected function assertWebLoginPublished(): void
+    {
+        $this->assertFileEqualsFixture('login_controller.php', app_path('Http/Controllers/Auth/LoginController.php'));
+        $this->assertFileEqualsFixture('app.css', public_path('app.css'));
+        $this->assertFileEqualsFixture('app.js', public_path('app.js'));
+        $this->assertFileEqualsFixture('app.blade.php', resource_path('views/layouts/app.blade.php'));
+        $this->assertFileEqualsFixture('login.blade.php', resource_path('views/auth/login.blade.php'));
+
+        File::deleteDirectory(app_path());
+        File::deleteDirectory(public_path());
+        File::deleteDirectory(resource_path('views/layouts'));
+        File::deleteDirectory(resource_path('views/auth'));
     }
 }
