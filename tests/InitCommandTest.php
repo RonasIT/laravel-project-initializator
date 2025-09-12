@@ -271,6 +271,10 @@ class InitCommandTest extends TestCase
                 $this->getFixture('admins_table_migration.php'),
             ],
             [
+                'database/migrations/2018_11_11_111111_add_nova_admin.php',
+                $this->getFixture('admins_add_nova_admin_migration.php'),
+            ],
+            [
                 'README.md',
                 $this->getFixture('default_readme.md'),
             ],
@@ -350,7 +354,9 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
-            ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?', 'yes')
+            ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?')
+            ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'mail@mail.com')
+            ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '123456')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
@@ -556,6 +562,10 @@ class InitCommandTest extends TestCase
                 $this->getFixture('migration.php'),
             ],
             [
+                'database/migrations/2018_11_11_111111_add_nova_admin.php',
+                $this->getFixture('nova_admins_table_migration.php'),
+            ],
+            [
                 'README.md',
                 $this->getFixture('full_readme.md'),
             ],
@@ -640,6 +650,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?')
             ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'nova_mail@mail.com')
             ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '654321')
+            ->expectsQuestion('Please enter a Laravel Nova\'s admin name', 'Nova Admin')
+            ->expectsQuestion('Please enter a Laravel Nova\'s admin role id', 1)
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
@@ -696,6 +708,14 @@ class InitCommandTest extends TestCase
                 base_path('/routes/web.php'),
                 "\nAuth::routes();\n",
                 FILE_APPEND,
+            ],
+            [
+                'database/migrations/2018_11_11_111111_add_telescope_admin.php',
+                $this->getFixture('telescope_admins_table_migration.php'),
+            ],
+            [
+                'database/migrations/2018_11_11_111111_add_nova_admin.php',
+                $this->getFixture('nova_admins_table_migration.php'),
             ],
             [
                 'README.md',
@@ -765,8 +785,12 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
             ->expectsQuestion('Please enter a Laravel Telescope\'s admin email', 'telescope_mail@mail.com')
             ->expectsQuestion('Please enter a Laravel Telescope\'s admin password', '654321')
+            ->expectsQuestion('Please enter a Laravel Telescope\'s admin name', 'Telescope Admin')
+            ->expectsQuestion('Please enter a Laravel Telescope\'s admin role id', 1)
             ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'nova_mail@mail.com')
             ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '654321')
+            ->expectsQuestion('Please enter a Laravel Nova\'s admin name', 'Nova Admin')
+            ->expectsQuestion('Please enter a Laravel Nova\'s admin role id', 1)
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
@@ -960,6 +984,167 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsConfirmation('Do you want to install media package?')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
+    }
+
+    public function testRunWithClerkAdditionalAdminsWithoutDefaultAdmin(): void
+    {
+        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+
+        $this->mockFileGetContent(
+            [
+                'arguments' => ['.env.example'],
+                'result' => $this->getFixture('env.example.yml'),
+            ],
+            [
+                'arguments' => ['.env.development'],
+                'result' => $this->getFixture('env.development.yml'),
+            ],
+            [
+                'arguments' => ['.env.development'],
+                'result' => $this->getFixture('env.development.yml'),
+            ],
+            [
+                'arguments' => ['.env.example'],
+                'result' => $this->getFixture('env.example.yml'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
+                'result' => $this->getTemplate('README.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
+                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
+                'result' => $this->getTemplate('RESOURCES.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
+                'result' => $this->getTemplate('CONTACTS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
+                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
+            ],
+            [
+                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md')],
+                'result' => $this->getTemplate('CLERK.md'),
+            ],
+        );
+
+        $this->mockFilePutContent(
+            'env.example.yml',
+            'env.development.yml',
+            [
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            ],
+            [
+                'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
+                $this->getFixture('users_add_clerk_id_field_migration.php'),
+            ],
+            [
+                'app/Support/Clerk/ClerkUserRepository.php',
+                $this->getFixture('clerk_user_repository.php'),
+            ],
+            [
+                '.env.development',
+                $this->getFixture('env.development_clerk_credentials_added.yml'),
+            ],
+            [
+                '.env.example',
+                $this->getFixture('env.example_clerk_credentials_added.yml'),
+            ],
+            [
+                'database/migrations/2018_11_11_111111_add_telescope_admin.php',
+                $this->getFixture('telescope_clerk_admin_migration.php'),
+            ],
+            [
+                'database/migrations/2018_11_11_111111_add_nova_admin.php',
+                $this->getFixture('admins_add_nova_admin_migration.php'),
+            ],
+            [
+                'README.md',
+                $this->getFixture('partial_readme_clerk_with_credentials.md'),
+            ],
+        );
+
+        $this->mockShellExec(
+            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
+            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
+            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
+            ['arguments' => 'php artisan laravel-clerk:install --ansi'],
+            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
+            ['arguments' => 'php artisan telescope:install --ansi'],
+        );
+
+        $this
+            ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsOutput('Project initialized successfully!')
+            ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Web')
+            ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
+            ->expectsConfirmation('Do you want to generate an admin user?')
+            ->expectsConfirmation('Do you want to generate a README file?', 'yes')
+            ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
+            ->expectsQuestion(
+                'Are you going to use Issue Tracker? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'no',
+            )
+            ->expectsQuestion(
+                'Are you going to use Figma? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'no',
+            )
+            ->expectsQuestion(
+                'Are you going to use Sentry? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'no',
+            )
+            ->expectsQuestion(
+                'Are you going to use DataDog? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'no',
+            )
+            ->expectsQuestion(
+                'Are you going to use ArgoCD? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'no',
+            )
+            ->expectsQuestion(
+                'Are you going to use Laravel Telescope? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later',
+            )
+            ->expectsQuestion(
+                'Are you going to use Laravel Nova? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later',
+            )
+            ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
+            ->expectsConfirmation('Do you need a `Prerequisites` part?')
+            ->expectsConfirmation('Do you need a `Getting Started` part?')
+            ->expectsConfirmation('Do you need an `Environments` part?')
+            ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
+            ->expectsQuestion('Please enter a Laravel Telescope\'s admin email', 'telescope_mail@mail.com')
+            ->expectsQuestion('Please enter a Laravel Telescope\'s admin password', '654321')
+            ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'mail@mail.com')
+            ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '123456')
+            ->expectsOutput('README generated successfully!')
+            ->expectsOutput('Don`t forget to fill the following empty values:')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
