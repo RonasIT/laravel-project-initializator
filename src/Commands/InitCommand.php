@@ -436,7 +436,16 @@ class InitCommand extends Command implements Isolatable
     {
         $env = EnvFile::open($fileName);
 
-        $env->addEmptyLine();
+        // TODO: After updating wintercms/laravel-config-writer, remove the key comparison check and keep only $env->addEmptyLine();
+        $envKeys = array_column($env->getAst(), 'match');
+        $dataKeys = array_keys($data);
+
+        $missingKeysExist = count(array_intersect($dataKeys, $envKeys)) !== count($dataKeys);
+
+        if ($missingKeysExist) {
+            $env->addEmptyLine();
+        }
+
         $env->set($data);
 
         $env->write();
