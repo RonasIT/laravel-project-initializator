@@ -32,13 +32,13 @@ class InitCommandTest extends TestCase
             'env.example_app_name_pascal_case.yml',
             'env.development_app_name_pascal_case.yml',
             [
-                base_path('bootstrap/app.php'),
-                $this->getFixture('app_after_changes.php'),
-            ],
-            [
                 base_path('/routes/web.php'),
                 "\nAuth::routes();\n",
                 FILE_APPEND,
+            ],
+            [
+                base_path('bootstrap/app.php'),
+                $this->getFixture('app_after_changes.php'),
             ],
         );
 
