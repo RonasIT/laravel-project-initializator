@@ -215,6 +215,8 @@ class InitCommand extends Command implements Isolatable
 
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
+        $this->addDefaultHttpExceptionRender();
+
         Artisan::call('migrate');
     }
 
@@ -225,6 +227,50 @@ class InitCommand extends Command implements Isolatable
         $config->set('info.contact.email', $email);
 
         $config->write();
+    }
+
+    protected function addDefaultHttpExceptionRender(): void
+    {
+        $file = base_path('bootstrap/app.php');
+
+        $content = file_get_contents($file);
+
+        $find = [
+            '$exceptions->render(function (HttpException $exception, Request $request)',
+            '$exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $exception, \Illuminate\Http\Request $request)',
+        ];
+
+        if (Str::contains($content, $find)) {
+            return;
+        }
+
+        $imports = [
+            'use Symfony\Component\HttpKernel\Exception\HttpException;',
+            'use Illuminate\Http\Request;',
+        ];
+
+        foreach ($imports as $import) {
+            if (!Str::contains($content, $import)) {
+                $content = preg_replace('/<\?php\s*/', "<?php\n\n{$import}\n", $content, 1);
+            }
+        }
+
+        $codeToAdd = view('project-initializator::default_http_exception')->render();
+
+        $baseIndent = '    ';
+
+        $content = preg_replace_callback(
+            pattern: '/^([ \t]*)(->withExceptions\(function \(Exceptions \$exceptions\)(?:\: void)? \{)/m',
+            callback: function ($matches) use ($codeToAdd, $baseIndent) {
+                $currentIndent = $matches[1];
+                $indentedCode = preg_replace('/^/m', $currentIndent . $baseIndent, $codeToAdd);
+                return $matches[0] . "\n" . $indentedCode;
+            },
+            subject: $content,
+            limit: 1
+        );
+
+        file_put_contents($file, $content);
     }
 
     protected function createAdminUser(string $kebabName): void
