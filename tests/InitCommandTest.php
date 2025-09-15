@@ -19,11 +19,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNamespaceFunctions(
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
-            $this->mockFilePutContent(
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            );
+
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -58,12 +55,8 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNamespaceFunctions(
-          $this->mockFilePutContent(
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            );
-            $this->callFilePutContent('renovate.json', 'renovate.json'),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
 
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -100,12 +93,8 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNamespaceFunctions(
-            $this->mockFilePutContent(
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            );
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', 'migration.php'),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', $this->getFixture('migration.php')),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
@@ -158,17 +147,13 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md', 'CLERK.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', 'RENOVATE.md'),
 
-            $this->mockFilePutContent(
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            );
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', 'users_add_clerk_id_field_migration.php'),
-            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', 'clerk_user_repository.php'),
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', 'admins_table_migration.php'),
-            $this->callFilePutContent('README.md', 'default_readme.md'),
-            $this->callFilePutContent('renovate.json', 'renovate.json'),
-            $this->callFilePutContent('README.md', 'default_readme_after_using_renovate.md'),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
+            $this->callFilePutContent('README.md', $this->getFixture('default_readme.md')),
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->callFilePutContent('README.md', $this->getFixture('default_readme_after_using_renovate.md')),
 
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -269,12 +254,8 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', 'ENVIRONMENTS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
 
-            $this->mockFilePutContent(
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            );
-            $this->callFilePutContent('README.md', 'partial_readme.md'),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+            $this->callFilePutContent('README.md', $this->getFixture('partial_readme.md')),
 
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -365,15 +346,11 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', 'RENOVATE.md'),
 
-            $this->mockFilePutContent(
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            );
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', 'migration.php'),
-            $this->callFilePutContent('README.md', 'full_readme.md'),
-            $this->callFilePutContent('renovate.json', 'renovate.json'),
-            $this->callFilePutContent('README.md', 'full_readme_after_using_renovate.md'),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', $this->getFixture('migration.php')),
+            $this->callFilePutContent('README.md', $this->getFixture('full_readme.md')),
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->callFilePutContent('README.md', $this->getFixture('full_readme_after_using_renovate.md')),
 
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -471,12 +448,8 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', 'ENVIRONMENTS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
 
-            $this->mockFilePutContent(
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            );
-            $this->callFilePutContent('README.md', 'partial_readme_with_telescope.md'),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_with_telescope.md')),
 
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -575,17 +548,13 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md', 'CLERK.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', 'RENOVATE.md'),
 
-            $this->mockFilePutContent(
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            );
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', 'users_add_clerk_id_field_migration.php'),
-            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', 'clerk_user_repository.php'),
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', 'admins_table_migration.php'),
-            $this->callFilePutContent('README.md', 'default_readme_with_mobile_app.md'),
-            $this->callFilePutContent('renovate.json', 'renovate.json'),
-            $this->callFilePutContent('README.md', 'default_readme_with_mobile_app_after_using_renovate.md'),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
+            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app.md')),
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md')),
 
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),

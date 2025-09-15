@@ -28,10 +28,10 @@ trait InitCommandMockTrait
         return file_get_contents(base_path("/resources/md/readme/{$template}"));
     }
 
-    protected function callFilePutContent(string $fileName, string $resultFixture): array
+    protected function callFilePutContent(string $fileName, string $result, int $flags = 0): array
     {
         return [
-            $this->functionCall('file_put_contents', [$fileName, $this->getFixture($resultFixture)]),
+            $this->functionCall('file_put_contents', [$fileName, $result, $flags]),
         ];
     }
 
