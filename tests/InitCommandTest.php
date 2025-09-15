@@ -801,7 +801,7 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function testRunWithClerkMobileAppAndPintAlreadyInstalled(): void
+    public function testRunWithClerkMobileAppWithPintInstalled(): void
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
