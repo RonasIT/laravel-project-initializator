@@ -2,6 +2,7 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use Illuminate\Support\Facades\File;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
@@ -18,6 +19,11 @@ class InitCommandTest extends TestCase
 
         $this->mockNamespaceFunctions(
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
+            $this->mockFilePutContent(
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            );
 
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -39,6 +45,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithoutAdminAndReadmeCreation()
@@ -50,6 +58,11 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNamespaceFunctions(
+          $this->mockFilePutContent(
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            );
             $this->callFilePutContent('renovate.json', 'renovate.json'),
 
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -74,6 +87,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndWithoutReadmeCreation()
@@ -85,6 +100,11 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNamespaceFunctions(
+            $this->mockFilePutContent(
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            );
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', 'migration.php'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -112,6 +132,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndDefaultReadmeCreation()
@@ -136,6 +158,11 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md', 'CLERK.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', 'RENOVATE.md'),
 
+            $this->mockFilePutContent(
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            );
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', 'users_add_clerk_id_field_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', 'clerk_user_repository.php'),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', 'admins_table_migration.php'),
@@ -222,6 +249,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndPartialReadmeCreation()
@@ -240,6 +269,11 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', 'ENVIRONMENTS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
 
+            $this->mockFilePutContent(
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            );
             $this->callFilePutContent('README.md', 'partial_readme.md'),
 
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -308,6 +342,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
@@ -329,6 +365,11 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', 'RENOVATE.md'),
 
+            $this->mockFilePutContent(
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            );
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', 'migration.php'),
             $this->callFilePutContent('README.md', 'full_readme.md'),
             $this->callFilePutContent('renovate.json', 'renovate.json'),
@@ -410,6 +451,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?', 'yes')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithoutAdminAndUsingTelescope()
@@ -428,6 +471,11 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', 'ENVIRONMENTS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', 'CREDENTIALS_AND_ACCESS.md'),
 
+            $this->mockFilePutContent(
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            );
             $this->callFilePutContent('README.md', 'partial_readme_with_telescope.md'),
 
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -500,6 +548,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
     }
 
     public function testRunWithClerkMobileApp(): void
@@ -510,6 +560,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
+
         );
 
         $this->mockNamespaceFunctions(
@@ -524,6 +575,11 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md', 'CLERK.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', 'RENOVATE.md'),
 
+            $this->mockFilePutContent(
+                base_path('/routes/web.php'),
+                "\nAuth::routes();\n",
+                FILE_APPEND,
+            );
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', 'users_add_clerk_id_field_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', 'clerk_user_repository.php'),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', 'admins_table_migration.php'),
@@ -610,5 +666,21 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+
+        $this->assertWebLoginPublished();
+    }
+
+    protected function assertWebLoginPublished(): void
+    {
+        $this->assertFileEqualsFixture('login_controller.php', app_path('Http/Controllers/Auth/LoginController.php'));
+        $this->assertFileEqualsFixture('app.css', public_path('app.css'));
+        $this->assertFileEqualsFixture('app.js', public_path('app.js'));
+        $this->assertFileEqualsFixture('app.blade.php', resource_path('views/layouts/app.blade.php'));
+        $this->assertFileEqualsFixture('login.blade.php', resource_path('views/auth/login.blade.php'));
+
+        File::deleteDirectory(app_path());
+        File::deleteDirectory(public_path());
+        File::deleteDirectory(resource_path('views/layouts'));
+        File::deleteDirectory(resource_path('views/auth'));
     }
 }
