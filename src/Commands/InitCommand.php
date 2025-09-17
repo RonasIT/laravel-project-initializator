@@ -98,6 +98,8 @@ class InitCommand extends Command implements Isolatable
             'APP_URL' => $this->appUrl,
         ]);
 
+        $this->publishWebLogin();
+
         $this->info('Project initialized successfully!');
 
         $this->appType = AppTypeEnum::from(
@@ -129,10 +131,10 @@ class InitCommand extends Command implements Isolatable
             }
 
             $this->createOrUpdateConfigFile('.env.development', '=', $data);
-            $this->createOrUpdateConfigFile($envFile, '=', $data);
+            $this->createOrUpdateConfigFile('.env.example', '=', $data);
 
-            if ($envFile !== '.env.example') {
-                $this->createOrUpdateConfigFile('.env.example', '=', $data);
+            if ($envFile === '.env') {
+                $this->createOrUpdateConfigFile($envFile, '=', $data);
             }
         }
 
@@ -397,13 +399,17 @@ class InitCommand extends Command implements Isolatable
         return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
     }
 
-    protected function publishView(View $view, string $viewName, string $path): void
+    protected function publishClass(View $template, string $fileName, string $filePath): void
     {
-        $viewName = "{$viewName}.php";
+        $fileName = "{$fileName}.php";
 
-        $data = $view->render();
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777, true);
+        }
 
-        file_put_contents("{$path}/{$viewName}", "<?php\n\n{$data}");
+        $data = $template->render();
+
+        file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
     }
 
     protected function publishMigration(View $view, string $migrationName): void
@@ -412,7 +418,7 @@ class InitCommand extends Command implements Isolatable
 
         $migrationName = "{$time}_{$migrationName}";
 
-        $this->publishView($view, $migrationName, "database/migrations");
+        $this->publishClass($view, $migrationName, 'database/migrations');
     }
 
     protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
@@ -552,10 +558,10 @@ class InitCommand extends Command implements Isolatable
             migrationName: 'users_add_clerk_id_field',
         );
 
-        $this->publishView(
-            view: view('initializator::clerk_user_repository'),
-            viewName: 'ClerkUserRepository',
-            path: 'app/Support/Clerk',
+        $this->publishClass(
+            template: view('initializator::clerk_user_repository'),
+            fileName: 'ClerkUserRepository',
+            filePath: 'app/Support/Clerk',
         );
 
         $this->modifyUserModel();
@@ -570,5 +576,15 @@ class InitCommand extends Command implements Isolatable
             ->removeValueFromArrayProperty(['fillable', 'hidden'], 'password')
             ->removeValueFromMethodReturnArray(['casts'], 'password')
             ->save();
+    }
+
+    protected function publishWebLogin(): void
+    {
+        Artisan::call('vendor:publish', [
+            '--tag' => 'initializator-web-login',
+            '--force' => true,
+        ]);
+
+        file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
     }
 }
