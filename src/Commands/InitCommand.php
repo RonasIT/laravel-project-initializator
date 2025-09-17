@@ -14,6 +14,7 @@ use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use Winter\LaravelConfigWriter\ArrayFile;
+use RonasIT\ProjectInitializator\Support\Parser\PhpParser;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -562,6 +563,19 @@ class InitCommand extends Command implements Isolatable
             fileName: 'ClerkUserRepository',
             filePath: 'app/Support/Clerk',
         );
+
+        $this->modifyUserModel();
+    }
+
+    protected function modifyUserModel(): void
+    {
+        $parser = app(PhpParser::class, ['filePath' => 'app/Models/User.php']);
+
+        $parser
+            ->addValueToArrayProperty(['fillable'], 'clerk_id')
+            ->removeValueFromArrayProperty(['fillable', 'hidden'], 'password')
+            ->removeValueFromMethodReturnArray(['casts'], 'password')
+            ->save();
     }
 
     protected function publishWebLogin(): void
