@@ -440,9 +440,9 @@ class InitCommand extends Command implements Isolatable
         $envKeys = array_column($env->getAst(), 'match');
         $dataKeys = array_keys($data);
 
-        $missingKeysExist = count(array_intersect($dataKeys, $envKeys)) !== count($dataKeys);
+        $hasMissingKeys = count(array_intersect($dataKeys, $envKeys)) !== count($dataKeys);
 
-        if ($missingKeysExist) {
+        if ($hasMissingKeys) {
             $env->addEmptyLine();
         }
 
