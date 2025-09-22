@@ -213,7 +213,7 @@ class InitCommand extends Command implements Isolatable
             shell_exec("{$shellCommand} --ansi");
         }
 
-        config(['telescope.middleware' => ['web', 'auth:web']]);
+        $this->changeMiddlewareForTelescopeAuthorization();
 
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
@@ -574,5 +574,15 @@ class InitCommand extends Command implements Isolatable
         ]);
 
         file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
+    }
+
+    protected function changeMiddlewareForTelescopeAuthorization(): void
+    {
+        $telescopeConfigPath = base_path('/config/telescope.php');
+
+        $content = Str::replace('Authorize::class', "'auth:web'", file_get_contents($telescopeConfigPath));
+        $content = Str::replace("use Laravel\Telescope\Http\Middleware\Authorize;\n", '', $content);
+
+        file_put_contents($telescopeConfigPath, $content);
     }
 }
