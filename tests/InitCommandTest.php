@@ -61,6 +61,8 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertWebLoginPublished();
+
+        $this->assertEquals(['web', 'auth:web'], config('telescope.middleware'));
     }
 
     public function testRunWithoutAdminAndReadmeCreation()
@@ -117,6 +119,8 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertWebLoginPublished();
+
+        $this->assertEquals(['web', 'auth:web'], config('telescope.middleware'));
     }
 
     public function testRunWithAdminAndWithoutReadmeCreation()
@@ -177,6 +181,8 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertWebLoginPublished();
+
+        $this->assertEquals(['web', 'auth:web'], config('telescope.middleware'));
     }
 
     public function testRunWithAdminAndDefaultReadmeCreation()
@@ -366,6 +372,8 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertWebLoginPublished();
+
+        $this->assertEquals(['web', 'auth:web'], config('telescope.middleware'));
     }
 
     public function testRunWithAdminAndPartialReadmeCreation()
@@ -490,6 +498,8 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertWebLoginPublished();
+
+        $this->assertEquals(['web', 'auth:web'], config('telescope.middleware'));
     }
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
@@ -648,6 +658,8 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertWebLoginPublished();
+
+        $this->assertEquals(['web', 'auth:web'], config('telescope.middleware'));
     }
 
     public function testRunWithoutAdminAndUsingTelescope()
@@ -776,6 +788,8 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertWebLoginPublished();
+
+        $this->assertEquals(['web', 'auth:web'], config('telescope.middleware'));
     }
 
     public function testRunWithClerkMobileApp(): void
@@ -965,6 +979,8 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertWebLoginPublished();
+
+        $this->assertEquals(['web', 'auth:web'], config('telescope.middleware'));
     }
 
     protected function assertWebLoginPublished(): void

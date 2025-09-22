@@ -213,6 +213,8 @@ class InitCommand extends Command implements Isolatable
             shell_exec("{$shellCommand} --ansi");
         }
 
+        config(['telescope.middleware' => ['web', 'auth:web']]);
+
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         Artisan::call('migrate');
