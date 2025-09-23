@@ -2,7 +2,6 @@
 
 namespace RonasIT\ProjectInitializator\Tests\Support\Traits;
 
-use Illuminate\Support\Arr;
 use RonasIT\Support\Traits\MockTrait;
 
 trait InitCommandMockTrait
@@ -42,7 +41,7 @@ trait InitCommandMockTrait
         ];
     }
 
-    public function mockNamespaceFunctions(array ...$calls): void
+    public function mockNativeFunctions(array ...$calls): void
     {
         $this->mockFunction('RonasIT\ProjectInitializator\Commands', ...$calls);
     } 

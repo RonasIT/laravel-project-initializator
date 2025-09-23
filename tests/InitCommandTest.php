@@ -17,7 +17,7 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNamespaceFunctions(
+        $this->mockNativeFunctions(
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
@@ -54,7 +54,7 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNamespaceFunctions(
+        $this->mockNativeFunctions(
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
 
@@ -92,7 +92,7 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNamespaceFunctions(
+        $this->mockNativeFunctions(
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', $this->getFixture('migration.php')),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -135,7 +135,7 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNamespaceFunctions(
+        $this->mockNativeFunctions(
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', 'README.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', 'RESOURCES_AND_CONTACTS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', 'RESOURCES.md'),
@@ -246,7 +246,7 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNamespaceFunctions(
+        $this->mockNativeFunctions(
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', 'README.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', 'RESOURCES_AND_CONTACTS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', 'RESOURCES.md'),
@@ -335,7 +335,7 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNamespaceFunctions(
+        $this->mockNativeFunctions(
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', 'README.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', 'RESOURCES_AND_CONTACTS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', 'RESOURCES.md'),
@@ -440,7 +440,7 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNamespaceFunctions(
+        $this->mockNativeFunctions(
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', 'README.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', 'RESOURCES_AND_CONTACTS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', 'RESOURCES.md'),
@@ -536,7 +536,7 @@ class InitCommandTest extends TestCase
 
         );
 
-        $this->mockNamespaceFunctions(
+        $this->mockNativeFunctions(
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', 'README.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', 'RESOURCES_AND_CONTACTS.md'),
             $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', 'RESOURCES.md'),
