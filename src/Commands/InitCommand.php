@@ -68,7 +68,7 @@ class InitCommand extends Command implements Isolatable
         'composer require --dev ronasit/laravel-entity-generator',
         'composer require --dev laravel/pint',
         'php artisan vendor:publish --tag=pint-config',
-        'composer require --dev brainmaestro/composer-git-hooks'
+        'composer require --dev brainmaestro/composer-git-hooks',
     ];
 
     protected string $appName;
