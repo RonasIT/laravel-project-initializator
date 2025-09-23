@@ -236,7 +236,7 @@ class InitCommand extends Command implements Isolatable
         $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
         $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', 'cghooks update');
 
-        $resultData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $resultData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
 
         file_put_contents($path, $resultData);
     }
