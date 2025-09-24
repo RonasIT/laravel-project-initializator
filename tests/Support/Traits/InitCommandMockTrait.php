@@ -10,16 +10,12 @@ trait InitCommandMockTrait
 
     protected function callClassExists(string $class, bool $result = true): array
     {
-        return [
-            $this->functionCall('class_exists', [$class], $result),
-        ];
+        return $this->functionCall('class_exists', [$class], $result);
     }
 
     protected function callFileGetContent(string $fileName, string $sourceFixture): array
     {
-        return [
-            $this->functionCall('file_get_contents', [base_path($fileName)], $this->getTemplate($sourceFixture)),
-        ];
+        return $this->functionCall('file_get_contents', [base_path($fileName)], $this->getTemplate($sourceFixture));
     }
 
     protected function getTemplate(string $template): string
@@ -29,26 +25,22 @@ trait InitCommandMockTrait
 
     protected function callFilePutContent(string $fileName, string $result, int $flags = 0): array
     {
-        return [
-            $this->functionCall('file_put_contents', [$fileName, $result, $flags]),
-        ];
+        return $this->functionCall('file_put_contents', [$fileName, $result, $flags]);
     }
 
     protected function callShellExec(string $command, string $result = 'success'): array
     {
-        return [
-            $this->functionCall('shell_exec', [$command], $result),
-        ];
+        return  $this->functionCall('shell_exec', [$command], $result);
     }
 
     public function mockNativeFunctions(array ...$calls): void
     {
-        $this->mockFunction('RonasIT\ProjectInitializator\Commands', ...$calls);
+        $this->mockFunction('RonasIT\ProjectInitializator\Commands', $calls);
     } 
 
     public function mockLaravelConfigWriter(array ...$calls): void
     {
-        $this->mockFunction('\Winter\LaravelConfigWriter', ...$calls);
+        $this->mockFunction('\Winter\LaravelConfigWriter', array_merge(...$calls));
     } 
 
     protected function changeEnvFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
@@ -69,11 +61,11 @@ trait InitCommandMockTrait
         ];
     }
     
-    protected function mockFunction(string $namespace, array ...$calls): void
+    protected function mockFunction(string $namespace, array $calls): void
     {
         $this->mockNativeFunction(
             namespace: $namespace,
-            callChain: array_merge(...$calls),
+            callChain: $calls,
         );
     }
 }
