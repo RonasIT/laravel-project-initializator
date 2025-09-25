@@ -67,6 +67,9 @@ class InitCommand extends Command implements Isolatable
         'composer require ronasit/laravel-swagger',
         'php artisan vendor:publish --provider="RonasIT\\AutoDoc\\AutoDocServiceProvider"',
         'composer require --dev ronasit/laravel-entity-generator',
+        'composer require --dev laravel/pint',
+        'php artisan vendor:publish --tag=pint-config',
+        'composer require --dev brainmaestro/composer-git-hooks',
     ];
 
     protected string $appName;
@@ -221,6 +224,8 @@ class InitCommand extends Command implements Isolatable
             $this->shellCommands[] = 'composer remove --dev ronasit/laravel-project-initializator';
         }
 
+        $this->setupComposerHooks();
+
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
         }
@@ -228,6 +233,35 @@ class InitCommand extends Command implements Isolatable
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         Artisan::call('migrate');
+    }
+
+    protected function setupComposerHooks(): void
+    {
+        $path = base_path('composer.json');
+
+        $content = file_get_contents($path);
+
+        $data = json_decode($content, true);
+
+        $this->addArrayItemIfMissing($data, 'extra.hooks.config.stop-on-failure', 'pre-commit');
+        $this->addArrayItemIfMissing($data, 'extra.hooks.pre-commit', 'docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair');
+        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
+        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', 'cghooks update');
+
+        $resultData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+
+        file_put_contents($path, $resultData);
+    }
+
+    protected function addArrayItemIfMissing(array &$data, string $path, string $value): void
+    {
+        $current = Arr::get($data, $path, []);
+
+        if (!in_array($value, $current)) {
+            $current[] = $value;
+
+            Arr::set($data, $path, $current);
+        }
     }
 
     protected function setAutoDocContactEmail(string $email): void

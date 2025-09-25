@@ -525,7 +525,7 @@ class InitCommandTest extends TestCase
         $this->assertWebLoginPublished();
     }
 
-    public function testRunWithClerkMobileApp(): void
+    public function testRunWithClerkMobileAppWithPintInstalled(): void
     {
         $this->mockLaravelConfigWriter(
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
