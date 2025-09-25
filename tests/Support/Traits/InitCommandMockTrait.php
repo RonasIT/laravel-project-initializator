@@ -15,7 +15,7 @@ trait InitCommandMockTrait
 
     protected function callFileGetContent(string $fileName, string $sourceFixture): array
     {
-        return $this->functionCall('file_get_contents', [base_path($fileName)], $this->getTemplate($sourceFixture));
+        return $this->functionCall('file_get_contents', [base_path($fileName)], $sourceFixture);
     }
 
     protected function getTemplate(string $template): string
