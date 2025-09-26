@@ -23,7 +23,6 @@ trait InitCommandMockTrait
         return file_get_contents(base_path("/resources/md/readme/{$template}"));
     }
 
-
     protected function getReadmePath(string $fileName): string
     {
         return "/vendor/ronasit/laravel-project-initializator/resources/md/readme/{$fileName}";
