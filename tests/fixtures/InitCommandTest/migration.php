@@ -10,7 +10,7 @@ class AddDefaultUser extends Migration
 {
     use MigrationTrait;
 
-    public function up()
+    public function up(): void
     {
         if (!App::environment('testing')) {
             DB::table('users')->insert([
@@ -22,7 +22,7 @@ class AddDefaultUser extends Migration
         }
     }
 
-    public function down()
+    public function down(): void
     {
         if (!App::environment('testing')) {
             DB::table('users')

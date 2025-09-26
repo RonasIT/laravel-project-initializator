@@ -1,18 +1,18 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use RonasIT\Support\Traits\MigrationTrait;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+use RonasIT\Support\Traits\MigrationTrait;
 
-class AddTelescopeAdmin extends Migration
+class AdminsCreateTable extends Migration
 {
     use MigrationTrait;
 
-    public function up(): void
+    public function up()
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->increments('id');
@@ -28,14 +28,8 @@ class AddTelescopeAdmin extends Migration
         }
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('admins');
-
-        if (!App::environment('testing')) {
-            DB::table('admins')
-                ->where('email', 'telescope_mail@mail.com')
-                ->delete();
-        }
     }
 }

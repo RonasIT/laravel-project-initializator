@@ -355,8 +355,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'mail@mail.com')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '123456')
+            ->expectsQuestion('Please enter Laravel Nova\'s admin email', 'mail@mail.com')
+            ->expectsQuestion('Please enter Laravel Nova\'s admin password', '123456')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
@@ -562,7 +562,7 @@ class InitCommandTest extends TestCase
                 $this->getFixture('migration.php'),
             ],
             [
-                'database/migrations/2018_11_11_111111_add_nova_admin.php',
+                'database/migrations/2018_11_11_111111_add_nova_user.php',
                 $this->getFixture('nova_admins_table_migration.php'),
             ],
             [
@@ -648,10 +648,10 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'nova_mail@mail.com')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '654321')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin name', 'Nova Admin')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin role id', 1)
+            ->expectsQuestion('Please enter Laravel Nova\'s admin email', 'nova_mail@mail.com')
+            ->expectsQuestion('Please enter Laravel Nova\'s admin password', '654321')
+            ->expectsQuestion('Please enter Laravel Nova\'s admin name', 'Nova Admin')
+            ->expectsQuestion('Please enter Laravel Nova\'s admin role id', 1)
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
@@ -710,11 +710,11 @@ class InitCommandTest extends TestCase
                 FILE_APPEND,
             ],
             [
-                'database/migrations/2018_11_11_111111_add_telescope_admin.php',
+                'database/migrations/2018_11_11_111111_add_telescope_user.php',
                 $this->getFixture('telescope_admins_table_migration.php'),
             ],
             [
-                'database/migrations/2018_11_11_111111_add_nova_admin.php',
+                'database/migrations/2018_11_11_111111_add_nova_user.php',
                 $this->getFixture('nova_admins_table_migration.php'),
             ],
             [
@@ -783,14 +783,14 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Getting Started` part?')
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
-            ->expectsQuestion('Please enter a Laravel Telescope\'s admin email', 'telescope_mail@mail.com')
-            ->expectsQuestion('Please enter a Laravel Telescope\'s admin password', '654321')
-            ->expectsQuestion('Please enter a Laravel Telescope\'s admin name', 'Telescope Admin')
-            ->expectsQuestion('Please enter a Laravel Telescope\'s admin role id', 1)
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'nova_mail@mail.com')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '654321')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin name', 'Nova Admin')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin role id', 1)
+            ->expectsQuestion('Please enter Laravel Telescope\'s admin email', 'telescope_mail@mail.com')
+            ->expectsQuestion('Please enter Laravel Telescope\'s admin password', '654321')
+            ->expectsQuestion('Please enter Laravel Telescope\'s admin name', 'Telescope Admin')
+            ->expectsQuestion('Please enter Laravel Telescope\'s admin role id', 1)
+            ->expectsQuestion('Please enter Laravel Nova\'s admin email', 'nova_mail@mail.com')
+            ->expectsQuestion('Please enter Laravel Nova\'s admin password', '654321')
+            ->expectsQuestion('Please enter Laravel Nova\'s admin name', 'Nova Admin')
+            ->expectsQuestion('Please enter Laravel Nova\'s admin role id', 1)
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
@@ -1063,7 +1063,7 @@ class InitCommandTest extends TestCase
                 $this->getFixture('env.example_clerk_credentials_added.yml'),
             ],
             [
-                'database/migrations/2018_11_11_111111_add_telescope_admin.php',
+                'database/migrations/2018_11_11_111111_admins_create_table.php',
                 $this->getFixture('telescope_clerk_admin_migration.php'),
             ],
             [
@@ -1138,10 +1138,10 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Getting Started` part?')
             ->expectsConfirmation('Do you need an `Environments` part?')
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
-            ->expectsQuestion('Please enter a Laravel Telescope\'s admin email', 'telescope_mail@mail.com')
-            ->expectsQuestion('Please enter a Laravel Telescope\'s admin password', '654321')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'mail@mail.com')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '123456')
+            ->expectsQuestion('Please enter Laravel Telescope\'s admin email', 'telescope_mail@mail.com')
+            ->expectsQuestion('Please enter Laravel Telescope\'s admin password', '654321')
+            ->expectsQuestion('Please enter Laravel Nova\'s admin email', 'mail@mail.com')
+            ->expectsQuestion('Please enter Laravel Nova\'s admin password', '123456')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsConfirmation('Would you use Renovate dependabot?')

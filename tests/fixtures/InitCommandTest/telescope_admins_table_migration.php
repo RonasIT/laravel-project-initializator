@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use RonasIT\Support\Traits\MigrationTrait;
 
-class AddTelescopeAdmin extends Migration
+class AddTelescopeUser extends Migration
 {
     use MigrationTrait;
 
