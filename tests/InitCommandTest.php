@@ -155,16 +155,16 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunctions(
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', $this->getTemplate('README.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', $this->getTemplate('RESOURCES.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md', $this->getTemplate('CONTACTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md', $this->getTemplate('PREREQUISITES.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md', $this->getTemplate('GETTING_STARTED.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', $this->getTemplate('ENVIRONMENTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md', $this->getTemplate('CLERK.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', $this->getTemplate('RENOVATE.md')),
+            $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
+            $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
+            $this->callFileGetContent($this->getReadmePath('CONTACTS.md'), $this->getTemplate('CONTACTS.md')),
+            $this->callFileGetContent($this->getReadmePath('PREREQUISITES.md'), $this->getTemplate('PREREQUISITES.md')),
+            $this->callFileGetContent($this->getReadmePath('GETTING_STARTED.md'), $this->getTemplate('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->getReadmePath('ENVIRONMENTS.md'), $this->getTemplate('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->getReadmePath('CREDENTIALS_AND_ACCESS.md'), $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->getReadmePath('CLERK.md'), $this->getTemplate('CLERK.md')),
+            $this->callFileGetContent($this->getReadmePath('RENOVATE.md'), $this->getTemplate('RENOVATE.md')),
             $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
@@ -271,12 +271,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunctions(
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', $this->getTemplate('README.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', $this->getTemplate('RESOURCES.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md', $this->getTemplate('CONTACTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', $this->getTemplate('ENVIRONMENTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
+            $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
+            $this->callFileGetContent($this->getReadmePath('CONTACTS.md'), $this->getTemplate('CONTACTS.md')),
+            $this->callFileGetContent($this->getReadmePath('ENVIRONMENTS.md'), $this->getTemplate('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->getReadmePath('CREDENTIALS_AND_ACCESS.md'), $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
@@ -365,15 +365,15 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunctions(
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', $this->getTemplate('README.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', $this->getTemplate('RESOURCES.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md', $this->getTemplate('CONTACTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md', $this->getTemplate('PREREQUISITES.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md', $this->getTemplate('GETTING_STARTED.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', $this->getTemplate('ENVIRONMENTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', $this->getTemplate('RENOVATE.md')),
+            $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
+            $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
+            $this->callFileGetContent($this->getReadmePath('CONTACTS.md'), $this->getTemplate('CONTACTS.md')),
+            $this->callFileGetContent($this->getReadmePath('PREREQUISITES.md'), $this->getTemplate('PREREQUISITES.md')),
+            $this->callFileGetContent($this->getReadmePath('GETTING_STARTED.md'), $this->getTemplate('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->getReadmePath('ENVIRONMENTS.md'), $this->getTemplate('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->getReadmePath('CREDENTIALS_AND_ACCESS.md'), $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->getReadmePath('RENOVATE.md'), $this->getTemplate('RENOVATE.md')),
             $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
@@ -475,12 +475,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunctions(
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', $this->getTemplate('README.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md', $this->getTemplate('RESOURCES.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md', $this->getTemplate('CONTACTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', $this->getTemplate('ENVIRONMENTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
+            $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
+            $this->callFileGetContent($this->getReadmePath('CONTACTS.md'), $this->getTemplate('CONTACTS.md')),
+            $this->callFileGetContent($this->getReadmePath('ENVIRONMENTS.md'), $this->getTemplate('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->getReadmePath('CREDENTIALS_AND_ACCESS.md'), $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
@@ -574,18 +574,18 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
 
         );
-
+        
         $this->mockNativeFunctions(
-            $this->callFileGetContent( '/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md', $this->getTemplate('README.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md', $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md',$this->getTemplate('RESOURCES.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md', $this->getTemplate('CONTACTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md', $this->getTemplate('PREREQUISITES.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md', $this->getTemplate('GETTING_STARTED.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md', $this->getTemplate('ENVIRONMENTS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md', $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md', $this->getTemplate('CLERK.md')),
-            $this->callFileGetContent('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md', $this->getTemplate('RENOVATE.md')),
+            $this->callFileGetContent( $this->getReadmePath('README.md'), $this->getTemplate('README.md')),
+            $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->getReadmePath('RESOURCES.md'),$this->getTemplate('RESOURCES.md')),
+            $this->callFileGetContent($this->getReadmePath('CONTACTS.md'), $this->getTemplate('CONTACTS.md')),
+            $this->callFileGetContent($this->getReadmePath('PREREQUISITES.md'), $this->getTemplate('PREREQUISITES.md')),
+            $this->callFileGetContent($this->getReadmePath('GETTING_STARTED.md'), $this->getTemplate('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->getReadmePath('ENVIRONMENTS.md'), $this->getTemplate('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->getReadmePath('CREDENTIALS_AND_ACCESS.md'), $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->getReadmePath('CLERK.md'), $this->getTemplate('CLERK.md')),
+            $this->callFileGetContent($this->getReadmePath('RENOVATE.md'), $this->getTemplate('RENOVATE.md')),
             $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
