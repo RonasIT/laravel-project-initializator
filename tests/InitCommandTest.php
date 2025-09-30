@@ -11,13 +11,15 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
-        $this->mockLaravelConfigWriter(
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNativeFunctions(
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
             $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
@@ -54,13 +56,15 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
-        $this->mockLaravelConfigWriter(
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNativeFunctions(
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
@@ -98,13 +102,15 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
-        $this->mockLaravelConfigWriter(
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNativeFunctions(
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
@@ -146,7 +152,8 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
-        $this->mockLaravelConfigWriter(
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_clerk_credentials_added.yml'),
@@ -154,7 +161,8 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNativeFunctions(
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
             $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
             $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
@@ -264,13 +272,15 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndPartialReadmeCreation()
     {
-        $this->mockLaravelConfigWriter(
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNativeFunctions(
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
             $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
             $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
@@ -358,13 +368,15 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
-        $this->mockLaravelConfigWriter(
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNativeFunctions(
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
             $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
             $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
@@ -468,13 +480,15 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndUsingTelescope()
     {
-        $this->mockLaravelConfigWriter(
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
-        $this->mockNativeFunctions(
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
             $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
             $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
@@ -566,16 +580,17 @@ class InitCommandTest extends TestCase
 
     public function testRunWithClerkMobileAppWithPintInstalled(): void
     {
-        $this->mockLaravelConfigWriter(
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
             $this->changeConfigFileCall(base_path('config/auto-doc.php'), 'auto_doc.php', 'auto_doc_after_changes.php'),
-
         );
         
-        $this->mockNativeFunctions(
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent( $this->getReadmePath('README.md'), $this->getTemplate('README.md')),
             $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
             $this->callFileGetContent($this->getReadmePath('RESOURCES.md'),$this->getTemplate('RESOURCES.md')),

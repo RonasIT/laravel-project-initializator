@@ -38,16 +38,6 @@ trait InitCommandMockTrait
         return  $this->functionCall('shell_exec', [$command], $result);
     }
 
-    public function mockNativeFunctions(array ...$calls): void
-    {
-        $this->mockFunction('RonasIT\ProjectInitializator\Commands', $calls);
-    } 
-
-    public function mockLaravelConfigWriter(array ...$calls): void
-    {
-        $this->mockFunction('\Winter\LaravelConfigWriter', array_merge(...$calls));
-    } 
-
     protected function changeEnvFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
     {
         return [
@@ -64,13 +54,5 @@ trait InitCommandMockTrait
             $this->functionCall('file_get_contents', [$fileName], $this->getFixture($sourceFixture)),
             $this->functionCall('file_put_contents', [$fileName, $this->getFixture($resultFixture)]),
         ];
-    }
-    
-    protected function mockFunction(string $namespace, array $calls): void
-    {
-        $this->mockNativeFunction(
-            namespace: $namespace,
-            callChain: $calls,
-        );
     }
 }
