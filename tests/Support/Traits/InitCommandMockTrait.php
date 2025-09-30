@@ -54,6 +54,20 @@ trait InitCommandMockTrait
         );
     }
 
+    public function mockCopy(array ...$rawCallChain): void
+    {
+        $callChain = array_map(fn ($call) => $this->functionCall(
+            name: 'copy',
+            arguments: $call,
+            result: true,
+        ), $rawCallChain);
+
+        $this->mockNativeFunction(
+            namespace: 'RonasIT\ProjectInitializator\Commands',
+            callChain: $callChain,
+        );
+    }
+
     protected function mockClassExists(array ...$rawCallChain): void
     {
         $callChain = array_map(fn ($call) => $this->functionCall(

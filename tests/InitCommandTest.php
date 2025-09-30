@@ -13,6 +13,11 @@ class InitCommandTest extends TestCase
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
+        $this->mockCopy(
+            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
+            ['.env.example', '.env.development'],
+        );
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -77,6 +82,11 @@ class InitCommandTest extends TestCase
     public function testRunWithoutAdminAndReadmeCreation()
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+
+        $this->mockCopy(
+            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
+            ['.env.example', '.env.development'],
+        );
 
         $this->mockFileGetContent(
             [
@@ -144,6 +154,11 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+
+        $this->mockCopy(
+            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
+            ['.env.example', '.env.development'],
+        );
 
         $this->mockFileGetContent(
             [
@@ -215,6 +230,11 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+
+        $this->mockCopy(
+            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
+            ['.env.example', '.env.development'],
+        );
 
         $this->mockFileGetContent(
             [
@@ -416,6 +436,11 @@ class InitCommandTest extends TestCase
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
+        $this->mockCopy(
+            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
+            ['.env.example', '.env.development'],
+        );
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -550,6 +575,11 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+
+        $this->mockCopy(
+            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
+            ['.env.example', '.env.development'],
+        );
 
         $this->mockFileGetContent(
             [
@@ -720,6 +750,11 @@ class InitCommandTest extends TestCase
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
+        $this->mockCopy(
+            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
+            ['.env.example', '.env.development'],
+        );
+
         $this->mockFileGetContent(
             [
                 'arguments' => ['.env.example'],
@@ -858,6 +893,11 @@ class InitCommandTest extends TestCase
     public function testRunWithClerkMobileAppWithPintInstalled(): void
     {
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+
+        $this->mockCopy(
+            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
+            ['.env.example', '.env.development'],
+        );
 
         $this->mockFileGetContent(
             [

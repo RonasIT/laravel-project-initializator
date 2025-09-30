@@ -17,6 +17,8 @@ use Winter\LaravelConfigWriter\ArrayFile;
 
 class InitCommand extends Command implements Isolatable
 {
+    public const string RESOURCES_PATH = 'vendor/ronasit/laravel-project-initializator/resources';
+
     public const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
 
     public const array RESOURCES_ITEMS = [
@@ -88,6 +90,15 @@ class InitCommand extends Command implements Isolatable
         );
 
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$kebabName}.com");
+
+        if (!file_exists(filename: '.env.example')) {
+            $envExamplePath = base_path(DIRECTORY_SEPARATOR . self::RESOURCES_PATH . DIRECTORY_SEPARATOR . '.env.example');
+            copy($envExamplePath, '.env.example');
+        }
+
+        if (!file_exists('.env.development')) {
+            copy('.env.example', '.env.development');
+        }
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
