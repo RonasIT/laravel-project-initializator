@@ -22,7 +22,7 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Commands',
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
-            $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -65,7 +65,7 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
-            $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
@@ -111,7 +111,7 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
-            $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', $this->getFixture('migration.php')),
@@ -163,17 +163,17 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
-            $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
-            $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
-            $this->callFileGetContent($this->getReadmePath('CONTACTS.md'), $this->getTemplate('CONTACTS.md')),
-            $this->callFileGetContent($this->getReadmePath('PREREQUISITES.md'), $this->getTemplate('PREREQUISITES.md')),
-            $this->callFileGetContent($this->getReadmePath('GETTING_STARTED.md'), $this->getTemplate('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->getReadmePath('ENVIRONMENTS.md'), $this->getTemplate('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->getReadmePath('CREDENTIALS_AND_ACCESS.md'), $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->getReadmePath('CLERK.md'), $this->getTemplate('CLERK.md')),
-            $this->callFileGetContent($this->getReadmePath('RENOVATE.md'), $this->getTemplate('RENOVATE.md')),
-            $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
@@ -281,13 +281,13 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
-            $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
-            $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
-            $this->callFileGetContent($this->getReadmePath('CONTACTS.md'), $this->getTemplate('CONTACTS.md')),
-            $this->callFileGetContent($this->getReadmePath('ENVIRONMENTS.md'), $this->getTemplate('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->getReadmePath('CREDENTIALS_AND_ACCESS.md'), $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent('README.md', $this->getFixture('partial_readme.md')),
@@ -377,16 +377,16 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
-            $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
-            $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
-            $this->callFileGetContent($this->getReadmePath('CONTACTS.md'), $this->getTemplate('CONTACTS.md')),
-            $this->callFileGetContent($this->getReadmePath('PREREQUISITES.md'), $this->getTemplate('PREREQUISITES.md')),
-            $this->callFileGetContent($this->getReadmePath('GETTING_STARTED.md'), $this->getTemplate('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->getReadmePath('ENVIRONMENTS.md'), $this->getTemplate('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->getReadmePath('CREDENTIALS_AND_ACCESS.md'), $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->getReadmePath('RENOVATE.md'), $this->getTemplate('RENOVATE.md')),
-            $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', $this->getFixture('migration.php')),
@@ -489,13 +489,13 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
-            $this->callFileGetContent($this->getReadmePath('README.md'), $this->getTemplate('README.md')),
-            $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->getReadmePath('RESOURCES.md'), $this->getTemplate('RESOURCES.md')),
-            $this->callFileGetContent($this->getReadmePath('CONTACTS.md'), $this->getTemplate('CONTACTS.md')),
-            $this->callFileGetContent($this->getReadmePath('ENVIRONMENTS.md'), $this->getTemplate('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->getReadmePath('CREDENTIALS_AND_ACCESS.md'), $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent('README.md', $this->getFixture('partial_readme_with_telescope.md')),
@@ -591,17 +591,17 @@ class InitCommandTest extends TestCase
         
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
-            $this->callFileGetContent( $this->getReadmePath('README.md'), $this->getTemplate('README.md')),
-            $this->callFileGetContent($this->getReadmePath('RESOURCES_AND_CONTACTS.md'), $this->getTemplate('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->getReadmePath('RESOURCES.md'),$this->getTemplate('RESOURCES.md')),
-            $this->callFileGetContent($this->getReadmePath('CONTACTS.md'), $this->getTemplate('CONTACTS.md')),
-            $this->callFileGetContent($this->getReadmePath('PREREQUISITES.md'), $this->getTemplate('PREREQUISITES.md')),
-            $this->callFileGetContent($this->getReadmePath('GETTING_STARTED.md'), $this->getTemplate('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->getReadmePath('ENVIRONMENTS.md'), $this->getTemplate('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->getReadmePath('CREDENTIALS_AND_ACCESS.md'), $this->getTemplate('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->getReadmePath('CLERK.md'), $this->getTemplate('CLERK.md')),
-            $this->callFileGetContent($this->getReadmePath('RENOVATE.md'), $this->getTemplate('RENOVATE.md')),
-            $this->callFileGetContent('composer.json', $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'),$this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),

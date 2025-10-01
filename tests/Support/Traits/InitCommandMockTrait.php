@@ -15,17 +15,12 @@ trait InitCommandMockTrait
 
     protected function callFileGetContent(string $fileName, string $sourceFixture): array
     {
-        return $this->functionCall('file_get_contents', [base_path($fileName)], $sourceFixture);
+        return $this->functionCall('file_get_contents', [$fileName], $sourceFixture);
     }
 
-    protected function getTemplate(string $template): string
+    protected function generateResourcePath(string $path): string
     {
-        return file_get_contents(base_path("/resources/md/readme/{$template}"));
-    }
-
-    protected function getReadmePath(string $fileName): string
-    {
-        return "/vendor/ronasit/laravel-project-initializator/resources/md/readme/{$fileName}";
+        return base_path("/vendor/ronasit/laravel-project-initializator/resources/{$path}");
     }
 
     protected function callFilePutContent(string $fileName, string $result, int $flags = 0): array
@@ -35,15 +30,15 @@ trait InitCommandMockTrait
 
     protected function callShellExec(string $command, string $result = 'success'): array
     {
-        return  $this->functionCall('shell_exec', [$command], $result);
+        return $this->functionCall('shell_exec', [$command], $result);
     }
 
     protected function changeEnvFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
     {
         return [
             $this->functionCall('is_file', [$fileName]),
-            $this->functionCall('file_get_contents', [$fileName], $this->getFixture($sourceFixture)),
-            $this->functionCall('file_put_contents', [$fileName, $this->getFixture($resultFixture)]),
+            $this->callFileGetContent($fileName, $this->getFixture($sourceFixture)),
+            $this->callFilePutContent($fileName, $this->getFixture($resultFixture)),
         ];
     }
 
@@ -51,8 +46,8 @@ trait InitCommandMockTrait
     {
         return [
             $this->functionCall('file_exists', [$fileName]),
-            $this->functionCall('file_get_contents', [$fileName], $this->getFixture($sourceFixture)),
-            $this->functionCall('file_put_contents', [$fileName, $this->getFixture($resultFixture)]),
+            $this->callFileGetContent($fileName, $this->getFixture($sourceFixture)),
+            $this->callFilePutContent($fileName, $this->getFixture($resultFixture)),
         ];
     }
 }

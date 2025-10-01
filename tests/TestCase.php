@@ -50,4 +50,9 @@ class TestCase extends BaseTestCase
             message: $assertFailedMessage,
         );
     }
+
+    protected function getReadmeTemplateContent(string $templateName): string
+    {
+        return file_get_contents(base_path("/resources/md/readme/{$templateName}"));
+    }
 }
