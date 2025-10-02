@@ -31,7 +31,7 @@
         "laravel/framework": ">=11.30",
         "php-mock/php-mock-phpunit": "^2.10",
         "ext-json": "*",
-        "ronasit/laravel-helpers": "^3.5.7",
+        "ronasit/laravel-helpers": ">=3.5.7",
         "winter/laravel-config-writer": "^1.2"
     },
     "require-dev": {

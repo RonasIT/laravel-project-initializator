@@ -55,4 +55,9 @@ class TestCase extends BaseTestCase
     {
         return file_get_contents(base_path("/resources/md/readme/{$templateName}"));
     }
+
+    protected function generateResourcePath(string $path): string
+    {
+        return base_path("/vendor/ronasit/laravel-project-initializator/resources/{$path}");
+    }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9a6c8c1a879bf20ac6365632562e61b2",
+    "content-hash": "ab5648220888ae8ccc4a9e7ab9640bdc",
     "packages": [
         {
             "name": "brick/math",
@@ -9592,16 +9592,16 @@
         },
         {
             "name": "orchestra/sidekick",
-            "version": "v1.2.15",
+            "version": "v1.2.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/sidekick.git",
-                "reference": "1cbe9a01d4db54aea85afe1dffd41f5e5de82243"
+                "reference": "2b165b602f56bbe05a5116fbfd76e4eb4986d1c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/sidekick/zipball/1cbe9a01d4db54aea85afe1dffd41f5e5de82243",
-                "reference": "1cbe9a01d4db54aea85afe1dffd41f5e5de82243",
+                "url": "https://api.github.com/repos/orchestral/sidekick/zipball/2b165b602f56bbe05a5116fbfd76e4eb4986d1c4",
+                "reference": "2b165b602f56bbe05a5116fbfd76e4eb4986d1c4",
                 "shasum": ""
             },
             "require": {
@@ -9643,9 +9643,9 @@
             "description": "Packages Toolkit Utilities and Helpers for Laravel",
             "support": {
                 "issues": "https://github.com/orchestral/sidekick/issues",
-                "source": "https://github.com/orchestral/sidekick/tree/v1.2.15"
+                "source": "https://github.com/orchestral/sidekick/tree/v1.2.16"
             },
-            "time": "2025-10-01T11:36:41+00:00"
+            "time": "2025-10-01T22:10:05+00:00"
         },
         {
             "name": "orchestra/testbench",

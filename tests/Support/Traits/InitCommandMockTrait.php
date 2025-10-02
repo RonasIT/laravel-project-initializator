@@ -18,11 +18,6 @@ trait InitCommandMockTrait
         return $this->functionCall('file_get_contents', [$fileName], $sourceFixture);
     }
 
-    protected function generateResourcePath(string $path): string
-    {
-        return base_path("/vendor/ronasit/laravel-project-initializator/resources/{$path}");
-    }
-
     protected function callFilePutContent(string $fileName, string $result, int $flags = 0): array
     {
         return $this->functionCall('file_put_contents', [$fileName, $result, $flags]);
