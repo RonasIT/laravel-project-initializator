@@ -14,6 +14,7 @@ use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use Winter\LaravelConfigWriter\ArrayFile;
+use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -92,13 +93,24 @@ class InitCommand extends Command implements Isolatable
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->createOrUpdateConfigFile($envFile, '=', [
+        $this->updateEnvFile($envFile, [
             'APP_NAME' => $this->appName,
+            'DB_CONNECTION' => 'pgsql',
+            'DB_HOST' => 'pgsql',
+            'DB_PORT' => '5432',
+            'DB_DATABASE' => 'postgres',
+            'DB_USERNAME' => 'postgres',
+            'DB_PASSWORD' => '',
         ]);
 
-        $this->createOrUpdateConfigFile('.env.development', '=', [
+        $this->updateEnvFile('.env.development', [
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
+            'APP_MAINTENANCE_DRIVER' => 'cache',
+            'CACHE_STORE' => 'redis',
+            'QUEUE_CONNECTION' => 'redis',
+            'SESSION_DRIVER' => 'redis',
+            'DB_CONNECTION' => 'pgsql',
         ]);
 
         $this->publishWebLogin();
@@ -133,11 +145,11 @@ class InitCommand extends Command implements Isolatable
                 $data['CLERK_ALLOWED_ORIGINS'] = '';
             }
 
-            $this->createOrUpdateConfigFile('.env.development', '=', $data);
-            $this->createOrUpdateConfigFile('.env.example', '=', $data);
+            $this->updateEnvFile('.env.development', $data);
+            $this->updateEnvFile($envFile, $data);
 
-            if ($envFile === '.env') {
-                $this->createOrUpdateConfigFile($envFile, '=', $data);
+            if ($envFile !== '.env.example') {
+                $this->updateEnvFile('.env.example', $data);
             }
         }
 
@@ -455,44 +467,23 @@ class InitCommand extends Command implements Isolatable
         $this->publishClass($view, $migrationName, 'database/migrations');
     }
 
-    protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
+    protected function updateEnvFile(string $fileName, array $data): void
     {
-        $parsed = file_get_contents($fileName);
+        $env = EnvFile::open($fileName);
 
-        $lines = explode("\n", $parsed);
+        // TODO: After updating wintercms/laravel-config-writer, remove the key comparison check and keep only $env->addEmptyLine();
+        $envKeys = array_column($env->getAst(), 'match');
+        $dataKeys = array_keys($data);
 
-        $previousKey = null;
+        $hasMissingKeys = count(array_intersect($dataKeys, $envKeys)) !== count($dataKeys);
 
-        foreach ($data as $key => $value) {
-            $value = $this->addQuotes($value);
-
-            foreach ($lines as &$line) {
-                if (Str::contains($line, $key)) {
-                    $line = "{$key}{$separator}{$value}";
-
-                    continue 2;
-                }
-            }
-
-            $item = "{$key}{$separator}{$value}";
-
-            if (!empty($previousKey) && $this->configKeysHaveSamePrefix($key, $previousKey)) {
-                $lines[] = $item;
-            } else {
-                $lines[] = "\n{$item}";
-            }
-
-            $previousKey = $key;
+        if ($hasMissingKeys) {
+            $env->addEmptyLine();
         }
 
-        $ymlSettings = implode("\n", $lines);
+        $env->set($data);
 
-        file_put_contents($fileName, $ymlSettings);
-    }
-
-    protected function configKeysHaveSamePrefix(string $key, string $previousKey): bool
-    {
-        return Str::before($key, '_') === Str::before($previousKey, '_');
+        $env->write();
     }
 
     protected function loadReadmePart(string $fileName): string
