@@ -14,7 +14,6 @@ class InitCommandTest extends TestCase
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockCopy(
-            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
             ['.env.example', '.env.development'],
         );
 
@@ -85,7 +84,6 @@ class InitCommandTest extends TestCase
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockCopy(
-            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
             ['.env.example', '.env.development'],
         );
 
@@ -158,7 +156,6 @@ class InitCommandTest extends TestCase
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockCopy(
-            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
             ['.env.example', '.env.development'],
         );
 
@@ -235,7 +232,6 @@ class InitCommandTest extends TestCase
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockCopy(
-            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
             ['.env.example', '.env.development'],
         );
 
@@ -441,7 +437,6 @@ class InitCommandTest extends TestCase
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockCopy(
-            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
             ['.env.example', '.env.development'],
         );
 
@@ -582,7 +577,6 @@ class InitCommandTest extends TestCase
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockCopy(
-            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
             ['.env.example', '.env.development'],
         );
 
@@ -757,7 +751,6 @@ class InitCommandTest extends TestCase
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockCopy(
-            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
             ['.env.example', '.env.development'],
         );
 
@@ -902,7 +895,6 @@ class InitCommandTest extends TestCase
         $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
 
         $this->mockCopy(
-            [base_path('/vendor/ronasit/laravel-project-initializator/resources/.env.example'), '.env.example'],
             ['.env.example', '.env.development'],
         );
 
