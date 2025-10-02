@@ -104,6 +104,10 @@ class InitCommand extends Command implements Isolatable
             'DB_PASSWORD' => '',
         ]);
 
+        if (!file_exists('.env.development')) {
+            copy('.env.example', '.env.development');
+        }
+
         $this->updateEnvFile('.env.development', [
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,

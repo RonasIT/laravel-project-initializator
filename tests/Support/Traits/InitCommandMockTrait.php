@@ -13,6 +13,16 @@ trait InitCommandMockTrait
         return $this->functionCall('class_exists', [$class], $result);
     }
 
+    protected function callCopy(string $source, string $result): array
+    {
+        return $this->functionCall('copy', [$source, $result], true);
+    }
+
+    protected function callFileExists(string $fileName, bool $result = true): array
+    {
+        return $this->functionCall('file_exists', [$fileName], $result);
+    }
+
     protected function callFileGetContent(string $fileName, string $sourceFixture): array
     {
         return $this->functionCall('file_get_contents', [$fileName], $sourceFixture);
@@ -40,7 +50,7 @@ trait InitCommandMockTrait
     protected function changeConfigFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
     {
         return [
-            $this->functionCall('file_exists', [$fileName]),
+            $this->callFileExists($fileName),
             $this->callFileGetContent($fileName, $this->getFixture($sourceFixture)),
             $this->callFilePutContent($fileName, $this->getFixture($resultFixture)),
         ];
