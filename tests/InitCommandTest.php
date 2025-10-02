@@ -35,6 +35,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
         );
 
         $this
@@ -80,6 +81,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
         );
@@ -127,6 +129,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
         );
@@ -196,6 +199,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
             $this->callShellExec('php artisan laravel-clerk:install --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
@@ -305,6 +309,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
         );
@@ -409,6 +414,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
@@ -515,6 +521,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
         );
@@ -628,6 +635,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
             $this->callShellExec('php artisan laravel-clerk:install --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),

@@ -71,6 +71,7 @@ class InitCommand extends Command implements Isolatable
         'php artisan vendor:publish --tag=pint-config',
         'composer require --dev brainmaestro/composer-git-hooks',
         './vendor/bin/cghooks update',
+        'php artisan lang:publish',
     ];
 
     protected string $appName;
