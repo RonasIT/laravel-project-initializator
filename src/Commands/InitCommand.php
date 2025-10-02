@@ -486,11 +486,6 @@ class InitCommand extends Command implements Isolatable
         $env->write();
     }
 
-    protected function configKeysHaveSamePrefix(string $key, string $previousKey): bool
-    {
-        return Str::before($key, '_') === Str::before($previousKey, '_');
-    }
-
     protected function loadReadmePart(string $fileName): string
     {
         $file = base_path(DIRECTORY_SEPARATOR . self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
