@@ -215,11 +215,11 @@ class InitCommand extends Command implements Isolatable
 
         $this->setupComposerHooks();
 
+        $this->setAutoDocContactEmail($this->codeOwnerEmail);
+
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
         }
-
-        $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         Artisan::call('migrate');
     }
