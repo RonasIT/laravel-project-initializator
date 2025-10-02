@@ -59,6 +59,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require --dev laravel/pint --ansi'],
             ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
             ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
+            ['arguments' => './vendor/bin/cghooks update --ansi'],
         );
 
         $this
@@ -129,6 +130,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require --dev laravel/pint --ansi'],
             ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
             ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
+            ['arguments' => './vendor/bin/cghooks update --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
@@ -201,6 +203,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require --dev laravel/pint --ansi'],
             ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
             ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
+            ['arguments' => './vendor/bin/cghooks update --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
@@ -354,6 +357,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require --dev laravel/pint --ansi'],
             ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
             ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
+            ['arguments' => './vendor/bin/cghooks update --ansi'],
             ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
             ['arguments' => 'php artisan laravel-clerk:install --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
@@ -506,6 +510,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require --dev laravel/pint --ansi'],
             ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
             ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
+            ['arguments' => './vendor/bin/cghooks update --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
@@ -671,6 +676,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require --dev laravel/pint --ansi'],
             ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
             ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
+            ['arguments' => './vendor/bin/cghooks update --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
             ['arguments' => 'composer require ronasit/laravel-media --ansi'],
@@ -820,6 +826,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require --dev laravel/pint --ansi'],
             ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
             ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
+            ['arguments' => './vendor/bin/cghooks update --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
             ['arguments' => 'php artisan telescope:install --ansi'],
         );
@@ -1017,6 +1024,7 @@ class InitCommandTest extends TestCase
             ['arguments' => 'composer require --dev laravel/pint --ansi'],
             ['arguments' => 'php artisan vendor:publish --tag=pint-config --ansi'],
             ['arguments' => 'composer require --dev brainmaestro/composer-git-hooks --ansi'],
+            ['arguments' => './vendor/bin/cghooks update --ansi'],
             ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
             ['arguments' => 'php artisan laravel-clerk:install --ansi'],
             ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
