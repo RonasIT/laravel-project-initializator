@@ -11,9 +11,16 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockFileExists(
+            namespace: '\RonasIT\ProjectInitializator\ConfigWriter',
+            callChain: [
+                ['path' => 'config/telescope.php'],
+                ['path' => 'config/auto-doc.php'],
+            ],
+        );
 
         $this->mockFileGetContent(
+            'RonasIT\ProjectInitializator\Commands',
             [
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
@@ -22,25 +29,43 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
+        );
+
+        $this->mockFileGetContent(
+            '\RonasIT\ProjectInitializator\ConfigWriter',
             [
-                'arguments' => [base_path('/config/telescope.php')],
-                'result' => $this->getFixture('origin_telescope_config.php'),
+                'arguments' => [base_path('config/telescope.php')],
+                'result' => $this->getFixture('telescope.php'),
+            ],
+            [
+                'arguments' => [base_path('config/auto-doc.php')],
+                'result' => $this->getFixture('auto_doc.php'),
             ],
         );
 
         $this->mockFilePutContent(
-            'env.example_app_name_pascal_case.yml',
-            'env.development_app_name_pascal_case.yml',
+            'RonasIT\ProjectInitializator\Commands',
             [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                base_path('/config/telescope.php'),
-                $this->getFixture('updated_telescope_config.php'),
+                ['.env.example', $this->getFixture('env.example_app_name_pascal_case.yml')],
+                ['.env.development', $this->getFixture('env.development_app_name_pascal_case.yml')],
+                [
+                    base_path('/routes/web.php'),
+                    "\nAuth::routes();\n",
+                    FILE_APPEND,
+                ],
             ],
         );
+
+        $this->mockFilePutContent('\Winter\LaravelConfigWriter', [
+            [
+                base_path('config/telescope.php'),
+                $this->getFixture('telescope_after_changes.php'),
+            ],
+            [
+                base_path('config/auto-doc.php'),
+                $this->getFixture('auto_doc_after_changes.php'),
+            ],
+        ]);
 
         $this->mockClassExists([
             'arguments' => ['Laravel\Telescope\TelescopeServiceProvider', true],
@@ -73,9 +98,16 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockFileExists(
+            namespace: '\RonasIT\ProjectInitializator\ConfigWriter',
+            callChain: [
+                ['path' => 'config/telescope.php'],
+                ['path' => 'config/auto-doc.php'],
+            ],
+        );
 
         $this->mockFileGetContent(
+            'RonasIT\ProjectInitializator\Commands',
             [
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
@@ -84,29 +116,47 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
             ],
+        );
+
+        $this->mockFileGetContent(
+            '\RonasIT\ProjectInitializator\ConfigWriter',
             [
-                'arguments' => [base_path('/config/telescope.php')],
-                'result' => $this->getFixture('origin_telescope_config.php'),
+                'arguments' => [base_path('config/telescope.php')],
+                'result' => $this->getFixture('telescope.php'),
+            ],
+            [
+                'arguments' => [base_path('config/auto-doc.php')],
+                'result' => $this->getFixture('auto_doc.php'),
             ],
         );
 
         $this->mockFilePutContent(
-            'env.example_app_name_pascal_case.yml',
-            'env.development_app_name_pascal_case.yml',
+            'RonasIT\ProjectInitializator\Commands',
             [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                base_path('/config/telescope.php'),
-                $this->getFixture('updated_telescope_config.php'),
+                ['.env.example', $this->getFixture('env.example_app_name_pascal_case.yml')],
+                ['.env.development', $this->getFixture('env.development_app_name_pascal_case.yml')],
+                [
+                    base_path('/routes/web.php'),
+                    "\nAuth::routes();\n",
+                    FILE_APPEND,
+                ],
+                [
+                    'renovate.json',
+                    $this->getFixture('renovate.json'),
+                ],
             ],
         );
+
+        $this->mockFilePutContent('\Winter\LaravelConfigWriter', [
+            [
+                base_path('config/telescope.php'),
+                $this->getFixture('telescope_after_changes.php'),
+            ],
+            [
+                base_path('config/auto-doc.php'),
+                $this->getFixture('auto_doc_after_changes.php'),
+            ],
+        ]);
 
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
@@ -137,9 +187,16 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockFileExists(
+            namespace: '\RonasIT\ProjectInitializator\ConfigWriter',
+            callChain: [
+                ['path' => 'config/telescope.php'],
+                ['path' => 'config/auto-doc.php'],
+            ],
+        );
 
         $this->mockFileGetContent(
+            'RonasIT\ProjectInitializator\Commands',
             [
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example.yml'),
@@ -148,29 +205,47 @@ class InitCommandTest extends TestCase
                 'arguments' => ['.env.development'],
                 'result' => $this->getFixture('env.development.yml'),
             ],
+        );
+
+        $this->mockFileGetContent(
+            '\RonasIT\ProjectInitializator\ConfigWriter',
             [
-                'arguments' => [base_path('/config/telescope.php')],
-                'result' => $this->getFixture('origin_telescope_config.php'),
+                'arguments' => [base_path('config/telescope.php')],
+                'result' => $this->getFixture('telescope.php'),
+            ],
+            [
+                'arguments' => [base_path('config/auto-doc.php')],
+                'result' => $this->getFixture('auto_doc.php'),
             ],
         );
 
         $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
+            'RonasIT\ProjectInitializator\Commands',
             [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'database/migrations/2018_11_11_111111_add_default_user.php',
-                $this->getFixture('migration.php'),
-            ],
-            [
-                base_path('/config/telescope.php'),
-                $this->getFixture('updated_telescope_config.php'),
+                ['.env.example', $this->getFixture('env.example.yml')],
+                ['.env.development', $this->getFixture('env.development.yml')],
+                [
+                    base_path('/routes/web.php'),
+                    "\nAuth::routes();\n",
+                    FILE_APPEND,
+                ],
+                [
+                    'database/migrations/2018_11_11_111111_add_default_user.php',
+                    $this->getFixture('migration.php'),
+                ],
             ],
         );
+
+        $this->mockFilePutContent('\Winter\LaravelConfigWriter', [
+            [
+                base_path('config/telescope.php'),
+                $this->getFixture('telescope_after_changes.php'),
+            ],
+            [
+                base_path('config/auto-doc.php'),
+                $this->getFixture('auto_doc_after_changes.php'),
+            ],
+        ]);
 
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
@@ -205,9 +280,16 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockFileExists(
+            namespace: '\RonasIT\ProjectInitializator\ConfigWriter',
+            callChain: [
+                ['path' => 'config/telescope.php'],
+                ['path' => 'config/auto-doc.php'],
+            ],
+        );
 
         $this->mockFileGetContent(
+            'RonasIT\ProjectInitializator\Commands',
             [
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example.yml'),
@@ -264,57 +346,75 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
+        );
+
+        $this->mockFileGetContent(
+            '\RonasIT\ProjectInitializator\ConfigWriter',
             [
-                'arguments' => [base_path('/config/telescope.php')],
-                'result' => $this->getFixture('origin_telescope_config.php'),
+                'arguments' => [base_path('config/telescope.php')],
+                'result' => $this->getFixture('telescope.php'),
+            ],
+            [
+                'arguments' => [base_path('config/auto-doc.php')],
+                'result' => $this->getFixture('auto_doc.php'),
             ],
         );
 
         $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
+            'RonasIT\ProjectInitializator\Commands',
             [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
-                $this->getFixture('users_add_clerk_id_field_migration.php'),
-            ],
-            [
-                'app/Support/Clerk/ClerkUserRepository.php',
-                $this->getFixture('clerk_user_repository.php'),
-            ],
-            [
-                '.env.development',
-                $this->getFixture('env.development_clerk_credentials_added.yml'),
-            ],
-            [
-                '.env.example',
-                $this->getFixture('env.example_clerk_credentials_added.yml'),
-            ],
-            [
-                'database/migrations/2018_11_11_111111_admins_create_table.php',
-                $this->getFixture('admins_table_migration.php'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme.md'),
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme_after_using_renovate.md'),
-            ],
-            [
-                base_path('/config/telescope.php'),
-                $this->getFixture('updated_telescope_config.php'),
+                ['.env.example', $this->getFixture('env.example.yml')],
+                ['.env.development', $this->getFixture('env.development.yml')],
+                [
+                    base_path('/routes/web.php'),
+                    "\nAuth::routes();\n",
+                    FILE_APPEND,
+                ],
+                [
+                    'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
+                    $this->getFixture('users_add_clerk_id_field_migration.php'),
+                ],
+                [
+                    'app/Support/Clerk/ClerkUserRepository.php',
+                    $this->getFixture('clerk_user_repository.php'),
+                ],
+                [
+                    '.env.development',
+                    $this->getFixture('env.development_clerk_credentials_added.yml'),
+                ],
+                [
+                    '.env.example',
+                    $this->getFixture('env.example_clerk_credentials_added.yml'),
+                ],
+                [
+                    'database/migrations/2018_11_11_111111_admins_create_table.php',
+                    $this->getFixture('admins_table_migration.php'),
+                ],
+                [
+                    'README.md',
+                    $this->getFixture('default_readme.md'),
+                ],
+                [
+                    'renovate.json',
+                    $this->getFixture('renovate.json'),
+                ],
+                [
+                    'README.md',
+                    $this->getFixture('default_readme_after_using_renovate.md'),
+                ],
             ],
         );
+
+        $this->mockFilePutContent('\Winter\LaravelConfigWriter', [
+            [
+                base_path('config/telescope.php'),
+                $this->getFixture('telescope_after_changes.php'),
+            ],
+            [
+                base_path('config/auto-doc.php'),
+                $this->getFixture('auto_doc_after_changes.php'),
+            ],
+        ]);
 
         $this->mockShellExec(
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
@@ -402,9 +502,16 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndPartialReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockFileExists(
+            namespace: '\RonasIT\ProjectInitializator\ConfigWriter',
+            callChain: [
+                ['path' => 'config/telescope.php'],
+                ['path' => 'config/auto-doc.php'],
+            ],
+        );
 
         $this->mockFileGetContent(
+            'RonasIT\ProjectInitializator\Commands',
             [
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example.yml'),
@@ -437,29 +544,47 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
+        );
+
+        $this->mockFileGetContent(
+            '\RonasIT\ProjectInitializator\ConfigWriter',
             [
-                'arguments' => [base_path('/config/telescope.php')],
-                'result' => $this->getFixture('origin_telescope_config.php'),
+                'arguments' => [base_path('config/telescope.php')],
+                'result' => $this->getFixture('telescope.php'),
+            ],
+            [
+                'arguments' => [base_path('config/auto-doc.php')],
+                'result' => $this->getFixture('auto_doc.php'),
             ],
         );
 
         $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
+            'RonasIT\ProjectInitializator\Commands',
             [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'README.md',
-                $this->getFixture('partial_readme.md'),
-            ],
-            [
-                base_path('/config/telescope.php'),
-                $this->getFixture('updated_telescope_config.php'),
+                ['.env.example', $this->getFixture('env.example.yml')],
+                ['.env.development', $this->getFixture('env.development.yml')],
+                [
+                    base_path('/routes/web.php'),
+                    "\nAuth::routes();\n",
+                    FILE_APPEND,
+                ],
+                [
+                    'README.md',
+                    $this->getFixture('partial_readme.md'),
+                ],
             ],
         );
+
+        $this->mockFilePutContent('\Winter\LaravelConfigWriter', [
+            [
+                base_path('config/telescope.php'),
+                $this->getFixture('telescope_after_changes.php'),
+            ],
+            [
+                base_path('config/auto-doc.php'),
+                $this->getFixture('auto_doc_after_changes.php'),
+            ],
+        ]);
 
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
@@ -534,9 +659,16 @@ class InitCommandTest extends TestCase
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockFileExists(
+            namespace: '\RonasIT\ProjectInitializator\ConfigWriter',
+            callChain: [
+                ['path' => 'config/telescope.php'],
+                ['path' => 'config/auto-doc.php'],
+            ],
+        );
 
         $this->mockFileGetContent(
+            'RonasIT\ProjectInitializator\Commands',
             [
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example.yml'),
@@ -581,41 +713,59 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
+        );
+
+        $this->mockFileGetContent(
+            '\RonasIT\ProjectInitializator\ConfigWriter',
             [
-                'arguments' => [base_path('/config/telescope.php')],
-                'result' => $this->getFixture('origin_telescope_config.php'),
+                'arguments' => [base_path('config/telescope.php')],
+                'result' => $this->getFixture('telescope.php'),
+            ],
+            [
+                'arguments' => [base_path('config/auto-doc.php')],
+                'result' => $this->getFixture('auto_doc.php'),
             ],
         );
 
         $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
+            'RonasIT\ProjectInitializator\Commands',
             [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'database/migrations/2018_11_11_111111_add_default_user.php',
-                $this->getFixture('migration.php'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('full_readme.md'),
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('full_readme_after_using_renovate.md'),
-            ],
-            [
-                base_path('/config/telescope.php'),
-                $this->getFixture('updated_telescope_config.php'),
+                ['.env.example', $this->getFixture('env.example.yml')],
+                ['.env.development', $this->getFixture('env.development.yml')],
+                [
+                    base_path('/routes/web.php'),
+                    "\nAuth::routes();\n",
+                    FILE_APPEND,
+                ],
+                [
+                    'database/migrations/2018_11_11_111111_add_default_user.php',
+                    $this->getFixture('migration.php'),
+                ],
+                [
+                    'README.md',
+                    $this->getFixture('full_readme.md'),
+                ],
+                [
+                    'renovate.json',
+                    $this->getFixture('renovate.json'),
+                ],
+                [
+                    'README.md',
+                    $this->getFixture('full_readme_after_using_renovate.md'),
+                ],
             ],
         );
+
+        $this->mockFilePutContent('\Winter\LaravelConfigWriter', [
+            [
+                base_path('config/telescope.php'),
+                $this->getFixture('telescope_after_changes.php'),
+            ],
+            [
+                base_path('config/auto-doc.php'),
+                $this->getFixture('auto_doc_after_changes.php'),
+            ],
+        ]);
 
         $this->mockShellExec(
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
@@ -700,9 +850,16 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndUsingTelescope()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockFileExists(
+            namespace: '\RonasIT\ProjectInitializator\ConfigWriter',
+            callChain: [
+                ['path' => 'config/telescope.php'],
+                ['path' => 'config/auto-doc.php'],
+            ],
+        );
 
         $this->mockFileGetContent(
+            'RonasIT\ProjectInitializator\Commands',
             [
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example.yml'),
@@ -735,29 +892,47 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
                 'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
             ],
+        );
+
+        $this->mockFileGetContent(
+            '\RonasIT\ProjectInitializator\ConfigWriter',
             [
-                'arguments' => [base_path('/config/telescope.php')],
-                'result' => $this->getFixture('origin_telescope_config.php'),
+                'arguments' => [base_path('config/telescope.php')],
+                'result' => $this->getFixture('telescope.php'),
+            ],
+            [
+                'arguments' => [base_path('config/auto-doc.php')],
+                'result' => $this->getFixture('auto_doc.php'),
             ],
         );
 
         $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
+            'RonasIT\ProjectInitializator\Commands',
             [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'README.md',
-                $this->getFixture('partial_readme_with_telescope.md'),
-            ],
-            [
-                base_path('/config/telescope.php'),
-                $this->getFixture('updated_telescope_config.php'),
+                ['.env.example', $this->getFixture('env.example.yml')],
+                ['.env.development', $this->getFixture('env.development.yml')],
+                [
+                    base_path('/routes/web.php'),
+                    "\nAuth::routes();\n",
+                    FILE_APPEND,
+                ],
+                [
+                    'README.md',
+                    $this->getFixture('partial_readme_with_telescope.md'),
+                ],
             ],
         );
+
+        $this->mockFilePutContent('\Winter\LaravelConfigWriter', [
+            [
+                base_path('config/telescope.php'),
+                $this->getFixture('telescope_after_changes.php'),
+            ],
+            [
+                base_path('config/auto-doc.php'),
+                $this->getFixture('auto_doc_after_changes.php'),
+            ],
+        ]);
 
         $this->mockShellExec(
             ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
@@ -836,9 +1011,16 @@ class InitCommandTest extends TestCase
 
     public function testRunWithClerkMobileApp(): void
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
+        $this->mockFileExists(
+            namespace: '\RonasIT\ProjectInitializator\ConfigWriter',
+            callChain: [
+                ['path' => 'config/telescope.php'],
+                ['path' => 'config/auto-doc.php'],
+            ],
+        );
 
         $this->mockFileGetContent(
+            'RonasIT\ProjectInitializator\Commands',
             [
                 'arguments' => ['.env.example'],
                 'result' => $this->getFixture('env.example.yml'),
@@ -895,57 +1077,75 @@ class InitCommandTest extends TestCase
                 'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
                 'result' => $this->getTemplate('RENOVATE.md'),
             ],
+        );
+
+        $this->mockFileGetContent(
+            '\RonasIT\ProjectInitializator\ConfigWriter',
             [
-                'arguments' => [base_path('/config/telescope.php')],
-                'result' => $this->getFixture('origin_telescope_config.php'),
+                'arguments' => [base_path('config/telescope.php')],
+                'result' => $this->getFixture('telescope.php'),
+            ],
+            [
+                'arguments' => [base_path('config/auto-doc.php')],
+                'result' => $this->getFixture('auto_doc.php'),
             ],
         );
 
         $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
+            'RonasIT\ProjectInitializator\Commands',
             [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
-                $this->getFixture('users_add_clerk_id_field_migration.php'),
-            ],
-            [
-                'app/Support/Clerk/ClerkUserRepository.php',
-                $this->getFixture('clerk_user_repository.php'),
-            ],
-            [
-                '.env.development',
-                $this->getFixture('env.development_clerk_credentials_added_mobile_app.yml'),
-            ],
-            [
-                '.env.example',
-                $this->getFixture('env.example_clerk_credentials_added_mobile_app.yml'),
-            ],
-            [
-                'database/migrations/2018_11_11_111111_admins_create_table.php',
-                $this->getFixture('admins_table_migration.php'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme_with_mobile_app.md'),
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md'),
-            ],
-            [
-                base_path('/config/telescope.php'),
-                $this->getFixture('updated_telescope_config.php'),
-            ],
+                ['.env.example', $this->getFixture('env.example.yml')],
+                ['.env.development', $this->getFixture('env.development.yml')],
+                [
+                    base_path('/routes/web.php'),
+                    "\nAuth::routes();\n",
+                    FILE_APPEND,
+                ],
+                [
+                    'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
+                    $this->getFixture('users_add_clerk_id_field_migration.php'),
+                ],
+                [
+                    'app/Support/Clerk/ClerkUserRepository.php',
+                    $this->getFixture('clerk_user_repository.php'),
+                ],
+                [
+                    '.env.development',
+                    $this->getFixture('env.development_clerk_credentials_added_mobile_app.yml'),
+                ],
+                [
+                    '.env.example',
+                    $this->getFixture('env.example_clerk_credentials_added_mobile_app.yml'),
+                ],
+                [
+                    'database/migrations/2018_11_11_111111_admins_create_table.php',
+                    $this->getFixture('admins_table_migration.php'),
+                ],
+                [
+                    'README.md',
+                    $this->getFixture('default_readme_with_mobile_app.md'),
+                ],
+                [
+                    'renovate.json',
+                    $this->getFixture('renovate.json'),
+                ],
+                [
+                    'README.md',
+                    $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md'),
+                ],
+            ]
         );
+
+        $this->mockFilePutContent('\Winter\LaravelConfigWriter', [
+            [
+                base_path('config/telescope.php'),
+                $this->getFixture('telescope_after_changes.php'),
+            ],
+            [
+                base_path('config/auto-doc.php'),
+                $this->getFixture('auto_doc_after_changes.php'),
+            ],
+        ]);
 
         $this->mockShellExec(
             ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],

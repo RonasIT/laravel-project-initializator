@@ -10,18 +10,11 @@ trait InitCommandMockTrait
     use MockTrait;
 
     public function mockFilePutContent(
-        string $exampleEnvFixtureName = 'env.example.yml',
-        string $developmentEnvFixtureName = 'env.development.yml',
-        ...$arguments,
+        string $namespace,
+        array $callChain,
     ): void {
-        $callChain = [
-            ['.env.example', $this->getFixture($exampleEnvFixtureName)],
-            ['.env.development', $this->getFixture($developmentEnvFixtureName)],
-            ...$arguments,
-        ];
-
         $this->mockNativeFunction(
-            namespace: 'RonasIT\ProjectInitializator\Commands',
+            namespace: $namespace,
             callChain: array_map(
                 fn ($call) => $this->functionCall('file_put_contents', $call),
                 $callChain,
@@ -40,7 +33,7 @@ trait InitCommandMockTrait
         $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands', $callChain);
     }
 
-    public function mockFileGetContent(array ...$rawCallChain): void
+    public function mockFileGetContent(string $namespace, array ...$rawCallChain): void
     {
         $callChain = array_map(fn ($call) => $this->functionCall(
             name: 'file_get_contents',
@@ -49,7 +42,7 @@ trait InitCommandMockTrait
         ), $rawCallChain);
 
         $this->mockNativeFunction(
-            namespace: 'RonasIT\ProjectInitializator\Commands',
+            namespace: $namespace,
             callChain: $callChain,
         );
     }
@@ -70,15 +63,11 @@ trait InitCommandMockTrait
         return file_get_contents(base_path("/resources/md/readme/{$template}"));
     }
 
-    public function mockChangeConfig(string $path, string $initialContent, string $finalContent): void 
+    public function mockFileExists(string $namespace, array $callChain): void
     {
-        $this->mockNativeFunction('\Winter\LaravelConfigWriter', [
-            $this->functionCall('file_exists', [base_path($path)], true),
-            $this->functionCall('file_get_contents', [base_path($path)], $this->getFixture($initialContent)),
-            $this->functionCall('file_put_contents', [
-                base_path($path),
-                $this->getFixture($finalContent),
-            ], 1),
-        ]);  
+        $this->mockNativeFunction($namespace, array_map(
+            fn ($call) => $this->functionCall('file_exists', [base_path($call['path'])]),
+            $callChain,
+        ));
     }
 }

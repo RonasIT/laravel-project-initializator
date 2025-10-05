@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
-use Winter\LaravelConfigWriter\ArrayFile;
+use RonasIT\ProjectInitializator\ConfigWriter\ArrayFile;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -223,7 +223,7 @@ class InitCommand extends Command implements Isolatable
     protected function setAutoDocContactEmail(string $email): void
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
-        
+
         $config->set('info.contact.email', $email);
 
         $config->write();
@@ -578,11 +578,13 @@ class InitCommand extends Command implements Isolatable
 
     protected function changeMiddlewareForTelescopeAuthorization(): void
     {
-        $telescopeConfigPath = base_path('/config/telescope.php');
+        $config = ArrayFile::open(base_path('config/telescope.php'));
 
-        $content = Str::replace('Authorize::class', "'auth:web'", file_get_contents($telescopeConfigPath));
-        $content = Str::replace("use Laravel\Telescope\Http\Middleware\Authorize;\n", '', $content);
+        $config->set('middleware', [
+            'web',
+            'auth:web',
+        ]);
 
-        file_put_contents($telescopeConfigPath, $content);
+        $config->write();
     }
 }
