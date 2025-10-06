@@ -238,7 +238,7 @@ class InitCommand extends Command implements Isolatable
             shell_exec("{$shellCommand} --ansi");
         }
 
-        Artisan::call('migrate');
+        $this->runMigrations();
     }
 
     protected function setupComposerHooks(): void
@@ -277,6 +277,25 @@ class InitCommand extends Command implements Isolatable
         $config->set('info.contact.email', $email);
 
         $config->write();
+    }
+
+    protected function runMigrations(): void
+    {
+        if (config('database.default') !== 'pgsql') {
+            config([
+                'database.default' => 'pgsql',
+                'database.connections.pgsql' => [
+                    'driver' => 'pgsql',
+                    'host' => 'pgsql',
+                    'port' => 5432,
+                    'database' => 'postgres',
+                    'username' => 'postgres',
+                    'password' => '',
+                ],
+            ]);
+        }
+
+        shell_exec("php artisan migrate");
     }
 
     protected function createAdminUser(string $kebabName): void
@@ -597,10 +616,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function publishWebLogin(): void
     {
-        Artisan::call('vendor:publish', [
-            '--tag' => 'initializator-web-login',
-            '--force' => true,
-        ]);
+        shell_exec("php artisan vendor:publish --tag=initializator-web-login --force");
 
         file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
     }

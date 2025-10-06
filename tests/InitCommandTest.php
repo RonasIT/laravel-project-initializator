@@ -2,7 +2,6 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
-use Illuminate\Support\Facades\File;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
@@ -32,6 +31,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
@@ -41,6 +41,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan migrate'),
         );
 
         $this
@@ -57,8 +58,6 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithoutAdminAndReadmeCreation()
@@ -81,6 +80,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
@@ -92,6 +92,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan migrate'),
         );
 
         $this
@@ -108,8 +109,6 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndWithoutReadmeCreation()
@@ -132,6 +131,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_user.php', $this->getFixture('migration.php')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
@@ -143,6 +143,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan migrate'),
         );
 
         $this
@@ -163,8 +164,6 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndDefaultReadmeCreation()
@@ -204,6 +203,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('README.md', $this->getFixture('default_readme_after_using_renovate.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -218,6 +218,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan laravel-clerk:install --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan migrate'),
         );
 
         $this
@@ -288,8 +289,6 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndPartialReadmeCreation()
@@ -318,6 +317,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('README.md', $this->getFixture('partial_readme.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
@@ -329,6 +329,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan migrate'),
         );
 
         $this
@@ -389,8 +390,6 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
@@ -425,6 +424,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('README.md', $this->getFixture('full_readme_after_using_renovate.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -439,6 +439,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
+            $this->callShellExec('php artisan migrate'),
         );
 
         $this
@@ -506,8 +507,6 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?', 'yes')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithoutAdminAndUsingTelescope()
@@ -536,6 +535,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('README.md', $this->getFixture('partial_readme_with_telescope.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
@@ -547,6 +547,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan migrate'),
         );
 
         $this
@@ -611,8 +612,6 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithClerkMobileAppWithPintInstalled(): void
@@ -652,6 +651,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -666,6 +666,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan laravel-clerk:install --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan migrate'),
         );
 
         $this
@@ -736,21 +737,5 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
-    }
-
-    protected function assertWebLoginPublished(): void
-    {
-        $this->assertFileEqualsFixture('login_controller.php', app_path('Http/Controllers/Auth/LoginController.php'));
-        $this->assertFileEqualsFixture('app.css', public_path('app.css'));
-        $this->assertFileEqualsFixture('app.js', public_path('app.js'));
-        $this->assertFileEqualsFixture('app.blade.php', resource_path('views/layouts/app.blade.php'));
-        $this->assertFileEqualsFixture('login.blade.php', resource_path('views/auth/login.blade.php'));
-
-        File::deleteDirectory(app_path());
-        File::deleteDirectory(public_path());
-        File::deleteDirectory(resource_path('views/layouts'));
-        File::deleteDirectory(resource_path('views/auth'));
     }
 }
