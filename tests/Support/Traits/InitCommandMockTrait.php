@@ -2,72 +2,57 @@
 
 namespace RonasIT\ProjectInitializator\Tests\Support\Traits;
 
-use Illuminate\Support\Arr;
 use RonasIT\Support\Traits\MockTrait;
 
 trait InitCommandMockTrait
 {
     use MockTrait;
 
-    public function mockFilePutContent(
-        string $namespace,
-        array $callChain,
-    ): void {
-        $this->mockNativeFunction(
-            namespace: $namespace,
-            callChain: array_map(
-                fn ($call) => $this->functionCall('file_put_contents', $call),
-                $callChain,
-            ),
-        );
+    protected function callClassExists(string $class, bool $result = true): array
+    {
+        return $this->functionCall('class_exists', [$class], $result);
     }
 
-    public function mockShellExec(array ...$rawCallChain): void
+    protected function callCopy(string $source, string $result): array
     {
-        $callChain = array_map(fn ($call) => $this->functionCall(
-            name: 'shell_exec',
-            arguments: Arr::wrap($call['arguments']),
-            result: Arr::get($call, 'result', 'success'),
-        ), $rawCallChain);
-
-        $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands', $callChain);
+        return $this->functionCall('copy', [$source, $result], true);
     }
 
-    public function mockFileGetContent(string $namespace, array ...$rawCallChain): void
+    protected function callFileExists(string $fileName, bool $result = true): array
     {
-        $callChain = array_map(fn ($call) => $this->functionCall(
-            name: 'file_get_contents',
-            arguments: $call['arguments'],
-            result: $call['result'],
-        ), $rawCallChain);
-
-        $this->mockNativeFunction(
-            namespace: $namespace,
-            callChain: $callChain,
-        );
+        return $this->functionCall('file_exists', [$fileName], $result);
     }
 
-    protected function mockClassExists(array ...$rawCallChain): void
+    protected function callFileGetContent(string $fileName, string $sourceFixture): array
     {
-        $callChain = array_map(fn ($call) => $this->functionCall(
-            name: 'class_exists',
-            arguments: Arr::wrap($call['arguments']),
-            result: Arr::get($call, 'result', true),
-        ), $rawCallChain);
-
-        $this->mockNativeFunction('RonasIT\ProjectInitializator\Commands', $callChain);
+        return $this->functionCall('file_get_contents', [$fileName], $sourceFixture);
     }
 
-    protected function getTemplate(string $template): string
+    protected function callFilePutContent(string $fileName, string $result, int $flags = 0): array
     {
-        return file_get_contents(base_path("/resources/md/readme/{$template}"));
+        return $this->functionCall('file_put_contents', [$fileName, $result, $flags]);
     }
 
-    public function mockFileExists(string $namespace, array $callChain): void
+    protected function callShellExec(string $command, string $result = 'success'): array
     {
-        $this->mockNativeFunction($namespace, array_map(
-            fn ($call) => $this->functionCall('file_exists', [base_path($call['path'])]),
-            $callChain,
-        ));
+        return $this->functionCall('shell_exec', [$command], $result);
+    }
+
+    protected function changeEnvFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
+    {
+        return [
+            $this->functionCall('is_file', [$fileName]),
+            $this->callFileGetContent($fileName, $this->getFixture($sourceFixture)),
+            $this->callFilePutContent($fileName, $this->getFixture($resultFixture)),
+        ];
+    }
+
+    protected function changeConfigFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
+    {
+        return [
+            $this->callFileExists($fileName),
+            $this->callFileGetContent($fileName, $this->getFixture($sourceFixture)),
+            $this->callFilePutContent($fileName, $this->getFixture($resultFixture)),
+        ];
     }
 }

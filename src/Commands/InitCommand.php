@@ -13,7 +13,8 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
-use RonasIT\ProjectInitializator\ConfigWriter\ArrayFile;
+use Winter\LaravelConfigWriter\ArrayFile;
+use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -62,11 +63,19 @@ class InitCommand extends Command implements Isolatable
     protected string $readmeContent = '';
 
     protected array $shellCommands = [
+        'composer require laravel/ui',
         'composer require ronasit/laravel-helpers',
         'composer require ronasit/laravel-swagger',
         'php artisan vendor:publish --provider="RonasIT\\AutoDoc\\AutoDocServiceProvider"',
         'composer require --dev ronasit/laravel-entity-generator',
+        'composer require --dev laravel/pint',
+        'php artisan vendor:publish --tag=pint-config',
+        'composer require --dev brainmaestro/composer-git-hooks',
+        './vendor/bin/cghooks update',
+        'php artisan lang:publish',
     ];
+
+    protected bool $shouldUninstallPackage = false;
 
     protected string $appName;
 
@@ -88,16 +97,29 @@ class InitCommand extends Command implements Isolatable
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->createOrUpdateConfigFile($envFile, '=', [
+        $this->updateEnvFile($envFile, [
             'APP_NAME' => $this->appName,
+            'DB_CONNECTION' => 'pgsql',
+            'DB_HOST' => 'pgsql',
+            'DB_PORT' => '5432',
+            'DB_DATABASE' => 'postgres',
+            'DB_USERNAME' => 'postgres',
+            'DB_PASSWORD' => '',
         ]);
 
-        $this->createOrUpdateConfigFile('.env.development', '=', [
+        if (!file_exists('.env.development')) {
+            copy('.env.example', '.env.development');
+        }
+
+        $this->updateEnvFile('.env.development', [
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
+            'APP_MAINTENANCE_DRIVER' => 'cache',
+            'CACHE_STORE' => 'redis',
+            'QUEUE_CONNECTION' => 'redis',
+            'SESSION_DRIVER' => 'redis',
+            'DB_CONNECTION' => 'pgsql',
         ]);
-
-        $this->publishWebLogin();
 
         $this->info('Project initialized successfully!');
 
@@ -129,11 +151,11 @@ class InitCommand extends Command implements Isolatable
                 $data['CLERK_ALLOWED_ORIGINS'] = '';
             }
 
-            $this->createOrUpdateConfigFile('.env.development', '=', $data);
-            $this->createOrUpdateConfigFile('.env.example', '=', $data);
+            $this->updateEnvFile('.env.development', $data);
+            $this->updateEnvFile($envFile, $data);
 
-            if ($envFile === '.env') {
-                $this->createOrUpdateConfigFile($envFile, '=', $data);
+            if ($envFile !== '.env.example') {
+                $this->updateEnvFile('.env.example', $data);
             }
         }
 
@@ -206,8 +228,12 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
-            $this->shellCommands[] = 'composer remove --dev ronasit/laravel-project-initializator';
+            $this->shouldUninstallPackage = true;
         }
+
+        $this->setupComposerHooks();
+
+        $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
@@ -217,7 +243,42 @@ class InitCommand extends Command implements Isolatable
 
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
+        $this->publishWebLogin();
+
         Artisan::call('migrate');
+
+        if ($this->shouldUninstallPackage) {
+            shell_exec('composer remove --dev ronasit/laravel-project-initializator --no-script --ansi');
+        }
+    }
+
+    protected function setupComposerHooks(): void
+    {
+        $path = base_path('composer.json');
+
+        $content = file_get_contents($path);
+
+        $data = json_decode($content, true);
+
+        $this->addArrayItemIfMissing($data, 'extra.hooks.config.stop-on-failure', 'pre-commit');
+        $this->addArrayItemIfMissing($data, 'extra.hooks.pre-commit', 'docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair');
+        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
+        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', 'cghooks update');
+
+        $resultData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+
+        file_put_contents($path, $resultData);
+    }
+
+    protected function addArrayItemIfMissing(array &$data, string $path, string $value): void
+    {
+        $current = Arr::get($data, $path, []);
+
+        if (!in_array($value, $current)) {
+            $current[] = $value;
+
+            Arr::set($data, $path, $current);
+        }
     }
 
     protected function setAutoDocContactEmail(string $email): void
@@ -422,44 +483,23 @@ class InitCommand extends Command implements Isolatable
         $this->publishClass($view, $migrationName, 'database/migrations');
     }
 
-    protected function createOrUpdateConfigFile(string $fileName, string $separator, array $data): void
+    protected function updateEnvFile(string $fileName, array $data): void
     {
-        $parsed = file_get_contents($fileName);
+        $env = EnvFile::open($fileName);
 
-        $lines = explode("\n", $parsed);
+        // TODO: After updating wintercms/laravel-config-writer, remove the key comparison check and keep only $env->addEmptyLine();
+        $envKeys = array_column($env->getAst(), 'match');
+        $dataKeys = array_keys($data);
 
-        $previousKey = null;
+        $hasMissingKeys = count(array_intersect($dataKeys, $envKeys)) !== count($dataKeys);
 
-        foreach ($data as $key => $value) {
-            $value = $this->addQuotes($value);
-
-            foreach ($lines as &$line) {
-                if (Str::contains($line, $key)) {
-                    $line = "{$key}{$separator}{$value}";
-
-                    continue 2;
-                }
-            }
-
-            $item = "{$key}{$separator}{$value}";
-
-            if (!empty($previousKey) && $this->configKeysHaveSamePrefix($key, $previousKey)) {
-                $lines[] = $item;
-            } else {
-                $lines[] = "\n{$item}";
-            }
-
-            $previousKey = $key;
+        if ($hasMissingKeys) {
+            $env->addEmptyLine();
         }
 
-        $ymlSettings = implode("\n", $lines);
+        $env->set($data);
 
-        file_put_contents($fileName, $ymlSettings);
-    }
-
-    protected function configKeysHaveSamePrefix(string $key, string $previousKey): bool
-    {
-        return Str::before($key, '_') === Str::before($previousKey, '_');
+        $env->write();
     }
 
     protected function loadReadmePart(string $fileName): string
