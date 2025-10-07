@@ -63,6 +63,7 @@ class InitCommand extends Command implements Isolatable
     protected string $readmeContent = '';
 
     protected array $shellCommands = [
+        'composer require laravel/ui',
         'composer require ronasit/laravel-helpers',
         'composer require ronasit/laravel-swagger',
         'php artisan vendor:publish --provider="RonasIT\\AutoDoc\\AutoDocServiceProvider"',
@@ -73,6 +74,8 @@ class InitCommand extends Command implements Isolatable
         './vendor/bin/cghooks update',
         'php artisan lang:publish',
     ];
+
+    protected bool $shouldUninstallPackage = false;
 
     protected string $appName;
 
@@ -117,8 +120,6 @@ class InitCommand extends Command implements Isolatable
             'SESSION_DRIVER' => 'redis',
             'DB_CONNECTION' => 'pgsql',
         ]);
-
-        $this->publishWebLogin();
 
         $this->info('Project initialized successfully!');
 
@@ -227,7 +228,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
-            $this->shellCommands[] = 'composer remove --dev ronasit/laravel-project-initializator';
+            $this->shouldUninstallPackage = true;
         }
 
         $this->setupComposerHooks();
@@ -238,7 +239,13 @@ class InitCommand extends Command implements Isolatable
             shell_exec("{$shellCommand} --ansi");
         }
 
+        $this->publishWebLogin();
+
         Artisan::call('migrate');
+
+        if ($this->shouldUninstallPackage) {
+            shell_exec('composer remove --dev ronasit/laravel-project-initializator --no-script --ansi');
+        }
     }
 
     protected function setupComposerHooks(): void
