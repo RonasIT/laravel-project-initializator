@@ -16,20 +16,20 @@ class ArrayPrinter extends BaseArrayPrinter
 
         $this->parser = $parser;
 
-        $p = "<?php\n\n" . $this->prettyPrint($stmts);
+        $code = "<?php\n\n" . $this->prettyPrint($stmts);
 
-        $p = preg_replace('/(;\n?)(return\s*\[)/', ";\n\n$2", $p, 1);
+        $code = preg_replace('/(;\n?)(return\s*\[)/', ";\n\n$2", $code, 1);
 
         if ($stmts[0] instanceof Stmt\InlineHTML) {
-            $p = preg_replace('/^<\?php\s+\?>\n?/', '', $p);
+            $code = preg_replace('/^<\?php\s+\?>\n?/', '', $code);
         }
 
         if ($stmts[count($stmts) - 1] instanceof Stmt\InlineHTML) {
-            $p = preg_replace('/<\?php$/', '', rtrim($p));
+            $code = preg_replace('/<\?php$/', '', rtrim($code));
         }
 
         $this->parser = null;
 
-        return $p;
+        return $code;
     }
 }
