@@ -42,7 +42,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate'),
+            $this->callShellExec('php artisan migrate --ansi 2>&1'),
         );
 
         $this
@@ -94,7 +94,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate'),
+            $this->callShellExec('php artisan migrate --ansi 2>&1'),
         );
 
         $this
@@ -146,7 +146,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate'),
+            $this->callShellExec('php artisan migrate --ansi 2>&1'),
         );
 
         $this
@@ -222,7 +222,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate'),
+            $this->callShellExec('php artisan migrate --ansi 2>&1'),
         );
 
         $this
@@ -334,7 +334,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate'),
+            $this->callShellExec('php artisan migrate --ansi 2>&1'),
         );
 
         $this
@@ -445,7 +445,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
-            $this->callShellExec('php artisan migrate'),
+            $this->callShellExec('php artisan migrate --ansi 2>&1'),
         );
 
         $this
@@ -554,7 +554,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate'),
+            $this->callShellExec('php artisan migrate --ansi 2>&1'),
         );
 
         $this
@@ -674,7 +674,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate'),
+            $this->callShellExec('php artisan migrate --ansi 2>&1'),
         );
 
         $this
