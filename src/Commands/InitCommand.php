@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
-use Winter\LaravelConfigWriter\ArrayFile;
+use RonasIT\ProjectInitializator\ConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
@@ -233,15 +233,13 @@ class InitCommand extends Command implements Isolatable
 
         $this->setupComposerHooks();
 
+        $this->changeMiddlewareForTelescopeAuthorization();
+
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
         }
-
-        $this->changeMiddlewareForTelescopeAuthorization();
-
-        $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         $this->publishWebLogin();
 
