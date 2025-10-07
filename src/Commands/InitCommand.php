@@ -247,7 +247,7 @@ class InitCommand extends Command implements Isolatable
         $this->publishWebLogin();
 
         if ($this->shouldUninstallPackage) {
-            shell_exec('composer remove --dev ronasit/laravel-project-initializator --no-script --ansi');
+            shell_exec('composer remove --dev ronasit/laravel-project-initializator --no-scripts --ansi');
         }
         $this->runMigrations();
     }

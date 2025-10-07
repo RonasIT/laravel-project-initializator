@@ -444,7 +444,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --no-script --ansi'),
+            $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --no-scripts --ansi'),
             $this->callShellExec('php artisan migrate'),
         );
 
