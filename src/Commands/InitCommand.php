@@ -305,8 +305,7 @@ class InitCommand extends Command implements Isolatable
             ],
         ]);
 
-        $output = shell_exec('php artisan migrate --ansi 2>&1');
-        echo $output;
+        shell_exec('php artisan migrate --ansi');
     }
 
     protected function createAdminUser(string $kebabName): void
