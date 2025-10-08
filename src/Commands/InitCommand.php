@@ -7,7 +7,6 @@ use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
@@ -79,6 +78,12 @@ class InitCommand extends Command implements Isolatable
 
     protected string $appName;
 
+    protected string $dbConnection = 'pgsql';
+    protected string $dbHost = 'pgsql';
+    protected string $dbPort = '5432';
+    protected string $dbName = 'postgres';
+    protected string $dbUserName = 'postgres';
+
     protected AppTypeEnum $appType;
 
     public function handle(): void
@@ -99,11 +104,11 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateEnvFile($envFile, [
             'APP_NAME' => $this->appName,
-            'DB_CONNECTION' => 'pgsql',
-            'DB_HOST' => 'pgsql',
-            'DB_PORT' => '5432',
-            'DB_DATABASE' => 'postgres',
-            'DB_USERNAME' => 'postgres',
+            'DB_CONNECTION' => $this->dbConnection,
+            'DB_HOST' => $this->dbHost,
+            'DB_PORT' => $this->dbPort,
+            'DB_DATABASE' => $this->dbName,
+            'DB_USERNAME' => $this->dbUserName,
             'DB_PASSWORD' => '',
         ]);
 
@@ -118,7 +123,7 @@ class InitCommand extends Command implements Isolatable
             'CACHE_STORE' => 'redis',
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
-            'DB_CONNECTION' => 'pgsql',
+            'DB_CONNECTION' => $this->dbConnection,
         ]);
 
         $this->info('Project initialized successfully!');
@@ -241,11 +246,11 @@ class InitCommand extends Command implements Isolatable
 
         $this->publishWebLogin();
 
-        Artisan::call('migrate');
-
         if ($this->shouldUninstallPackage) {
-            shell_exec('composer remove --dev ronasit/laravel-project-initializator --no-script --ansi');
+            shell_exec('composer remove --dev ronasit/laravel-project-initializator --ansi');
         }
+
+        $this->runMigrations();
     }
 
     protected function setupComposerHooks(): void
@@ -284,6 +289,23 @@ class InitCommand extends Command implements Isolatable
         $config->set('info.contact.email', $email);
 
         $config->write();
+    }
+
+    protected function runMigrations(): void
+    {
+        config([
+            'database.default' => $this->dbConnection,
+            'database.connections.pgsql' => [
+                'driver' => $this->dbConnection,
+                'host' => $this->dbHost,
+                'port' => $this->dbPort,
+                'database' => $this->dbName,
+                'username' => $this->dbUserName,
+                'password' => '',
+            ],
+        ]);
+
+        shell_exec('php artisan migrate --ansi');
     }
 
     protected function createAdminUser(string $kebabName): void
@@ -604,10 +626,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function publishWebLogin(): void
     {
-        Artisan::call('vendor:publish', [
-            '--tag' => 'initializator-web-login',
-            '--force' => true,
-        ]);
+        shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
 
         file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
     }
