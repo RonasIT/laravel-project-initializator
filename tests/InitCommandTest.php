@@ -42,7 +42,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi 2>&1'),
+            $this->callShellExec('php artisan migrate --ansi'),
         );
 
         $this
