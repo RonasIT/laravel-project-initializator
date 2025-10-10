@@ -10,10 +10,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
-use RonasIT\ProjectInitializator\ConfigWriter\ArrayFile;
+use RonasIT\ProjectInitializator\Extensions\ConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
