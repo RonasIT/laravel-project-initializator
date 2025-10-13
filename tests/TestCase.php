@@ -31,26 +31,6 @@ class TestCase extends BaseTestCase
         ];
     }
 
-    protected function assertFileEqualsFixture(string $fixture, string $fileName, bool $exportMode = false): void
-    {
-        $this->assertFileExists($fileName);
-
-        $data = File::get($fileName);
-
-        if ($this->globalExportMode || $exportMode) {
-            $this->exportContent($data, $fixture);
-        }
-
-        $fixturePath = $this->prepareFixtureName($this->getFixturePath($fixture));
-        $assertFailedMessage = "Failed asserting that the provided file {$fileName} equal to fixture: {$fixturePath}";
-
-        $this->assertEquals(
-            expected: $this->getFixture($fixture),
-            actual: $data,
-            message: $assertFailedMessage,
-        );
-    }
-
     protected function getReadmeTemplateContent(string $templateName): string
     {
         return file_get_contents(base_path("/resources/md/readme/{$templateName}"));
