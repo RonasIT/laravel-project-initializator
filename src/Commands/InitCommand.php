@@ -119,12 +119,18 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->updateEnvFile('.env.development', [
+            'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
             'APP_MAINTENANCE_DRIVER' => 'cache',
             'CACHE_STORE' => 'redis',
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
-            ...$envConfig,
+            'DB_CONNECTION' => $this->dbConnection,
+            'DB_HOST' => '',
+            'DB_PORT' => '',
+            'DB_DATABASE' => '',
+            'DB_USERNAME' => '',
+            'DB_PASSWORD' => '',
         ]);
 
         $this->info('Project initialized successfully!');
