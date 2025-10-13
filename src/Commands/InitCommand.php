@@ -9,10 +9,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
-use Winter\LaravelConfigWriter\ArrayFile;
+use RonasIT\ProjectInitializator\Extensions\ConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
@@ -238,6 +238,8 @@ class InitCommand extends Command implements Isolatable
 
         $this->setupComposerHooks();
 
+        $this->changeMiddlewareForTelescopeAuthorization();
+
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         foreach ($this->shellCommands as $shellCommand) {
@@ -285,7 +287,7 @@ class InitCommand extends Command implements Isolatable
     protected function setAutoDocContactEmail(string $email): void
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
-        
+
         $config->set('info.contact.email', $email);
 
         $config->write();
@@ -629,5 +631,18 @@ class InitCommand extends Command implements Isolatable
         shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
 
         file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
+    }
+
+    protected function changeMiddlewareForTelescopeAuthorization(): void
+    {
+        $config = ArrayFile::open(base_path('config/telescope.php'));
+
+        // TODO: add Authorize::class middleware after inplementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
+        $config->set('middleware', [
+            'web',
+            'auth:web',
+        ]);
+
+        $config->write();
     }
 }
