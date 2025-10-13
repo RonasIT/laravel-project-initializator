@@ -618,6 +618,7 @@ class InitCommand extends Command implements Isolatable
     {
         $config = ArrayFile::open(base_path('config/telescope.php'));
 
+        // TODO: add Authorize::class middleware after inplementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
         $config->set('middleware', [
             'web',
             'auth:web',
