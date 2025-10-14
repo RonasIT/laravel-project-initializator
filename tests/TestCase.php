@@ -31,23 +31,13 @@ class TestCase extends BaseTestCase
         ];
     }
 
-    protected function assertFileEqualsFixture(string $fixture, string $fileName, bool $exportMode = false): void
+    protected function getReadmeTemplateContent(string $templateName): string
     {
-        $this->assertFileExists($fileName);
+        return file_get_contents(base_path("/resources/md/readme/{$templateName}"));
+    }
 
-        $data = File::get($fileName);
-
-        if ($this->globalExportMode || $exportMode) {
-            $this->exportContent($data, $fixture);
-        }
-
-        $fixturePath = $this->prepareFixtureName($this->getFixturePath($fixture));
-        $assertFailedMessage = "Failed asserting that the provided file {$fileName} equal to fixture: {$fixturePath}";
-
-        $this->assertEquals(
-            expected: $this->getFixture($fixture),
-            actual: $data,
-            message: $assertFailedMessage,
-        );
+    protected function generateResourcePath(string $path): string
+    {
+        return base_path("/vendor/ronasit/laravel-project-initializator/resources/{$path}");
     }
 }
