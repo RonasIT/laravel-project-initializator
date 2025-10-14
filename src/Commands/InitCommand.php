@@ -102,7 +102,7 @@ class InitCommand extends Command implements Isolatable
 
         $envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
-        $this->updateEnvFile($envFile, [
+        $envConfig = [
             'APP_NAME' => $this->appName,
             'DB_CONNECTION' => $this->dbConnection,
             'DB_HOST' => $this->dbHost,
@@ -110,7 +110,9 @@ class InitCommand extends Command implements Isolatable
             'DB_DATABASE' => $this->dbName,
             'DB_USERNAME' => $this->dbUserName,
             'DB_PASSWORD' => '',
-        ]);
+        ];
+
+        $this->updateEnvFile($envFile, $envConfig);
 
         if (!file_exists('.env.development')) {
             copy('.env.example', '.env.development');
@@ -124,6 +126,11 @@ class InitCommand extends Command implements Isolatable
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
             'DB_CONNECTION' => $this->dbConnection,
+            'DB_HOST' => '',
+            'DB_PORT' => '',
+            'DB_DATABASE' => '',
+            'DB_USERNAME' => '',
+            'DB_PASSWORD' => '',
         ]);
 
         $this->info('Project initialized successfully!');
