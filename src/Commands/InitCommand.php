@@ -324,22 +324,23 @@ class InitCommand extends Command implements Isolatable
         shell_exec('php artisan migrate --ansi');
     }
 
-    protected function createAdminUser(string $kebabName, string $serviceKey = '', string $serviceName = ''): array {
+    protected function createAdminUser(string $kebabName, string $serviceKey = '', string $serviceName = ''): array
+    {
         $adminEmail = when($serviceKey, "admin.{$serviceKey}@{$kebabName}.com", "admin@{$kebabName}.com");
         $defaultPassword = substr(md5(uniqid()), 0, 8);
 
-        $serviceName = when($serviceName, " for $serviceName");
+        $serviceLabel = when($serviceName, " for {$serviceName}");
 
         $adminCredentials = [
-            'email' => $this->ask("Please enter admin email{$serviceName}", $adminEmail),
-            'password' => $this->ask("Please enter admin password{$serviceName}", $defaultPassword),
+            'email' => $this->ask("Please enter admin email{$serviceLabel}", $adminEmail),
+            'password' => $this->ask("Please enter admin password{$serviceLabel}", $defaultPassword),
         ];
 
         if (!$serviceName) {
             $this->adminCredentials = $adminCredentials;
         }
 
-        return $this->publishAdminMigration($adminCredentials, $serviceKey, $serviceName);
+        return $this->publishAdminMigration($adminCredentials, $serviceKey, $serviceLabel);
     }
 
     protected function fillReadme(): void
@@ -451,8 +452,6 @@ class InitCommand extends Command implements Isolatable
 
         $this->removeTag($filePart, 'admin_credentials', !$this->adminCredentials);
 
-        $adminsCount = 0;
-
         foreach (self::CREDENTIALS_ITEMS as $key => $title) {
             if (!Arr::get($this->resources, $key)) {
                 $this->removeTag($filePart, "{$key}_credentials", true);
@@ -462,10 +461,8 @@ class InitCommand extends Command implements Isolatable
 
             if (!empty($this->adminCredentials) && $this->confirm("Is {$title}'s admin the same as default one?", true)) {
                 $adminCredentials = $this->adminCredentials;
-
-                $adminsCount++;
             } else {
-                if ($this->authType === AuthTypeEnum::Clerk && empty($adminsCount)) {
+                if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
                     $this->publishMigration(
                         view: view('initializator::admins_create_table'),
                         migrationName: 'admins_create_table',
@@ -473,8 +470,6 @@ class InitCommand extends Command implements Isolatable
                 }
 
                 $adminCredentials = $this->createAdminUser($kebabName, $key, $title);
-
-                $adminsCount++;
             }
 
             $this->setReadmeValue($filePart, "{$key}_email", $adminCredentials['email']);
@@ -662,37 +657,33 @@ class InitCommand extends Command implements Isolatable
         $config->write();
     }
 
-    protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey, ?string $serviceName): array {
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $migrationName = $this->getAdminMigrationName($adminCredentials, $serviceKey, $serviceName);
+    protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey, ?string $serviceLabel): array
+    {
+        $isClerk = $this->authType === AuthTypeEnum::Clerk;
 
-            $this->publishMigration(
-                view: view("initializator::admins_add_additional_admin")->with($adminCredentials),
-                migrationName: $migrationName,
-            );
-        } else {
-            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceName}", 'Admin');
-            $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceName}", RoleEnum::Admin->value);
-
-            $migrationName = $this->getAdminMigrationName($adminCredentials, $serviceKey, $serviceName);
-
-            $this->publishMigration(
-                view: view('initializator::add_default_user')->with($adminCredentials),
-                migrationName: $migrationName,
-            );
+        if (!$isClerk) {
+            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", 'Admin');
+            $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
         }
+
+        $migrationName = !empty($this->adminCredentials) && !$serviceKey
+            ? ($isClerk ? 'add_default_admin' : 'add_default_user')
+            : ($isClerk ? "add_{$serviceKey}_admin" : "add_{$serviceKey}_user");
+
+        $adminCredentials['migrationName'] = Str::studly($migrationName);;
+
+        $viewName = $isClerk ? 'initializator::admins_add_additional_admin' : 'initializator::add_default_user';
+
+        $this->publishMigration(
+            view: view($viewName)->with($adminCredentials),
+            migrationName: $migrationName,
+        );
 
         return $adminCredentials;
     }
 
-    protected function getAdminMigrationName(array &$adminCredentials, ?string $serviceKey, ?string $serviceName): string
+    protected function isMigrationExists(string $migrationName): bool
     {
-        $adminUserType = when($this->authType === AuthTypeEnum::Clerk, 'admin', 'user');
-
-        $migrationName = when(!empty($this->adminCredentials) && !$serviceName, "add_default_{$adminUserType}", "add_{$serviceKey}_{$adminUserType}");
-
-        $adminCredentials['migrationName'] = Str::studly($migrationName);
-
-        return $migrationName;
+        return !empty(glob(base_path("database/migrations/*_{$migrationName}.php")));
     }
 }
