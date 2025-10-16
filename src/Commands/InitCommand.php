@@ -336,11 +336,16 @@ class InitCommand extends Command implements Isolatable
             'password' => $this->ask("Please enter admin password{$serviceLabel}", $defaultPassword),
         ];
 
+        if ($this->authType === AuthTypeEnum::None) {
+            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", 'Admin');
+            $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
+        }
+
         if (!$serviceName) {
             $this->adminCredentials = $adminCredentials;
         }
 
-        return $this->publishAdminMigration($adminCredentials, $serviceKey, $serviceLabel);
+        return $this->publishAdminMigration($adminCredentials, $serviceKey);
     }
 
     protected function fillReadme(): void
@@ -657,25 +662,21 @@ class InitCommand extends Command implements Isolatable
         $config->write();
     }
 
-    protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey, ?string $serviceLabel): array
+    protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): array
     {
-        $isClerk = $this->authType === AuthTypeEnum::Clerk;
+        $migrationName = (!empty($this->adminCredentials) && !$serviceKey)
+            ? 'add_default_admin'
+            : "add_{$serviceKey}_admin";
 
-        if (!$isClerk) {
-            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", 'Admin');
-            $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
-        }
-
-        $migrationName = !empty($this->adminCredentials) && !$serviceKey
-            ? ($isClerk ? 'add_default_admin' : 'add_default_user')
-            : ($isClerk ? "add_{$serviceKey}_admin" : "add_{$serviceKey}_user");
-
-        $adminCredentials['migrationName'] = Str::studly($migrationName);;
-
-        $viewName = $isClerk ? 'initializator::admins_add_additional_admin' : 'initializator::add_default_user';
+        $viewName = ($this->authType === AuthTypeEnum::Clerk)
+            ? 'initializator::admins_add_additional_admin'
+            : 'initializator::add_default_user';
 
         $this->publishMigration(
-            view: view($viewName)->with($adminCredentials),
+            view: view($viewName)->with([
+                ...$adminCredentials,
+                'migrationName' => Str::studly($migrationName),
+            ]),
             migrationName: $migrationName,
         );
 
