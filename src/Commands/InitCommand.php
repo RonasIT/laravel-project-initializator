@@ -83,12 +83,10 @@ class InitCommand extends Command implements Isolatable
 
     protected AppTypeEnum $appType;
 
-    protected $readmeGenerator;
-
-    public function __construct(ReadmeGenerator $readme)
-    {
+    public function __construct(
+        protected ReadmeGenerator $readmeGenerator
+    ) {
         parent::__construct();
-        $this->readmeGenerator = $readme;
     }
 
     public function handle(): void
