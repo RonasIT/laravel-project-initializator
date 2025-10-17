@@ -88,4 +88,15 @@ class ReadmeGenerator
 
         $this->updateReadmeFile($filePart);
     }
+
+    public function fillGettingStarted(string $gitProjectPath): void
+    {
+        $projectDirectory = basename($gitProjectPath, '.git');
+        $filePart = $this->loadReadmePart('GETTING_STARTED.md');
+
+        $this->setReadmeValue($filePart, 'git_project_path', $gitProjectPath);
+        $this->setReadmeValue($filePart, 'project_directory', $projectDirectory);
+
+        $this->updateReadmeFile($filePart);
+    }
 }

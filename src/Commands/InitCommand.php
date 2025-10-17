@@ -351,6 +351,11 @@ class InitCommand extends Command implements Isolatable
 
     protected function generateReadme(): void
     {
+        $array = [
+            'appName' => $this->appName,
+            'appType' => $this->appType->value,
+        ];
+
         $this->readmeGenerator->fillReadme($this->appName, $this->appType->value);
 
             if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
@@ -364,7 +369,8 @@ class InitCommand extends Command implements Isolatable
             }
 
             if ($this->confirm('Do you need a `Getting Started` part?', true)) {
-                $this->fillGettingStarted();
+                $array['gitProjectPath'] = trim((string) shell_exec('git ls-remote --get-url origin'));
+                $this->readmeGenerator->fillGettingStarted($array['gitProjectPath']);
             }
 
             if ($this->confirm('Do you need an `Environments` part?', true)) {
@@ -441,18 +447,6 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->readmeGenerator->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
-
-        $this->readmeGenerator->updateReadmeFile($filePart);
-    }
-
-    protected function fillGettingStarted(): void
-    {
-        $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
-        $projectDirectory = basename($gitProjectPath, '.git');
-        $filePart = $this->readmeGenerator->loadReadmePart('GETTING_STARTED.md');
-
-        $this->readmeGenerator->setReadmeValue($filePart, 'git_project_path', $gitProjectPath);
-        $this->readmeGenerator->setReadmeValue($filePart, 'project_directory', $projectDirectory);
 
         $this->readmeGenerator->updateReadmeFile($filePart);
     }
