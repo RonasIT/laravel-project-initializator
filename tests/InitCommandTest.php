@@ -12,18 +12,18 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
             $this->callFileExists(base_path('config/auto-doc.php')),
             $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
+            $this->callFileExists(base_path('config/telescope.php')),
+            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
         );
 
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
             $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
         );
 
         $this->mockNativeFunction(
@@ -74,18 +74,18 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
             $this->callFileExists(base_path('config/auto-doc.php')),
             $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
+            $this->callFileExists(base_path('config/telescope.php')),
+            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
         );
 
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
             $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
         );
 
         $this->mockNativeFunction(
@@ -135,18 +135,18 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
             $this->callFileExists(base_path('config/auto-doc.php')),
             $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
+            $this->callFileExists(base_path('config/telescope.php')),
+            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
         );
 
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
             $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
         );
 
         $this->mockNativeFunction(
@@ -200,10 +200,10 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
             $this->callFileExists(base_path('config/auto-doc.php')),
             $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
+            $this->callFileExists(base_path('config/telescope.php')),
+            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
         );
 
         $this->mockNativeFunction(
@@ -212,8 +212,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
             $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
         );
 
         $this->mockNativeFunction(
@@ -335,18 +335,18 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
             $this->callFileExists(base_path('config/auto-doc.php')),
             $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
+            $this->callFileExists(base_path('config/telescope.php')),
+            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
         );
 
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
             $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
         );
 
         $this->mockNativeFunction(
@@ -446,18 +446,18 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
             $this->callFileExists(base_path('config/auto-doc.php')),
             $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
+            $this->callFileExists(base_path('config/telescope.php')),
+            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
         );
 
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
             $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
         );
 
         $this->mockNativeFunction(
@@ -573,18 +573,18 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
             $this->callFileExists(base_path('config/auto-doc.php')),
             $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
+            $this->callFileExists(base_path('config/telescope.php')),
+            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
         );
 
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
             $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
         );
 
         $this->mockNativeFunction(
@@ -688,10 +688,10 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
             $this->callFileExists(base_path('config/auto-doc.php')),
             $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
+            $this->callFileExists(base_path('config/telescope.php')),
+            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
         );
 
         $this->mockNativeFunction(
@@ -700,8 +700,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
             $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
         );
 
         $this->mockNativeFunction(

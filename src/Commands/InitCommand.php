@@ -245,13 +245,13 @@ class InitCommand extends Command implements Isolatable
 
         $this->setupComposerHooks();
 
-        $this->changeMiddlewareForTelescopeAuthorization();
-
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
         }
+
+        $this->changeMiddlewareForTelescopeAuthorization();
 
         $this->publishWebLogin();
 
