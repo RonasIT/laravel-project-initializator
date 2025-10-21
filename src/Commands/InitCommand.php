@@ -13,8 +13,8 @@ use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Extensions\ConfigWriter\ArrayFile;
-use Winter\LaravelConfigWriter\EnvFile;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
+use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -23,7 +23,7 @@ class InitCommand extends Command implements Isolatable
 
     protected array $adminCredentials = [];
 
-    protected array $readmeCommands = [];
+    protected array $readmeParts = [];
 
     protected array $emptyValuesList = [];
 
@@ -59,7 +59,7 @@ class InitCommand extends Command implements Isolatable
     ];
 
     public function __construct(
-        protected ReadmeGenerator $readmeGenerator
+        protected ReadmeGenerator $readmeGenerator,
     ) {
         parent::__construct();
     }
@@ -101,17 +101,18 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
-            $this->generateReadme();
+            $this->configureReadmeParts();
         }
 
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
-    
-            $this->readmeCommands[] = 'fillRenovate';
+
+            $this->readmeParts[] = 'fillRenovate';
         }
 
         if ($shouldGenerateReadme) {
-            $this->readmeGenerator->run($this->readmeCommands);
+            $this->readmeGenerator->generate($this->readmeParts);
+
             $this->info('README generated successfully!');
 
             if ($this->emptyValuesList) {
@@ -186,7 +187,7 @@ class InitCommand extends Command implements Isolatable
         $this->kebabName = Str::kebab($this->appName);
     }
 
-    protected function updateEnvFile(): void 
+    protected function updateEnvFile(): void
     {
         $this->envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
@@ -333,7 +334,7 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
     }
 
-    protected function generateReadme(): void
+    protected function configureReadmeParts(): void
     {
         $this->readmeGenerator->appInfo = [
             'name' => $this->appName,
@@ -343,43 +344,43 @@ class InitCommand extends Command implements Isolatable
         ];
 
         if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
-            $this->fillResources();
-            $this->fillContacts();
+            $this->configureResources();
+            $this->configureContacts();
 
-            $this->readmeCommands[] = 'fillResourcesAndContacts';
-            $this->readmeCommands[] = 'saveResources';
-            $this->readmeCommands[] = 'saveContacts';
+            $this->readmeParts[] = 'fillResourcesAndContacts';
+            $this->readmeParts[] = 'fillResources';
+            $this->readmeParts[] = 'fillContacts';
         }
 
         if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeCommands[] = 'fillPrerequisites';
+            $this->readmeParts[] = 'fillPrerequisites';
         }
 
         if ($this->confirm('Do you need a `Getting Started` part?', true)) {
-            $this->readmeCommands[] = 'fillGettingStarted';
+            $this->readmeParts[] = 'fillGettingStarted';
         }
 
         if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeCommands[] = 'fillEnvironments';
+            $this->readmeParts[] = 'fillEnvironments';
         }
 
         if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
-            $this->fillCredentialsAndAccess();
+            $this->configureCredentialsAndAccess();
 
-            $this->readmeCommands[] = 'saveCredentialsAndAccess';
+            $this->readmeParts[] = 'fillCredentialsAndAccess';
 
             if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeCommands[] = 'fillClerkAuthType';
+                $this->readmeParts[] = 'fillClerkAuthType';
             }
         }
     }
 
-    protected function fillResources(): void
+    protected function configureResources(): void
     {
         foreach ($this->readmeGenerator->resourcesItems as $key => $resource) {
             $defaultAnswer = (Arr::has($resource, 'default_url')) ? $this->appUrl . "/{$key}" : 'later';
             $text = "Are you going to use {$resource['title']}? "
-                . "Please enter a link or select `later` to do it later, otherwise select `no`.";
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.';
 
             $link = $this->anticipate($text, ['later', 'no'], $defaultAnswer);
 
@@ -392,7 +393,7 @@ class InitCommand extends Command implements Isolatable
         }
     }
 
-    protected function fillContacts(): void
+    protected function configureContacts(): void
     {
         foreach ($this->readmeGenerator->contactsItems as $key => $value) {
             if ($link = $this->ask("Please enter a {$value['title']}'s email", '')) {
@@ -403,7 +404,7 @@ class InitCommand extends Command implements Isolatable
         }
     }
 
-    protected function fillCredentialsAndAccess(): void
+    protected function configureCredentialsAndAccess(): void
     {
         foreach ($this->readmeGenerator->credentialsItems as $key => &$item) {
             if (!Arr::get($this->readmeGenerator->resourcesItems, "{$key}.active")) {
