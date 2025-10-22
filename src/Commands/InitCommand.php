@@ -329,7 +329,7 @@ class InitCommand extends Command implements Isolatable
         $adminEmail = when(empty($serviceKey), "admin@{$kebabName}.com", "admin.{$serviceKey}@{$kebabName}.com");
         $defaultPassword = substr(md5(uniqid()), 0, 8);
 
-        $serviceLabel = when($serviceName, " for {$serviceName}");
+        $serviceLabel = when(!empty($serviceName), " for {$serviceName}");
 
         $adminCredentials = [
             'email' => $this->ask("Please enter admin email{$serviceLabel}", $adminEmail),
