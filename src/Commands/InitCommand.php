@@ -173,10 +173,7 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
             if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->publishMigration(
-                    view: view('initializator::admins_create_table'),
-                    migrationName: 'admins_create_table',
-                );
+                $this->publishAdminsTableMigration();
             }
 
             $this->createAdminUser($kebabName);
@@ -337,15 +334,17 @@ class InitCommand extends Command implements Isolatable
         ];
 
         if ($this->authType === AuthTypeEnum::None) {
-            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", 'Admin');
+            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", "{$serviceName} Admin");
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
         }
 
-        if (!$serviceName) {
+        if (empty($serviceName)) {
             $this->adminCredentials = $adminCredentials;
         }
 
-        return $this->publishAdminMigration($adminCredentials, $serviceKey);
+        $this->publishAdminMigration($adminCredentials, $serviceKey);
+
+        return $adminCredentials;
     }
 
     protected function fillReadme(): void
@@ -468,10 +467,7 @@ class InitCommand extends Command implements Isolatable
                 $adminCredentials = $this->adminCredentials;
             } else {
                 if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
-                    $this->publishMigration(
-                        view: view('initializator::admins_create_table'),
-                        migrationName: 'admins_create_table',
-                    );
+                    $this->publishAdminsTableMigration();
                 }
 
                 $adminCredentials = $this->createAdminUser($kebabName, $key, $title);
@@ -662,29 +658,30 @@ class InitCommand extends Command implements Isolatable
         $config->write();
     }
 
-    protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): array
+    protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
     {
-        $migrationName = (!empty($this->adminCredentials) && !$serviceKey)
-            ? 'add_default_admin'
-            : "add_{$serviceKey}_admin";
+        $migrationName = (empty($serviceKey)) ? 'add_default_admin' : "add_{$serviceKey}_admin";
 
         $viewName = ($this->authType === AuthTypeEnum::Clerk)
             ? 'initializator::admins_add_additional_admin'
             : 'initializator::add_default_user';
 
         $this->publishMigration(
-            view: view($viewName)->with([
-                ...$adminCredentials,
-                'migrationName' => Str::studly($migrationName),
-            ]),
+            view: view($viewName)->with($adminCredentials),
             migrationName: $migrationName,
         );
-
-        return $adminCredentials;
     }
 
     protected function isMigrationExists(string $migrationName): bool
     {
         return !empty(glob(base_path("database/migrations/*_{$migrationName}.php")));
+    }
+
+    protected function publishAdminsTableMigration(): void
+    {
+        $this->publishMigration(
+            view: view('initializator::admins_create_table'),
+            migrationName: 'admins_create_table',
+        );
     }
 }

@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class AddNovaAdmin extends Migration
+return new class extends Migration
 {
     public function up(): void
     {

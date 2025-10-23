@@ -3,7 +3,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use RonasIT\Support\Traits\MigrationTrait;
 
-class UsersAddClerkIdField extends Migration
+return new class extends Migration
 {
     use MigrationTrait;
 
