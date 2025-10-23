@@ -353,23 +353,22 @@ class InitCommand extends Command implements Isolatable
             }
 
             if (!empty($this->adminCredentials) && $this->confirm("Is {$title}'s admin the same as default one?", true)) {
-                $email = $this->adminCredentials['email'];
-                $password = $this->adminCredentials['password'];
+                $adminCredentials = $this->adminCredentials;
             } else {
-                $defaultPassword = substr(md5(uniqid()), 0, 8);
+                if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
+                    $this->publishAdminsTableMigration();
+                }
 
-                $email = $this->ask("Please enter a {$title}'s admin email", "admin@{$kebabName}.com");
-                $password = $this->ask("Please enter a {$title}'s admin password", $defaultPassword);
+                $adminCredentials = $this->createAdminUser($kebabName, $key, $title);
             }
 
-            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_email", $email);
-            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_password", $password);
+            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_email", $adminCredentials['email']);
+            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_password", $adminCredentials['password']);
             $this->readmeGenerator->removeTag($filePart, "{$key}_credentials");
         }
 
         $this->readmeGenerator->updateReadmeFile($filePart);
     }
-
 
     protected function setupComposerHooks(): void
     {
