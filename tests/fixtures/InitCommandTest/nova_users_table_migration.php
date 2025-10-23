@@ -11,9 +11,9 @@ return new class extends Migration
     {
         if (!App::environment('testing')) {
             DB::table('users')->insert([
-                'name' => 'TestAdmin',
-                'email' => 'mail@mail.com',
-                'password' => Hash::make('123456'),
+                'name' => 'Nova Admin',
+                'email' => 'nova_mail@mail.com',
+                'password' => Hash::make('654321'),
                 'role_id' => 1,
             ]);
         }
@@ -23,7 +23,7 @@ return new class extends Migration
     {
         if (!App::environment('testing')) {
             DB::table('users')
-                ->where('email', 'mail@mail.com')
+                ->where('email', 'nova_mail@mail.com')
                 ->delete();
         }
     }
