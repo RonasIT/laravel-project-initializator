@@ -202,7 +202,7 @@ class InitCommand extends Command implements Isolatable
         $this->kebabName = Str::kebab($this->appName);
     }
 
-    protected function updateEnvFile(): void 
+    protected function updateEnvFile(): void
     {
         $this->envFile = (file_exists('.env')) ? '.env' : '.env.example';
 
