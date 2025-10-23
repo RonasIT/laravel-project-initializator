@@ -83,3 +83,7 @@ Laravel Nova access:
 - password `123456`
 
 Core auth solution is [Clerk](https://clerk.com) so in `development` environment use any test phones and emails from [this list](https://clerk.com/docs/testing/test-emails-and-phones)
+
+### Renovate
+
+The application uses Renovate dependabot for automatically updating dependencies. You can configure it more precisely using the `renovate.json` file. Available configuration described here https://docs.renovatebot.com/config-overview
