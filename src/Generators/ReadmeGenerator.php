@@ -8,7 +8,7 @@ class ReadmeGenerator
 
     protected string $readmeContent = '';
 
-    public function fillReadme(string $appName, string $appType): void
+    public function generate(string $appName, string $appType): void
     {
         $file = $this->loadReadmePart('README.md');
 
@@ -33,7 +33,6 @@ class ReadmeGenerator
         $this->updateReadmeFile($filePart);
     }
 
-
     public function fillEnvironments(string $appUrl): void
     {
         $filePart = $this->loadReadmePart('ENVIRONMENTS.md');
@@ -51,7 +50,7 @@ class ReadmeGenerator
     
     public function loadReadmePart(string $fileName): string
     {
-        $file = base_path(DIRECTORY_SEPARATOR . self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
+        $file = base_path(self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
 
         return file_get_contents($file);
     }
@@ -77,7 +76,7 @@ class ReadmeGenerator
         $file = str_replace(":{$key}", $value, $file);
     }
 
-    public function saveReadme(): void
+    public function save(): void
     {
         file_put_contents('README.md', $this->readmeContent);
     }

@@ -46,4 +46,9 @@ trait InitCommandMockTrait
             $this->callFilePutContent($fileName, $this->getFixture($resultFixture)),
         ];
     }
+
+    protected function callGlob(string $pattern, array $result): array
+    {
+        return $this->functionCall('glob', [$pattern], $result);
+    }
 }

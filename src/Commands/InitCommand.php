@@ -122,6 +122,10 @@ class InitCommand extends Command implements Isolatable
         $this->configureClerk();
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
+            if ($this->authType === AuthTypeEnum::Clerk) {
+                $this->publishAdminsTableMigration();
+            }
+
             $this->createAdminUser();
         }
 
@@ -135,7 +139,7 @@ class InitCommand extends Command implements Isolatable
             if ($this->shouldGenerateReadme) {
                 $this->readmeGenerator->fillRenovate();
 
-                $this->readmeGenerator->saveReadme();
+                $this->readmeGenerator->save();
             }
         }
 
@@ -302,29 +306,30 @@ class InitCommand extends Command implements Isolatable
         );
     }
 
-    protected function createAdminUser(): void
+    protected function createAdminUser(string $serviceKey = '', string $serviceName = ''): array
     {
+        $adminEmail = when(empty($serviceKey), "admin@{$this->kebabName}.com", "admin.{$serviceKey}@{$this->kebabName}.com");
         $defaultPassword = substr(md5(uniqid()), 0, 8);
 
-        $this->adminCredentials = [
-            'email' => $this->ask('Please enter an admin email', "admin@{$this->kebabName}.com"),
-            'password' => $this->ask('Please enter an admin password', $defaultPassword),
+        $serviceLabel = when(!empty($serviceName), " for {$serviceName}");
+
+        $adminCredentials = [
+            'email' => $this->ask("Please enter admin email{$serviceLabel}", $adminEmail),
+            'password' => $this->ask("Please enter admin password{$serviceLabel}", $defaultPassword),
         ];
 
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->publishMigration(
-                view: view('initializator::admins_create_table')->with($this->adminCredentials),
-                migrationName: 'admins_create_table',
-            );
-        } else {
-            $this->adminCredentials['name'] = $this->ask('Please enter an admin name', 'Admin');
-            $this->adminCredentials['role_id'] = $this->ask('Please enter an admin role id', RoleEnum::Admin->value);
-
-            $this->publishMigration(
-                view: view('initializator::add_default_user')->with($this->adminCredentials),
-                migrationName: 'add_default_user',
-            );
+        if ($this->authType === AuthTypeEnum::None) {
+            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", "{$serviceName} Admin");
+            $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
         }
+
+        if (empty($serviceName)) {
+            $this->adminCredentials = $adminCredentials;
+        }
+
+        $this->publishAdminMigration($adminCredentials, $serviceKey);
+
+        return $adminCredentials;
     }
 
     protected function publishMigration(View $view, string $migrationName): void
@@ -351,7 +356,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function generateReadme(): void
     {
-        $this->readmeGenerator->fillReadme($this->appName, $this->appType->value);
+        $this->readmeGenerator->generate($this->appName, $this->appType->value);
 
             if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
                 $this->readmeGenerator->fillResourcesAndContacts();
@@ -379,7 +384,7 @@ class InitCommand extends Command implements Isolatable
                 }
             }
 
-            $this->readmeGenerator->saveReadme();
+            $this->readmeGenerator->save();
 
             $this->info('README generated successfully!');
 
@@ -476,17 +481,17 @@ class InitCommand extends Command implements Isolatable
             }
 
             if (!empty($this->adminCredentials) && $this->confirm("Is {$title}'s admin the same as default one?", true)) {
-                $email = $this->adminCredentials['email'];
-                $password = $this->adminCredentials['password'];
+                $adminCredentials = $this->adminCredentials;
             } else {
-                $defaultPassword = substr(md5(uniqid()), 0, 8);
+                if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
+                    $this->publishAdminsTableMigration();
+                }
 
-                $email = $this->ask("Please enter a {$title}'s admin email", "admin@{$this->kebabName}.com");
-                $password = $this->ask("Please enter a {$title}'s admin password", $defaultPassword);
+                $adminCredentials = $this->createAdminUser($key, $title);
             }
 
-            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_email", $email);
-            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_password", $password);
+            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_email", $adminCredentials['email']);
+            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_password", $adminCredentials['password']);
             $this->readmeGenerator->removeTag($filePart, "{$key}_credentials");
         }
 
@@ -584,5 +589,31 @@ class InitCommand extends Command implements Isolatable
         ]);
 
         shell_exec('php artisan migrate --ansi');
+    }
+    protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
+    {
+        $migrationName = (empty($serviceKey)) ? 'add_default_admin' : "add_{$serviceKey}_admin";
+
+        $viewName = ($this->authType === AuthTypeEnum::Clerk)
+            ? 'initializator::admins_add_additional_admin'
+            : 'initializator::add_default_user';
+
+        $this->publishMigration(
+            view: view($viewName)->with($adminCredentials),
+            migrationName: $migrationName,
+        );
+    }
+
+    protected function isMigrationExists(string $migrationName): bool
+    {
+        return !empty(glob(base_path("database/migrations/*_{$migrationName}.php")));
+    }
+
+    protected function publishAdminsTableMigration(): void
+    {
+        $this->publishMigration(
+            view: view('initializator::admins_create_table'),
+            migrationName: 'admins_create_table',
+        );
     }
 }
