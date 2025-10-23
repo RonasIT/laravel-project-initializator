@@ -10,11 +10,9 @@ return new class extends Migration
     public function up(): void
     {
         if (!App::environment('testing')) {
-            DB::table('users')->insert([
-                'name' => 'TestAdmin',
+            DB::table('admins')->insert([
                 'email' => 'mail@mail.com',
                 'password' => Hash::make('123456'),
-                'role_id' => 1,
             ]);
         }
     }
@@ -22,7 +20,7 @@ return new class extends Migration
     public function down(): void
     {
         if (!App::environment('testing')) {
-            DB::table('users')
+            DB::table('admins')
                 ->where('email', 'mail@mail.com')
                 ->delete();
         }
