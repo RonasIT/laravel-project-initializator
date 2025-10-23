@@ -176,7 +176,7 @@ class ReadmeGenerator
 
     protected function loadReadmePart(string $fileName): string
     {
-        $file = base_path(DIRECTORY_SEPARATOR . self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
+        $file = base_path(self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
 
         return file_get_contents($file);
     }
