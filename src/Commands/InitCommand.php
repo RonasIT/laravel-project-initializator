@@ -183,7 +183,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
-            $this->readmeGenerator->fillReadme($this->appName, $this->appType->value);
+            $this->readmeGenerator->generate($this->appName, $this->appType->value);
 
             if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
                 $this->readmeGenerator->fillResourcesAndContacts();
@@ -211,7 +211,7 @@ class InitCommand extends Command implements Isolatable
                 }
             }
 
-            $this->readmeGenerator->saveReadme();
+            $this->readmeGenerator->save();
 
             $this->info('README generated successfully!');
 
@@ -230,7 +230,7 @@ class InitCommand extends Command implements Isolatable
             if ($shouldGenerateReadme) {
                 $this->readmeGenerator->fillRenovate();
 
-                $this->readmeGenerator->saveReadme();
+                $this->readmeGenerator->save();
             }
         }
 
