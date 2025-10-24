@@ -323,10 +323,12 @@ class InitCommand extends Command implements Isolatable
 
     protected function createAdminUser(string $kebabName, string $serviceKey = '', string $serviceName = ''): array
     {
-        $adminEmail = when(empty($serviceKey), "admin@{$kebabName}.com", "admin.{$serviceKey}@{$kebabName}.com");
+        $isServiceAdmin = (!empty($serviceKey) && !empty($serviceName));
+
+        $adminEmail = when($isServiceAdmin, "admin.{$serviceKey}@{$kebabName}.com", "admin@{$kebabName}.com");
         $defaultPassword = substr(md5(uniqid()), 0, 8);
 
-        $serviceLabel = when(!empty($serviceName), " for {$serviceName}");
+        $serviceLabel = when($isServiceAdmin, " for {$serviceName}");
 
         $adminCredentials = [
             'email' => $this->ask("Please enter admin email{$serviceLabel}", $adminEmail),
@@ -334,11 +336,11 @@ class InitCommand extends Command implements Isolatable
         ];
 
         if ($this->authType === AuthTypeEnum::None) {
-            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", "{$serviceName} Admin");
+            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", when($isServiceAdmin, "{$serviceName} Admin", 'Admin'));
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
         }
 
-        if (empty($serviceName)) {
+        if (!$isServiceAdmin) {
             $this->adminCredentials = $adminCredentials;
         }
 
