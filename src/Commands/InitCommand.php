@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use RonasIT\ProjectInitializator\Extensions\ConfigWriter\ArrayFile;
+use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 
@@ -477,15 +477,7 @@ class InitCommand extends Command implements Isolatable
     {
         $env = EnvFile::open($fileName);
 
-        // TODO: After updating wintercms/laravel-config-writer, remove the key comparison check and keep only $env->addEmptyLine();
-        $envKeys = array_column($env->getAst(), 'match');
-        $dataKeys = array_keys($data);
-
-        $hasMissingKeys = count(array_intersect($dataKeys, $envKeys)) !== count($dataKeys);
-
-        if ($hasMissingKeys) {
-            $env->addEmptyLine();
-        }
+        $env->addEmptyLine();
 
         $env->set($data);
 
