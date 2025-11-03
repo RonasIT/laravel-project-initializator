@@ -8,8 +8,12 @@ class ReadmeGenerator
 
     protected string $content = '';
 
-    public function generate(string $appName, string $appType): void
+    protected string $appUrl;
+
+    public function generate(string $appName, string $appType, string $appUrl): void
     {
+        $this->appUrl = $appUrl;
+
         $file = $this->loadReadmePart('README.md');
 
         $this->setReadmeValue($file, 'project_name', $appName);
@@ -33,15 +37,15 @@ class ReadmeGenerator
         $this->updateReadmeFile($filePart);
     }
 
-    public function fillEnvironments(string $appUrl): void
+    public function fillEnvironments(): void
     {
         $filePart = $this->loadReadmePart('ENVIRONMENTS.md');
 
-        $this->setReadmeValue($filePart, 'api_link', $appUrl);
+        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
         $this->updateReadmeFile($filePart);
     }
 
-    public function fillClerkAuthType(): void
+    public function fillClerkAuth(): void
     {
         $filePart = $this->loadReadmePart('CLERK.md');
 

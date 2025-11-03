@@ -183,7 +183,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
-            $this->readmeGenerator->generate($this->appName, $this->appType->value);
+            $this->readmeGenerator->generate($this->appName, $this->appType->value, $this->appUrl);
 
             if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
                 $this->readmeGenerator->fillResourcesAndContacts();
@@ -200,14 +200,14 @@ class InitCommand extends Command implements Isolatable
             }
 
             if ($this->confirm('Do you need an `Environments` part?', true)) {
-                $this->readmeGenerator->fillEnvironments($this->appUrl);
+                $this->readmeGenerator->fillEnvironments();
             }
 
             if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
                 $this->fillCredentialsAndAccess($kebabName);
 
                 if ($this->authType === AuthTypeEnum::Clerk) {
-                    $this->readmeGenerator->fillClerkAuthType();
+                    $this->readmeGenerator->fillClerkAuth();
                 }
             }
         }
