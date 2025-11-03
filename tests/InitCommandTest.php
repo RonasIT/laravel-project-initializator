@@ -264,7 +264,6 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme.md')),
             $this->callFilePutContent('README.md', $this->getFixture('default_readme_after_using_renovate.md')),
         );
 
@@ -516,7 +515,6 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-            $this->callFilePutContent('README.md', $this->getFixture('full_readme.md')),
             $this->callFilePutContent('README.md', $this->getFixture('full_readme_after_using_renovate.md')),
         );
 
@@ -780,7 +778,6 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app.md')),
             $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md')),
         );
 

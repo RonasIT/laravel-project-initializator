@@ -210,7 +210,17 @@ class InitCommand extends Command implements Isolatable
                     $this->readmeGenerator->fillClerkAuthType();
                 }
             }
+        }
 
+        if ($this->confirm('Would you use Renovate dependabot?', true)) {
+            $this->saveRenovateJSON();
+
+            if ($shouldGenerateReadme) {
+                $this->readmeGenerator->fillRenovate();
+            }
+        }
+
+        if ($shouldGenerateReadme) {
             $this->readmeGenerator->save();
 
             $this->info('README generated successfully!');
@@ -221,16 +231,6 @@ class InitCommand extends Command implements Isolatable
                 foreach ($this->emptyValuesList as $value) {
                     $this->warn("- {$value}");
                 }
-            }
-        }
-
-        if ($this->confirm('Would you use Renovate dependabot?', true)) {
-            $this->saveRenovateJSON();
-
-            if ($shouldGenerateReadme) {
-                $this->readmeGenerator->fillRenovate();
-
-                $this->readmeGenerator->save();
             }
         }
 
