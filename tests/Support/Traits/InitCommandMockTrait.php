@@ -38,12 +38,26 @@ trait InitCommandMockTrait
         return $this->functionCall('shell_exec', [$command], $result);
     }
 
+    protected function callGlob(string $pattern, array $result): array
+    {
+        return $this->functionCall('glob', [$pattern], $result);
+    }
+
     protected function changeEnvFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
     {
         return [
             $this->functionCall('is_file', [$fileName]),
             $this->callFileGetContent($fileName, $this->getFixture($sourceFixture)),
             $this->callFilePutContent($fileName, $this->getFixture($resultFixture)),
+        ];
+    }
+
+    protected function changeConfigFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
+    {
+        return [
+            $this->callFileExists(base_path($fileName)),
+            $this->callFileGetContent(base_path($fileName), $this->getFixture($sourceFixture)),
+            $this->callFilePutContent(base_path($fileName), $this->getFixture($resultFixture)),
         ];
     }
 }
