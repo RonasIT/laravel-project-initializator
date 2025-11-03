@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use RonasIT\ProjectInitializator\Extensions\ConfigWriter\ArrayFile;
+use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 
@@ -84,7 +84,7 @@ class InitCommand extends Command implements Isolatable
     ];
 
     public function __construct(
-        protected ReadmeGenerator $readmeGenerator
+        protected ReadmeGenerator $readmeGenerator,
     ) {
         parent::__construct();
     }
@@ -138,11 +138,22 @@ class InitCommand extends Command implements Isolatable
 
             if ($this->shouldGenerateReadme) {
                 $this->readmeGenerator->fillRenovate();
-
-                $this->readmeGenerator->save();
             }
         }
 
+        if ($this->shouldGenerateReadme) {
+            $this->readmeGenerator->save();
+
+            $this->info('README generated successfully!');
+
+            if ($this->emptyValuesList) {
+                $this->warn('Don`t forget to fill the following empty values:');
+
+                foreach ($this->emptyValuesList as $value) {
+                    $this->warn("- {$value}");
+                }
+            }
+        }
         if (!class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             array_push(
                 $this->shellCommands,
@@ -356,45 +367,33 @@ class InitCommand extends Command implements Isolatable
 
     protected function generateReadme(): void
     {
-        $this->readmeGenerator->generate($this->appName, $this->appType->value);
+        $this->readmeGenerator->generate($this->appName, $this->appType->value, $this->appUrl);
 
-            if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
-                $this->readmeGenerator->fillResourcesAndContacts();
-                $this->fillResources();
-                $this->fillContacts();
+        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
+            $this->readmeGenerator->fillResourcesAndContacts();
+            $this->fillResources();
+            $this->fillContacts();
+        }
+
+        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
+            $this->readmeGenerator->fillPrerequisites();
+        }
+
+        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
+            $this->fillGettingStarted();
+        }
+
+        if ($this->confirm('Do you need an `Environments` part?', true)) {
+            $this->readmeGenerator->fillEnvironments();
+        }
+
+        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
+            $this->fillCredentialsAndAccess();
+
+            if ($this->authType === AuthTypeEnum::Clerk) {
+                $this->readmeGenerator->fillClerkAuth();
             }
-
-            if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-                $this->readmeGenerator->fillPrerequisites();
-            }
-
-            if ($this->confirm('Do you need a `Getting Started` part?', true)) {
-                $this->fillGettingStarted();
-            }
-
-            if ($this->confirm('Do you need an `Environments` part?', true)) {
-                $this->readmeGenerator->fillEnvironments($this->appUrl);
-            }
-
-            if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
-                $this->fillCredentialsAndAccess();
-
-                if ($this->authType === AuthTypeEnum::Clerk) {
-                    $this->readmeGenerator->fillClerkAuthType();
-                }
-            }
-
-            $this->readmeGenerator->save();
-
-            $this->info('README generated successfully!');
-
-            if ($this->emptyValuesList) {
-                $this->warn('Don`t forget to fill the following empty values:');
-
-                foreach ($this->emptyValuesList as $value) {
-                    $this->warn("- {$value}");
-                }
-            }
+        }
     }
 
     protected function fillResources(): void
