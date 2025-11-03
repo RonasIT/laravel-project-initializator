@@ -6,7 +6,7 @@ class ReadmeGenerator
 {
     public const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
 
-    protected string $readmeContent = '';
+    protected string $content = '';
 
     public function generate(string $appName, string $appType): void
     {
@@ -16,7 +16,7 @@ class ReadmeGenerator
 
         $this->setReadmeValue($file, 'type', $appType);
 
-        $this->readmeContent = $file;
+        $this->content = $file;
     }
 
     public function fillResourcesAndContacts(): void
@@ -47,7 +47,8 @@ class ReadmeGenerator
 
         $this->updateReadmeFile($filePart);
     }
-    
+
+    //TODO: make protected after refactoring completed
     public function loadReadmePart(string $fileName): string
     {
         $file = base_path(self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
@@ -55,11 +56,12 @@ class ReadmeGenerator
         return file_get_contents($file);
     }
 
+    //TODO: make protected after refactoring completed
     public function updateReadmeFile(string $filePart): void
     {
         $filePart = preg_replace('#(\n){3,}#', "\n", $filePart);
 
-        $this->readmeContent .= "\n" . $filePart;
+        $this->content .= "\n" . $filePart;
     }
 
     public function removeTag(string &$text, string $tag, bool $removeWholeString = false): void
@@ -71,6 +73,7 @@ class ReadmeGenerator
         $text = preg_replace($regex, '', $text);
     }
 
+    //TODO: make protected after refactoring completed
     public function setReadmeValue(string &$file, string $key, string $value = ''): void
     {
         $file = str_replace(":{$key}", $value, $file);
@@ -78,7 +81,7 @@ class ReadmeGenerator
 
     public function save(): void
     {
-        file_put_contents('README.md', $this->readmeContent);
+        file_put_contents('README.md', $this->content);
     }
 
     public function fillRenovate(): void
