@@ -19,6 +19,7 @@ use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 class InitCommand extends Command implements Isolatable
 {
     protected $signature = 'init {application-name : The application name }';
+
     protected $description = 'Initialize required project parameters to run DEV environment';
 
     public const array RESOURCES_ITEMS = [
@@ -93,12 +94,12 @@ class InitCommand extends Command implements Isolatable
     {
         $this->prepareAppName();
 
-        $this->codeOwnerEmail = $this->validateInput(
-            method: fn () => $this->ask('Please specify a Code Owner/Team Lead\'s email'),
+        $this->codeOwnerEmail = $this->askWithValidation(
+            parameter: 'Please specify a Code Owner/Team Lead\'s email',
             field: 'email of code owner / team lead',
-            rules: 'required|email',
+            rules: 'required|email'
         );
-
+    
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabName}.com");
 
         $this->updateEnvFile();
@@ -119,7 +120,9 @@ class InitCommand extends Command implements Isolatable
             default: AuthTypeEnum::None->value,
         ));
 
-        $this->configureClerk();
+        if ($this->authType === AuthTypeEnum::Clerk) {
+            $this->configureClerk();
+        }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
             if ($this->authType === AuthTypeEnum::Clerk) {
@@ -154,6 +157,7 @@ class InitCommand extends Command implements Isolatable
                 }
             }
         }
+
         if (!class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             array_push(
                 $this->shellCommands,
@@ -189,16 +193,18 @@ class InitCommand extends Command implements Isolatable
         $this->runMigrations();
     }
 
-    protected function validateInput(callable $method, string $field, string|array $rules): string
+    protected function askWithValidation(string $parameter, string $field, string|array $rules, ?string $default = null): string
     {
-        $value = $method();
+        $value = $default
+            ? $this->ask($parameter, $default)
+            : $this->ask($parameter);
 
         $validator = Validator::make([$field => $value], [$field => $rules]);
 
         if ($validator->fails()) {
             $this->warn($validator->errors()->first());
 
-            $value = $this->validateInput($method, $field, $rules);
+            $value = $this->askWithValidation($parameter, $field,$rules, $default);
         }
 
         return $value;
@@ -206,13 +212,15 @@ class InitCommand extends Command implements Isolatable
 
     protected function prepareAppName(): void
     {
-        $this->appName = $this->argument('application-name');
+        $appName = $this->argument('application-name');
 
-        $pascalCaseAppName = ucfirst(Str::camel($this->appName));
+        $pascalCaseAppName = ucfirst(Str::camel($appName));
 
-        if ($this->appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
-            $this->appName = $pascalCaseAppName;
+        if ($appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
+            $appName = $pascalCaseAppName;
         }
+
+        $this->appName = $appName;
 
         $this->kebabName = Str::kebab($this->appName);
     }
@@ -255,26 +263,24 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureClerk(): void
     {
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->enableClerk();
+        $this->enableClerk();
 
-            $data = [
-                'AUTH_GUARD' => 'clerk',
-                'CLERK_ALLOWED_ISSUER' => '',
-                'CLERK_SECRET_KEY' => '',
-                'CLERK_SIGNER_KEY_PATH' => '',
-            ];
+        $data = [
+            'AUTH_GUARD' => 'clerk',
+            'CLERK_ALLOWED_ISSUER' => '',
+            'CLERK_SECRET_KEY' => '',
+            'CLERK_SIGNER_KEY_PATH' => '',
+        ];
 
-            if ($this->appType !== AppTypeEnum::Mobile) {
-                $data['CLERK_ALLOWED_ORIGINS'] = '';
-            }
+        if ($this->appType !== AppTypeEnum::Mobile) {
+            $data['CLERK_ALLOWED_ORIGINS'] = '';
+        }
 
-            $this->writeEnvFile('.env.development', $data);
-            $this->writeEnvFile($this->envFile, $data);
+        $this->writeEnvFile('.env.development', $data);
+        $this->writeEnvFile($this->envFile, $data);
 
-            if ($this->envFile !== '.env.example') {
-                $this->writeEnvFile('.env.example', $data);
-            }
+        if ($this->envFile !== '.env.example') {
+            $this->writeEnvFile('.env.example', $data);
         }
     }
 
@@ -282,15 +288,7 @@ class InitCommand extends Command implements Isolatable
     {
         $env = EnvFile::open($fileName);
 
-        // TODO: After updating wintercms/laravel-config-writer, remove the key comparison check and keep only $env->addEmptyLine();
-        $envKeys = array_column($env->getAst(), 'match');
-        $dataKeys = array_keys($data);
-
-        $hasMissingKeys = count(array_intersect($dataKeys, $envKeys)) !== count($dataKeys);
-
-        if ($hasMissingKeys) {
-            $env->addEmptyLine();
-        }
+        $env->addEmptyLine();
 
         $env->set($data);
 
@@ -499,10 +497,11 @@ class InitCommand extends Command implements Isolatable
 
     protected function saveRenovateJSON(): void
     {
-        $reviewer = $this->validateInput(
-            method: fn () => $this->ask('Please type username of the project reviewer', Str::before($this->codeOwnerEmail, '@')),
+        $reviewer = $this->askWithValidation(
+            parameter: 'Please type username of the project reviewer',
             field: 'username of the project reviewer',
             rules: 'required|alpha_dash',
+            default: Str::before($this->codeOwnerEmail, '@')
         );
 
         $data = [
