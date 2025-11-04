@@ -1,0 +1,97 @@
+<?php
+
+namespace RonasIT\ProjectInitializator\Generators;
+
+class ReadmeGenerator
+{
+    public const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
+
+    protected string $content = '';
+
+    protected string $appUrl;
+
+    public function generate(string $appName, string $appType, string $appUrl): void
+    {
+        $this->appUrl = $appUrl;
+
+        $file = $this->loadReadmePart('README.md');
+
+        $this->setReadmeValue($file, 'project_name', $appName);
+
+        $this->setReadmeValue($file, 'type', $appType);
+
+        $this->content = $file;
+    }
+
+    public function fillResourcesAndContacts(): void
+    {
+        $filePart = $this->loadReadmePart('RESOURCES_AND_CONTACTS.md');
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    public function fillPrerequisites(): void
+    {
+        $filePart = $this->loadReadmePart('PREREQUISITES.md');
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    public function fillEnvironments(): void
+    {
+        $filePart = $this->loadReadmePart('ENVIRONMENTS.md');
+
+        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
+        $this->updateReadmeFile($filePart);
+    }
+
+    public function fillClerkAuth(): void
+    {
+        $filePart = $this->loadReadmePart('CLERK.md');
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    //TODO: make protected after refactoring completed
+    public function loadReadmePart(string $fileName): string
+    {
+        $file = base_path(self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
+
+        return file_get_contents($file);
+    }
+
+    //TODO: make protected after refactoring completed
+    public function updateReadmeFile(string $filePart): void
+    {
+        $filePart = preg_replace('#(\n){3,}#', "\n", $filePart);
+
+        $this->content .= "\n" . $filePart;
+    }
+
+    public function removeTag(string &$text, string $tag, bool $removeWholeString = false): void
+    {
+        $regex = ($removeWholeString)
+            ? "#({{$tag}})(.|\s)*?({/{$tag}})#"
+            : "# {0,1}{(/*){$tag}}#";
+
+        $text = preg_replace($regex, '', $text);
+    }
+
+    //TODO: make protected after refactoring completed
+    public function setReadmeValue(string &$file, string $key, string $value = ''): void
+    {
+        $file = str_replace(":{$key}", $value, $file);
+    }
+
+    public function save(): void
+    {
+        file_put_contents('README.md', $this->content);
+    }
+
+    public function fillRenovate(): void
+    {
+        $filePart = $this->loadReadmePart('RENOVATE.md');
+
+        $this->updateReadmeFile($filePart);
+    }
+}

@@ -14,11 +14,10 @@ use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
+use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 
 class InitCommand extends Command implements Isolatable
 {
-    public const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
-
     public const array RESOURCES_ITEMS = [
         'issue_tracker' => 'Issue Tracker',
         'figma' => 'Figma',
@@ -59,8 +58,6 @@ class InitCommand extends Command implements Isolatable
 
     protected array $emptyValuesList = [];
 
-    protected string $readmeContent = '';
-
     protected array $shellCommands = [
         'composer require laravel/ui',
         'composer require ronasit/laravel-helpers',
@@ -85,6 +82,12 @@ class InitCommand extends Command implements Isolatable
     protected string $dbUserName = 'postgres';
 
     protected AppTypeEnum $appType;
+
+    public function __construct(
+        protected ReadmeGenerator $readmeGenerator,
+    ) {
+        parent::__construct();
+    }
 
     public function handle(): void
     {
@@ -180,16 +183,16 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
-            $this->fillReadme();
+            $this->readmeGenerator->generate($this->appName, $this->appType->value, $this->appUrl);
 
             if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
-                $this->fillResourcesAndContacts();
+                $this->readmeGenerator->fillResourcesAndContacts();
                 $this->fillResources();
                 $this->fillContacts();
             }
 
             if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-                $this->fillPrerequisites();
+                $this->readmeGenerator->fillPrerequisites();
             }
 
             if ($this->confirm('Do you need a `Getting Started` part?', true)) {
@@ -197,18 +200,28 @@ class InitCommand extends Command implements Isolatable
             }
 
             if ($this->confirm('Do you need an `Environments` part?', true)) {
-                $this->fillEnvironments();
+                $this->readmeGenerator->fillEnvironments();
             }
 
             if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
                 $this->fillCredentialsAndAccess($kebabName);
 
                 if ($this->authType === AuthTypeEnum::Clerk) {
-                    $this->fillClerkAuthType();
+                    $this->readmeGenerator->fillClerkAuth();
                 }
             }
+        }
 
-            $this->saveReadme();
+        if ($this->confirm('Would you use Renovate dependabot?', true)) {
+            $this->saveRenovateJSON();
+
+            if ($shouldGenerateReadme) {
+                $this->readmeGenerator->fillRenovate();
+            }
+        }
+
+        if ($shouldGenerateReadme) {
+            $this->readmeGenerator->save();
 
             $this->info('README generated successfully!');
 
@@ -218,16 +231,6 @@ class InitCommand extends Command implements Isolatable
                 foreach ($this->emptyValuesList as $value) {
                     $this->warn("- {$value}");
                 }
-            }
-        }
-
-        if ($this->confirm('Would you use Renovate dependabot?', true)) {
-            $this->saveRenovateJSON();
-
-            if ($shouldGenerateReadme) {
-                $this->fillRenovate();
-
-                $this->saveReadme();
             }
         }
 
@@ -264,6 +267,107 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->runMigrations();
+    }
+
+    protected function fillResources(): void
+    {
+        $filePart = $this->readmeGenerator->loadReadmePart('RESOURCES.md');
+        $laterText = '(will be added later)';
+
+        foreach (self::RESOURCES_ITEMS as $key => $title) {
+            $defaultAnswer = (in_array($key, self::DEFAULT_URLS)) ? $this->appUrl . "/{$key}" : 'later';
+            $text = "Are you going to use {$title}? "
+                . "Please enter a link or select `later` to do it later, otherwise select `no`.";
+
+            $link = $this->anticipate(
+                $text,
+                ['later', 'no'],
+                $defaultAnswer
+            );
+
+            if ($link === 'later') {
+                $this->emptyValuesList[] = "{$title} link";
+                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_link");
+                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_later", $laterText);
+            } elseif ($link !== 'no') {
+                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_link", $link);
+                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_later");
+            }
+
+            $this->resources[$key] = ($link !== 'no');
+
+            $this->readmeGenerator->removeTag($filePart, $key, $link === 'no');
+        }
+
+        $this->readmeGenerator->setReadmeValue($filePart, 'api_link', $this->appUrl);
+        $this->readmeGenerator->updateReadmeFile($filePart);
+    }
+
+    protected function fillContacts(): void
+    {
+        $filePart = $this->readmeGenerator->loadReadmePart('CONTACTS.md');
+
+        foreach (self::CONTACTS_ITEMS as $key => $title) {
+            if ($link = $this->ask("Please enter a {$title}'s email", '')) {
+                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_link", $link);
+            } else {
+                $this->emptyValuesList[] = "{$title}'s email";
+            }
+
+            $this->readmeGenerator->removeTag($filePart, $key);
+        }
+
+        $this->readmeGenerator->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
+
+        $this->readmeGenerator->updateReadmeFile($filePart);
+    }
+
+    protected function fillGettingStarted(): void
+    {
+        $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
+        $projectDirectory = basename($gitProjectPath, '.git');
+        $filePart = $this->readmeGenerator->loadReadmePart('GETTING_STARTED.md');
+
+        $this->readmeGenerator->setReadmeValue($filePart, 'git_project_path', $gitProjectPath);
+        $this->readmeGenerator->setReadmeValue($filePart, 'project_directory', $projectDirectory);
+
+        $this->readmeGenerator->updateReadmeFile($filePart);
+    }
+
+    protected function fillCredentialsAndAccess(string $kebabName): void
+    {
+        $filePart = $this->readmeGenerator->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
+
+        if (!empty($this->adminCredentials)) {
+            $this->readmeGenerator->setReadmeValue($filePart, 'admin_email', $this->adminCredentials['email']);
+            $this->readmeGenerator->setReadmeValue($filePart, 'admin_password', $this->adminCredentials['password']);
+        }
+
+        $this->readmeGenerator->removeTag($filePart, 'admin_credentials', !$this->adminCredentials);
+
+        foreach (self::CREDENTIALS_ITEMS as $key => $title) {
+            if (!Arr::get($this->resources, $key)) {
+                $this->readmeGenerator->removeTag($filePart, "{$key}_credentials", true);
+
+                continue;
+            }
+
+            if (!empty($this->adminCredentials) && $this->confirm("Is {$title}'s admin the same as default one?", true)) {
+                $adminCredentials = $this->adminCredentials;
+            } else {
+                if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
+                    $this->publishAdminsTableMigration();
+                }
+
+                $adminCredentials = $this->createAdminUser($kebabName, $key, $title);
+            }
+
+            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_email", $adminCredentials['email']);
+            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_password", $adminCredentials['password']);
+            $this->readmeGenerator->removeTag($filePart, "{$key}_credentials");
+        }
+
+        $this->readmeGenerator->updateReadmeFile($filePart);
     }
 
     protected function setupComposerHooks(): void
@@ -347,152 +451,6 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
-    protected function fillReadme(): void
-    {
-        $file = $this->loadReadmePart('README.md');
-
-        $this->setReadmeValue($file, 'project_name', $this->appName);
-
-        $this->setReadmeValue($file, 'type', $this->appType->value);
-
-        $this->readmeContent = $file;
-    }
-
-    protected function fillResourcesAndContacts(): void
-    {
-        $filePart = $this->loadReadmePart('RESOURCES_AND_CONTACTS.md');
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    protected function fillResources(): void
-    {
-        $filePart = $this->loadReadmePart('RESOURCES.md');
-        $laterText = '(will be added later)';
-
-        foreach (self::RESOURCES_ITEMS as $key => $title) {
-            $defaultAnswer = (in_array($key, self::DEFAULT_URLS)) ? $this->appUrl . "/{$key}" : 'later';
-            $text = "Are you going to use {$title}? "
-                . "Please enter a link or select `later` to do it later, otherwise select `no`.";
-
-            $link = $this->anticipate(
-                $text,
-                ['later', 'no'],
-                $defaultAnswer
-            );
-
-            if ($link === 'later') {
-                $this->emptyValuesList[] = "{$title} link";
-                $this->setReadmeValue($filePart, "{$key}_link");
-                $this->setReadmeValue($filePart, "{$key}_later", $laterText);
-            } elseif ($link !== 'no') {
-                $this->setReadmeValue($filePart, "{$key}_link", $link);
-                $this->setReadmeValue($filePart, "{$key}_later");
-            }
-
-            $this->resources[$key] = ($link !== 'no');
-
-            $this->removeTag($filePart, $key, $link === 'no');
-        }
-
-        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
-        $this->updateReadmeFile($filePart);
-    }
-
-    protected function fillContacts(): void
-    {
-        $filePart = $this->loadReadmePart('CONTACTS.md');
-
-        foreach (self::CONTACTS_ITEMS as $key => $title) {
-            if ($link = $this->ask("Please enter a {$title}'s email", '')) {
-                $this->setReadmeValue($filePart, "{$key}_link", $link);
-            } else {
-                $this->emptyValuesList[] = "{$title}'s email";
-            }
-
-            $this->removeTag($filePart, $key);
-        }
-
-        $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    protected function fillPrerequisites(): void
-    {
-        $filePart = $this->loadReadmePart('PREREQUISITES.md');
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    protected function fillGettingStarted(): void
-    {
-        $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
-        $projectDirectory = basename($gitProjectPath, '.git');
-        $filePart = $this->loadReadmePart('GETTING_STARTED.md');
-
-        $this->setReadmeValue($filePart, 'git_project_path', $gitProjectPath);
-        $this->setReadmeValue($filePart, 'project_directory', $projectDirectory);
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    protected function fillEnvironments(): void
-    {
-        $filePart = $this->loadReadmePart('ENVIRONMENTS.md');
-
-        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
-        $this->updateReadmeFile($filePart);
-    }
-
-    protected function fillCredentialsAndAccess(string $kebabName): void
-    {
-        $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
-
-        if (!empty($this->adminCredentials)) {
-            $this->setReadmeValue($filePart, 'admin_email', $this->adminCredentials['email']);
-            $this->setReadmeValue($filePart, 'admin_password', $this->adminCredentials['password']);
-        }
-
-        $this->removeTag($filePart, 'admin_credentials', !$this->adminCredentials);
-
-        foreach (self::CREDENTIALS_ITEMS as $key => $title) {
-            if (!Arr::get($this->resources, $key)) {
-                $this->removeTag($filePart, "{$key}_credentials", true);
-
-                continue;
-            }
-
-            if (!empty($this->adminCredentials) && $this->confirm("Is {$title}'s admin the same as default one?", true)) {
-                $adminCredentials = $this->adminCredentials;
-            } else {
-                if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
-                    $this->publishAdminsTableMigration();
-                }
-
-                $adminCredentials = $this->createAdminUser($kebabName, $key, $title);
-            }
-
-            $this->setReadmeValue($filePart, "{$key}_email", $adminCredentials['email']);
-            $this->setReadmeValue($filePart, "{$key}_password", $adminCredentials['password']);
-            $this->removeTag($filePart, "{$key}_credentials");
-        }
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    protected function fillClerkAuthType(): void
-    {
-        $filePart = $this->loadReadmePart('CLERK.md');
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    protected function addQuotes($string): string
-    {
-        return (Str::contains($string, ' ')) ? "\"{$string}\"" : $string;
-    }
-
     protected function publishClass(View $template, string $fileName, string $filePath): void
     {
         $fileName = "{$fileName}.php";
@@ -524,39 +482,6 @@ class InitCommand extends Command implements Isolatable
         $env->set($data);
 
         $env->write();
-    }
-
-    protected function loadReadmePart(string $fileName): string
-    {
-        $file = base_path(DIRECTORY_SEPARATOR . self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
-
-        return file_get_contents($file);
-    }
-
-    protected function updateReadmeFile(string $filePart): void
-    {
-        $filePart = preg_replace('#(\n){3,}#', "\n", $filePart);
-
-        $this->readmeContent .= "\n" . $filePart;
-    }
-
-    protected function removeTag(string &$text, string $tag, bool $removeWholeString = false): void
-    {
-        $regex = ($removeWholeString)
-            ? "#({{$tag}})(.|\s)*?({/{$tag}})#"
-            : "# {0,1}{(/*){$tag}}#";
-
-        $text = preg_replace($regex, '', $text);
-    }
-
-    protected function setReadmeValue(string &$file, string $key, string $value = ''): void
-    {
-        $file = str_replace(":{$key}", $value, $file);
-    }
-
-    protected function saveReadme(): void
-    {
-        file_put_contents('README.md', $this->readmeContent);
     }
 
     protected function prepareAppName(): void
@@ -601,13 +526,6 @@ class InitCommand extends Command implements Isolatable
         }
 
         return $value;
-    }
-
-    protected function fillRenovate(): void
-    {
-        $filePart = $this->loadReadmePart('RENOVATE.md');
-
-        $this->updateReadmeFile($filePart);
     }
 
     protected function enableClerk(): void
