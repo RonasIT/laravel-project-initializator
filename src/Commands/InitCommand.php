@@ -586,7 +586,7 @@ class InitCommand extends Command implements Isolatable
             ],
         ]);
 
-        shell_exec('php artisan migrate --ansi');
+        shell_exec('php artisan migrate --ansi --force');
     }
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
