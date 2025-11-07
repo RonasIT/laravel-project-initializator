@@ -2,7 +2,10 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use RonasIT\ProjectInitializator\Commands\InitCommand;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
 
 class InitCommandTest extends TestCase
 {
@@ -957,5 +960,151 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+    }
+
+    public function testDefaultAdminsCredentialsNoneAuth()
+    {
+        $this->mockNativeFunction(
+            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
+            $this->callFileExists(base_path('config/telescope.php')),
+            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
+            $this->callFileExists(base_path('config/auto-doc.php')),
+            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
+        );
+
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
+            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development'),
+
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('users_default_admin_default_credentials.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_telescope_admin.php', $this->getFixture('telescope_users_default_credentials.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('nova_users_default_credentials.php')),
+            $this->callFilePutContent('README.md', $this->getFixture('none_auth_default_admins_credentials_readme.md')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi'),
+        );
+
+        $consoleApplication = new Application();
+        $consoleApplication->add(app(InitCommand::class));
+
+        $command = $consoleApplication->find('init');
+        $command->setLaravel(app());
+
+        $tester = new CommandTester($command);
+        $tester->setInputs($this->getJsonFixture('none_auth_type_admin_default_credentials_user_inputs'));
+
+        $tester->execute([
+            'command' => $command->getName(),
+            'application-name' => 'My App',
+        ]);
+    }
+
+    public function testDefaultAdminsCredentialsClerkAuth()
+    {
+        $this->mockNativeFunction(
+            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
+            $this->callFileExists(base_path('config/telescope.php')),
+            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
+            $this->callFileExists(base_path('config/auto-doc.php')),
+            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
+        );
+
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
+            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
+            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development'),
+
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('admins_add_default_admin_default_credentials.php')),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111111_admins_create_table.php')]),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_telescope_admin.php', $this->getFixture('admins_add_telescope_admin_default_credentials.php')),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111111_admins_create_table.php')]),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('admins_add_nova_admin_default_credentials.php')),
+            $this->callFilePutContent('README.md', $this->getFixture('clerk_auth_default_admins_credentials_readme.md')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
+            $this->callShellExec('php artisan laravel-clerk:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi'),
+        );
+
+        $consoleApplication = new Application();
+        $consoleApplication->add(app(InitCommand::class));
+
+        $command = $consoleApplication->find('init');
+        $command->setLaravel(app());
+
+        $tester = new CommandTester($command);
+        $tester->setInputs($this->getJsonFixture('clerk_auth_type_admin_default_credentials_user_inputs'));
+
+        $tester->execute([
+            'command' => $command->getName(),
+            'application-name' => 'My App',
+        ]);
     }
 }

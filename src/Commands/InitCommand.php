@@ -335,8 +335,10 @@ class InitCommand extends Command implements Isolatable
             'password' => $this->ask("Please enter admin password{$serviceLabel}", $defaultPassword),
         ];
 
+        $adminName = when($isServiceAdmin, "{$serviceName} Admin", 'Admin');
+
         if ($this->authType === AuthTypeEnum::None) {
-            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", when($isServiceAdmin, "{$serviceName} Admin", 'Admin'));
+            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
         }
 
