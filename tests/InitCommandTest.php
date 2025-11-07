@@ -14,19 +14,11 @@ class InitCommandTest extends TestCase
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -76,19 +68,11 @@ class InitCommandTest extends TestCase
     public function testRunWithoutAdminAndReadmeCreation()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -137,19 +121,11 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -202,21 +178,13 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -224,16 +192,6 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
@@ -242,9 +200,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('admins_add_default_admin.php')),
             $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111111_admins_create_table.php')]),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('admins_add_nova_admin_migration.php')),
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme.md')),
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme_after_using_renovate.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
@@ -265,6 +221,21 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan migrate --ansi'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('default_readme_after_using_renovate.md')),
         );
 
         $this
@@ -342,19 +313,11 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndPartialReadmeCreation()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -362,15 +325,8 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callFilePutContent('README.md', $this->getFixture('partial_readme.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
@@ -388,6 +344,17 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan migrate --ansi'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('partial_readme.md')),
         );
 
         $this
@@ -453,19 +420,11 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -473,22 +432,11 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
-            $this->callFilePutContent('README.md', $this->getFixture('full_readme.md')),
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
-            $this->callFilePutContent('README.md', $this->getFixture('full_readme_after_using_renovate.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
@@ -509,6 +457,20 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
             $this->callShellExec('php artisan migrate --ansi'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('full_readme_after_using_renovate.md')),
         );
 
         $this
@@ -583,19 +545,11 @@ class InitCommandTest extends TestCase
     public function testRunWithoutAdminAndUsingTelescope()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -603,17 +557,10 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_telescope_admin.php', $this->getFixture('telescope_users_table_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
-            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_with_telescope.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
@@ -631,6 +578,17 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan migrate --ansi'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_with_telescope.md')),
         );
 
         $this
@@ -704,21 +662,13 @@ class InitCommandTest extends TestCase
     public function testRunWithClerkMobileAppWithPintInstalled(): void
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -726,25 +676,13 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('admins_add_default_admin.php')),
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app.md')),
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
@@ -765,6 +703,21 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan migrate --ansi'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md')),
         );
 
         $this
@@ -840,21 +793,13 @@ class InitCommandTest extends TestCase
     public function testRunWithClerkAdditionalAdminsWithoutDefaultAdmin(): void
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -862,13 +807,7 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
-            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+           $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
@@ -877,7 +816,6 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_telescope_admin.php', $this->getFixture('admins_add_telescope_admin_migration.php')),
             $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111111_admins_create_table.php')]),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('admins_add_nova_admin_migration.php')),
-            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_clerk_with_credentials.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
@@ -897,6 +835,17 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan migrate --ansi'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators', 
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_clerk_with_credentials.md')),
         );
 
         $this
