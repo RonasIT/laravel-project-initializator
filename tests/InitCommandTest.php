@@ -947,7 +947,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -1020,7 +1020,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
