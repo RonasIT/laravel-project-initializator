@@ -99,7 +99,7 @@ class InitCommand extends Command implements Isolatable
             field: 'email of code owner / team lead',
             rules: 'required|email'
         );
-    
+
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabName}.com");
 
         $this->updateEnvFile();
@@ -204,7 +204,7 @@ class InitCommand extends Command implements Isolatable
         if ($validator->fails()) {
             $this->warn($validator->errors()->first());
 
-            $value = $this->askWithValidation($parameter, $field,$rules, $default);
+            $value = $this->askWithValidation($parameter, $field, $rules, $default);
         }
 
         return $value;
@@ -548,7 +548,7 @@ class InitCommand extends Command implements Isolatable
     {
         $config = ArrayFile::open(base_path('config/telescope.php'));
 
-        // TODO: add Authorize::class middleware after inplementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
+        // TODO: add Authorize::class middleware after implementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
         $config->set('middleware', [
             'web',
             'auth:web',
