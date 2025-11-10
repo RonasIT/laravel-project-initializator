@@ -227,8 +227,6 @@ class InitCommand extends Command implements Isolatable
 
     protected function updateEnvFile(): void
     {
-        $this->envFile = (file_exists('.env')) ? '.env' : '.env.example';
-
         $envConfig = [
             'APP_NAME' => $this->appName,
             'DB_CONNECTION' => $this->envConfig['dbConnection'],
@@ -239,7 +237,13 @@ class InitCommand extends Command implements Isolatable
             'DB_PASSWORD' => '',
         ];
 
-        $this->writeEnvFile($this->envFile, $envConfig);
+        $this->writeEnvFile('.env.example', $envConfig);
+
+        if (!file_exists('.env')) {
+            copy('.env.example', '.env');
+        } else {
+            $this->writeEnvFile('.env', $envConfig);
+        }
 
         if (!file_exists('.env.development')) {
             copy('.env.example', '.env.development');
@@ -276,12 +280,9 @@ class InitCommand extends Command implements Isolatable
             $data['CLERK_ALLOWED_ORIGINS'] = '';
         }
 
+        $this->writeEnvFile('.env', $data);
+        $this->writeEnvFile('.env.example', $data);
         $this->writeEnvFile('.env.development', $data);
-        $this->writeEnvFile($this->envFile, $data);
-
-        if ($this->envFile !== '.env.example') {
-            $this->writeEnvFile('.env.example', $data);
-        }
     }
 
     protected function writeEnvFile(string $fileName, array $data): void

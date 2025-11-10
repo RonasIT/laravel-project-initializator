@@ -23,6 +23,7 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development', false),
 
+            $this->callCopy('.env.example', '.env'),
             $this->callCopy('.env.example', '.env.development'),
 
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
@@ -66,6 +67,7 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
@@ -130,6 +132,8 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
+            $this->callCopy('.env.example', '.env'),
+
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('migration.php')),
@@ -178,8 +182,9 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
@@ -188,6 +193,8 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
@@ -322,6 +329,8 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
+            $this->callCopy('.env.example', '.env'),
+
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -428,6 +437,8 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
@@ -554,6 +565,8 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
+            $this->callCopy('.env.example', '.env'),
+
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_telescope_admin.php', $this->getFixture('telescope_users_table_migration.php')),
@@ -662,8 +675,9 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
+            $this->changeEnvFileCall('.env', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
@@ -672,6 +686,8 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
@@ -793,8 +809,9 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
@@ -804,7 +821,9 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
-           $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callCopy('.env.example', '.env'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
