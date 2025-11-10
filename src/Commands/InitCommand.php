@@ -103,8 +103,6 @@ class InitCommand extends Command implements Isolatable
 
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$kebabName}.com");
 
-        $envFile = (file_exists('.env')) ? '.env' : '.env.example';
-
         $envConfig = [
             'APP_NAME' => $this->appName,
             'DB_CONNECTION' => $this->dbConnection,
@@ -115,7 +113,13 @@ class InitCommand extends Command implements Isolatable
             'DB_PASSWORD' => '',
         ];
 
-        $this->updateEnvFile($envFile, $envConfig);
+        $this->updateEnvFile('.env.example', $envConfig);
+
+        if (!file_exists('.env')) {
+            copy('.env.example', '.env');
+        } else {
+            $this->updateEnvFile('.env', $envConfig);
+        }
 
         if (!file_exists('.env.development')) {
             copy('.env.example', '.env.development');
@@ -166,12 +170,9 @@ class InitCommand extends Command implements Isolatable
                 $data['CLERK_ALLOWED_ORIGINS'] = '';
             }
 
+            $this->updateEnvFile('.env', $data);
+            $this->updateEnvFile('.env.example', $data);
             $this->updateEnvFile('.env.development', $data);
-            $this->updateEnvFile($envFile, $data);
-
-            if ($envFile !== '.env.example') {
-                $this->updateEnvFile('.env.example', $data);
-            }
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
