@@ -102,7 +102,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabName}.com");
 
-        $this->updateEnvFile();
+        $this->setupEnvFiles();
 
         $this->info('Project initialized successfully!');
 
@@ -225,7 +225,7 @@ class InitCommand extends Command implements Isolatable
         $this->kebabName = Str::kebab($this->appName);
     }
 
-    protected function updateEnvFile(): void
+    protected function setupEnvFiles(): void
     {
         $envConfig = [
             'APP_NAME' => $this->appName,
@@ -237,19 +237,19 @@ class InitCommand extends Command implements Isolatable
             'DB_PASSWORD' => '',
         ];
 
-        $this->writeEnvFile('.env.example', $envConfig);
+        $this->updateEnvFile('.env.example', $envConfig);
 
         if (!file_exists('.env')) {
             copy('.env.example', '.env');
         } else {
-            $this->writeEnvFile('.env', $envConfig);
+            $this->updateEnvFile('.env', $envConfig);
         }
 
         if (!file_exists('.env.development')) {
             copy('.env.example', '.env.development');
         }
 
-        $this->writeEnvFile('.env.development', [
+        $this->updateEnvFile('.env.development', [
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
             'APP_MAINTENANCE_DRIVER' => 'cache',
@@ -280,12 +280,12 @@ class InitCommand extends Command implements Isolatable
             $data['CLERK_ALLOWED_ORIGINS'] = '';
         }
 
-        $this->writeEnvFile('.env', $data);
-        $this->writeEnvFile('.env.example', $data);
-        $this->writeEnvFile('.env.development', $data);
+        $this->updateEnvFile('.env', $data);
+        $this->updateEnvFile('.env.example', $data);
+        $this->updateEnvFile('.env.development', $data);
     }
 
-    protected function writeEnvFile(string $fileName, array $data): void
+    protected function updateEnvFile(string $fileName, array $data): void
     {
         $env = EnvFile::open($fileName);
 
