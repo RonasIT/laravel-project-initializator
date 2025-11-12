@@ -50,7 +50,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -103,7 +103,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "MyApp"')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -111,7 +111,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -159,7 +159,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -245,7 +245,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -308,7 +308,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -366,7 +366,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
@@ -484,7 +484,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
@@ -544,7 +544,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?', 'yes')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->assertExitCode(0);
@@ -604,7 +604,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
@@ -736,7 +736,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
@@ -797,7 +797,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -867,7 +867,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')

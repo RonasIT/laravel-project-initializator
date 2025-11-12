@@ -66,22 +66,20 @@ class InitCommand extends Command implements Isolatable
     ];
 
     protected bool $shouldUninstallPackage = false;
-    protected bool $shouldGenerateReadme;
 
     protected string $appName;
-    protected string $kebabName;
+    protected string $kebabAppName;
     protected string $appUrl;
     protected AppTypeEnum $appType;
     protected AuthTypeEnum $authType;
     protected string $codeOwnerEmail;
 
-    protected string $envFile;
-    protected array $envConfig = [
-        'dbConnection' => 'pgsql',
-        'dbHost' => 'pgsql',
-        'dbPort' => '5432',
-        'dbName' => 'postgres',
-        'dbUserName' => 'postgres',
+    protected array $defaulDBConnectionConfig = [
+        'driver' => 'pgsql',
+        'host' => 'pgsql',
+        'port' => '5432',
+        'database' => 'postgres',
+        'username' => 'postgres',
     ];
 
     public function __construct(
@@ -95,12 +93,11 @@ class InitCommand extends Command implements Isolatable
         $this->prepareAppName();
 
         $this->codeOwnerEmail = $this->askWithValidation(
-            parameter: 'Please specify a Code Owner/Team Lead\'s email',
-            field: 'email of code owner / team lead',
-            rules: 'required|email'
+            parameter: 'email of code owner / team lead',
+            rules: 'required|email',
         );
 
-        $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabName}.com");
+        $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabAppName}.com");
 
         $this->setupEnvFiles();
 
@@ -132,19 +129,19 @@ class InitCommand extends Command implements Isolatable
             $this->createAdminUser();
         }
 
-        if ($this->shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
+        if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
             $this->generateReadme();
         }
 
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
-            if ($this->shouldGenerateReadme) {
+            if ($shouldGenerateReadme) {
                 $this->readmeGenerator->fillRenovate();
             }
         }
 
-        if ($this->shouldGenerateReadme) {
+        if ($shouldGenerateReadme) {
             $this->readmeGenerator->save();
 
             $this->info('README generated successfully!');
@@ -193,18 +190,20 @@ class InitCommand extends Command implements Isolatable
         $this->runMigrations();
     }
 
-    protected function askWithValidation(string $parameter, string $field, string|array $rules, ?string $default = null): string
+    protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
     {
-        $value = $default
-            ? $this->ask($parameter, $default)
-            : $this->ask($parameter);
+        $question = "Please specify: {$parameter}";
 
-        $validator = Validator::make([$field => $value], [$field => $rules]);
+        $value = ($default)
+            ? $this->ask($question, $default)
+            : $this->ask($question);
+
+        $validator = Validator::make([$parameter => $value], [$parameter => $rules]);
 
         if ($validator->fails()) {
             $this->warn($validator->errors()->first());
 
-            $value = $this->askWithValidation($parameter, $field, $rules, $default);
+            $value = $this->askWithValidation($parameter, $rules, $default);
         }
 
         return $value;
@@ -221,19 +220,18 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->appName = $appName;
-
-        $this->kebabName = Str::kebab($this->appName);
+        $this->kebabAppName = Str::kebab($this->appName);
     }
 
     protected function setupEnvFiles(): void
     {
         $envConfig = [
             'APP_NAME' => $this->appName,
-            'DB_CONNECTION' => $this->envConfig['dbConnection'],
-            'DB_HOST' => $this->envConfig['dbHost'],
-            'DB_PORT' => $this->envConfig['dbPort'],
-            'DB_DATABASE' => $this->envConfig['dbName'],
-            'DB_USERNAME' => $this->envConfig['dbUserName'],
+            'DB_CONNECTION' => $this->defaulDBConnectionConfig['driver'],
+            'DB_HOST' => $this->defaulDBConnectionConfig['host'],
+            'DB_PORT' => $this->defaulDBConnectionConfig['port'],
+            'DB_DATABASE' => $this->defaulDBConnectionConfig['database'],
+            'DB_USERNAME' => $this->defaulDBConnectionConfig['username'],
             'DB_PASSWORD' => '',
         ];
 
@@ -256,7 +254,7 @@ class InitCommand extends Command implements Isolatable
             'CACHE_STORE' => 'redis',
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
-            'DB_CONNECTION' => $this->envConfig['dbConnection'],
+            'DB_CONNECTION' => $this->defaulDBConnectionConfig['driver'],
             'DB_HOST' => '',
             'DB_PORT' => '',
             'DB_DATABASE' => '',
@@ -318,7 +316,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function createAdminUser(string $serviceKey = '', string $serviceName = ''): array
     {
-        $adminEmail = when(empty($serviceKey), "admin@{$this->kebabName}.com", "admin.{$serviceKey}@{$this->kebabName}.com");
+        $adminEmail = when(empty($serviceKey), "admin@{$this->kebabAppName}.com", "admin.{$serviceKey}@{$this->kebabAppName}.com");
         $defaultPassword = substr(md5(uniqid()), 0, 8);
 
         $serviceLabel = when(!empty($serviceName), " for {$serviceName}");
@@ -499,10 +497,9 @@ class InitCommand extends Command implements Isolatable
     protected function saveRenovateJSON(): void
     {
         $reviewer = $this->askWithValidation(
-            parameter: 'Please type username of the project reviewer',
-            field: 'username of the project reviewer',
+            parameter: 'username of the project reviewer',
             rules: 'required|alpha_dash',
-            default: Str::before($this->codeOwnerEmail, '@')
+            default: Str::before($this->codeOwnerEmail, '@'),
         );
 
         $data = [
@@ -576,14 +573,10 @@ class InitCommand extends Command implements Isolatable
     protected function runMigrations(): void
     {
         config([
-            'database.default' => $this->envConfig['dbConnection'],
-            'database.connections.pgsql' => [
-                'driver' => $this->envConfig['dbConnection'],
-                'host' => $this->envConfig['dbHost'],
-                'port' => $this->envConfig['dbPort'],
-                'database' => $this->envConfig['dbName'],
-                'username' => $this->envConfig['dbUserName'],
+            'database.default' => $this->defaulDBConnectionConfig['driver'],
+            "database.connections.{$this->defaulDBConnectionConfig['driver']}" => [
                 'password' => '',
+                ...$this->defaulDBConnectionConfig,
             ],
         ]);
 
