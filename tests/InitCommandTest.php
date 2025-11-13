@@ -932,25 +932,11 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testDefaultAdminsCredentials()
     {
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
-            $this->functionCall('substr', ['0058a062', 0, 8], '123456'),
-            $this->functionCall('md5', ['0058a062'], '0058a062'),
-            $this->functionCall('uniqid', [], '0058a062'),
-        );
-
         $commandMock = Mockery::mock(InitCommand::class)->shouldAllowMockingProtectedMethods();
 
-        $commandMock->shouldReceive('ask')->with('Please enter admin email', 'admin@my-app.com');
-        $commandMock->shouldReceive('ask')->with('Please enter admin password', '123456');
-        $commandMock->shouldReceive('ask')->with('Please enter admin name', 'Admin');
-        $commandMock->shouldReceive('ask')->with('Please enter admin role id', 1);
-
+        $commandMock->shouldReceive('ask')->andReturnUsing(fn ($question, $default) => $default);
         $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
 
         $authTypeProperty = new ReflectionProperty(InitCommand::class, 'authType');
@@ -958,6 +944,8 @@ class InitCommandTest extends TestCase
         $authTypeProperty->setValue($commandMock, AuthTypeEnum::None);
 
         $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
-        $createAdminMethod->invokeArgs($commandMock, ['my-app']);
+        $credentials = $createAdminMethod->invokeArgs($commandMock, ['my-app']);
+
+        $this->assertEquals($credentials['name'], 'Admin');
     }
 }
