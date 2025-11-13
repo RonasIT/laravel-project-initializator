@@ -60,13 +60,4 @@ trait InitCommandMockTrait
             $this->callFilePutContent(base_path($fileName), $this->getFixture($resultFixture)),
         ];
     }
-
-    protected function mockAdminDefaultPassword(string $resultPassword): array
-    {
-        return [
-            $this->functionCall('substr', ['0058a062', 0, 8], $resultPassword),
-            $this->functionCall('md5', ['0058a062'], '0058a062'),
-            $this->functionCall('uniqid', [], '0058a062'),
-        ];
-    }
 }
