@@ -946,6 +946,6 @@ class InitCommandTest extends TestCase
         $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
         $credentials = $createAdminMethod->invokeArgs($commandMock, ['my-app']);
 
-        $this->assertEquals($credentials['name'], 'Admin');
+        $this->assertEquals('Admin', $credentials['name']);
     }
 }
