@@ -2,6 +2,11 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use Mockery;
+use ReflectionMethod;
+use ReflectionProperty;
+use RonasIT\ProjectInitializator\Commands\InitCommand;
+use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
@@ -925,5 +930,22 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+    }
+
+    public function testDefaultAdminsCredentials(): void
+    {
+        $commandMock = Mockery::mock(InitCommand::class)->shouldAllowMockingProtectedMethods();
+
+        $commandMock->shouldReceive('ask')->andReturnUsing(fn ($question, $default) => $default);
+        $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
+
+        $authTypeProperty = new ReflectionProperty(InitCommand::class, 'authType');
+        $authTypeProperty->setAccessible(true);
+        $authTypeProperty->setValue($commandMock, AuthTypeEnum::None);
+
+        $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
+        $credentials = $createAdminMethod->invokeArgs($commandMock, ['my-app']);
+
+        $this->assertEquals('Admin', $credentials['name']);
     }
 }
