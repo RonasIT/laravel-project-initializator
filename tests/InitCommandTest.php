@@ -932,7 +932,7 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function testDefaultAdminsCredentials()
+    public function testDefaultAdminsCredentials(): void
     {
         $commandMock = Mockery::mock(InitCommand::class)->shouldAllowMockingProtectedMethods();
 
