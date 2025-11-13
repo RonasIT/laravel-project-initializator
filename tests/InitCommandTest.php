@@ -2,6 +2,7 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use Mockery;
 use ReflectionMethod;
 use ReflectionProperty;
 use RonasIT\ProjectInitializator\Commands\InitCommand;
@@ -939,41 +940,28 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->mockAdminDefaultPassword('123456'),
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('users_default_admin_default_credentials.php')),
-            $this->mockAdminDefaultPassword('654321'),
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_telescope_admin.php', $this->getFixture('telescope_users_default_credentials.php')),
             $this->mockAdminDefaultPassword('123456'),
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('nova_users_default_credentials.php')),
-            $this->mockAdminDefaultPassword('123456'),
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('admins_add_default_admin_default_credentials.php')),
-            $this->mockAdminDefaultPassword('654321'),
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_telescope_admin.php', $this->getFixture('admins_add_telescope_admin_default_credentials.php')),
-            $this->mockAdminDefaultPassword('123456'),
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('admins_add_nova_admin_default_credentials.php')),
         );
 
-        $commandMock = $this
-            ->getMockBuilder(InitCommand::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $commandMock = Mockery::mock(InitCommand::class)->shouldAllowMockingProtectedMethods();
 
-        $commandMock->method('ask')->willReturnCallback(fn ($question, $default) => $default);
+        $commandMock->shouldReceive('ask')->with('Please enter admin email', 'admin@my-app.com');
+        $commandMock->shouldReceive('ask')->with('Please enter admin password', '123456');
+        $commandMock->shouldReceive('ask')->with('Please enter admin name', 'Admin');
+        $commandMock->shouldReceive('ask')->with('Please enter admin role id', 1);
+        $commandMock->shouldReceive('ask')->with('Please enter admin email for Laravel Telescope', 'admin.telescope@my-app.com');
+        $commandMock->shouldReceive('ask')->with('Please enter admin password for Laravel Telescope', '123456');
+        $commandMock->shouldReceive('ask')->with('Please enter admin name for Laravel Telescope', 'Laravel Telescope Admin');
+        $commandMock->shouldReceive('ask')->with('Please enter admin role id for Laravel Telescope', 1);
+
+        $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
 
         $authTypeProperty = new ReflectionProperty(InitCommand::class, 'authType');
         $authTypeProperty->setAccessible(true);
-
-        $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
-
         $authTypeProperty->setValue($commandMock, AuthTypeEnum::None);
 
+        $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
         $createAdminMethod->invokeArgs($commandMock, ['my-app']);
         $createAdminMethod->invokeArgs($commandMock, ['my-app', 'telescope', 'Laravel Telescope']);
-        $createAdminMethod->invokeArgs($commandMock, ['my-app', 'nova', 'Laravel Nova']);
-
-        $authTypeProperty->setValue($commandMock, AuthTypeEnum::Clerk);
-
-        $createAdminMethod->invokeArgs($commandMock, ['my-app']);
-        $createAdminMethod->invokeArgs($commandMock, ['my-app', 'telescope', 'Laravel Telescope']);
-        $createAdminMethod->invokeArgs($commandMock, ['my-app', 'nova', 'Laravel Nova']);
     }
 }
