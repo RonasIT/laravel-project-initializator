@@ -943,6 +943,10 @@ class InitCommandTest extends TestCase
         $authTypeProperty->setAccessible(true);
         $authTypeProperty->setValue($commandMock, AuthTypeEnum::None);
 
+        $kebabAppNameProperty = new ReflectionProperty(InitCommand::class, 'kebabAppName');
+        $kebabAppNameProperty->setAccessible(true);
+        $kebabAppNameProperty->setValue($commandMock, 'my-app');
+
         $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
         $credentials = $createAdminMethod->invokeArgs($commandMock, ['my-app']);
 
