@@ -194,9 +194,7 @@ class InitCommand extends Command implements Isolatable
     {
         $question = "Please specify: {$parameter}";
 
-        $value = ($default)
-            ? $this->ask($question, $default)
-            : $this->ask($question);
+        $value = $this->ask($question, $default);
 
         $validator = Validator::make([$parameter => $value], [$parameter => $rules]);
 
@@ -220,7 +218,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->appName = $appName;
-        $this->kebabAppName = Str::kebab($this->appName);
+        $this->kebabAppName = Str::kebab($appName);
     }
 
     protected function setupEnvFiles(): void
