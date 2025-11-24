@@ -22,33 +22,9 @@ class InitCommand extends Command implements Isolatable
 
     protected $description = 'Initialize required project parameters to run DEV environment';
 
-    public const array RESOURCES_ITEMS = [
-        'issue_tracker' => 'Issue Tracker',
-        'figma' => 'Figma',
-        'sentry' => 'Sentry',
-        'datadog' => 'DataDog',
-        'argocd' => 'ArgoCD',
-        'telescope' => 'Laravel Telescope',
-        'nova' => 'Laravel Nova',
-    ];
-
-    public const array CONTACTS_ITEMS = [
-        'manager' => 'Manager',
-    ];
-
-    public const array CREDENTIALS_ITEMS = [
-        'telescope' => 'Laravel Telescope',
-        'nova' => 'Laravel Nova',
-    ];
-
-    public const array DEFAULT_URLS = [
-        'telescope',
-        'nova',
-    ];
-
-    protected array $resources = [];
-
     protected array $adminCredentials = [];
+
+    protected array $readmeParts = [];
 
     protected array $emptyValuesList = [];
 
@@ -130,19 +106,17 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
-            $this->generateReadme();
+            $this->configureReadmeParts();
         }
 
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
-            if ($shouldGenerateReadme) {
-                $this->readmeGenerator->fillRenovate();
-            }
+            $this->readmeParts[] = 'fillRenovate';
         }
 
         if ($shouldGenerateReadme) {
-            $this->readmeGenerator->save();
+            $this->readmeGenerator->generate($this->readmeParts);
 
             $this->info('README generated successfully!');
 
@@ -364,136 +338,104 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
     }
 
-    protected function generateReadme(): void
+    protected function configureReadmeParts(): void
     {
-        $this->readmeGenerator->generate($this->appName, $this->appType->value, $this->appUrl);
+        $this->readmeGenerator->appInfo = [
+            'name' => $this->appName,
+            'type' => $this->appType->value,
+            'url' => $this->appUrl,
+            'code_owner_email' => $this->codeOwnerEmail,
+        ];
 
         if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
-            $this->readmeGenerator->fillResourcesAndContacts();
-            $this->fillResources();
-            $this->fillContacts();
+            $this->configureResources();
+            $this->configureContacts();
+
+            $this->readmeParts[] = 'fillResourcesAndContacts';
+            $this->readmeParts[] = 'fillResources';
+            $this->readmeParts[] = 'fillContacts';
         }
 
         if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeGenerator->fillPrerequisites();
+            $this->readmeParts[] = 'fillPrerequisites';
         }
 
         if ($this->confirm('Do you need a `Getting Started` part?', true)) {
-            $this->fillGettingStarted();
+            $this->readmeParts[] = 'fillGettingStarted';
         }
 
         if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeGenerator->fillEnvironments();
+            $this->readmeParts[] = 'fillEnvironments';
         }
 
         if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
-            $this->fillCredentialsAndAccess();
+            $this->configureCredentialsAndAccess();
+
+            $this->readmeParts[] = 'fillCredentialsAndAccess';
 
             if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator->fillClerkAuth();
+                $this->readmeParts[] = 'fillClerkAuthType';
             }
         }
     }
 
-    protected function fillResources(): void
+    protected function configureResources(): void
     {
-        $filePart = $this->readmeGenerator->loadReadmePart('RESOURCES.md');
-        $laterText = '(will be added later)';
+        foreach ($this->readmeGenerator->resourcesItems as $key => $resource) {
+            $defaultAnswer = (Arr::has($resource, 'default_url')) ? $this->appUrl . "/{$key}" : 'later';
+            $text = "Are you going to use {$resource['title']}? "
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.';
 
-        foreach (self::RESOURCES_ITEMS as $key => $title) {
-            $defaultAnswer = (in_array($key, self::DEFAULT_URLS)) ? $this->appUrl . "/{$key}" : 'later';
-            $text = "Are you going to use {$title}? "
-                . "Please enter a link or select `later` to do it later, otherwise select `no`.";
-
-            $link = $this->anticipate(
-                $text,
-                ['later', 'no'],
-                $defaultAnswer
-            );
+            $link = $this->anticipate($text, ['later', 'no'], $defaultAnswer);
 
             if ($link === 'later') {
-                $this->emptyValuesList[] = "{$title} link";
-                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_link");
-                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_later", $laterText);
-            } elseif ($link !== 'no') {
-                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_link", $link);
-                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_later");
+                $this->emptyValuesList[] = "{$resource['title']} link";
             }
 
-            $this->resources[$key] = ($link !== 'no');
-
-            $this->readmeGenerator->removeTag($filePart, $key, $link === 'no');
+            $this->readmeGenerator->resourcesItems[$key]['link'] = $link;
+            $this->readmeGenerator->resourcesItems[$key]['active'] = ($link !== 'no');
         }
-
-        $this->readmeGenerator->setReadmeValue($filePart, 'api_link', $this->appUrl);
-        $this->readmeGenerator->updateReadmeFile($filePart);
     }
 
-    protected function fillContacts(): void
+    protected function configureContacts(): void
     {
-        $filePart = $this->readmeGenerator->loadReadmePart('CONTACTS.md');
-
-        foreach (self::CONTACTS_ITEMS as $key => $title) {
-            if ($link = $this->ask("Please enter a {$title}'s email", '')) {
-                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_link", $link);
+        foreach ($this->readmeGenerator->contactsItems as $key => $value) {
+            if ($link = $this->ask("Please enter a {$value['title']}'s email", '')) {
+                $this->readmeGenerator->contactsItems[$key]['email'] = $link;
             } else {
-                $this->emptyValuesList[] = "{$title}'s email";
+                $this->emptyValuesList[] = "{$value['title']}'s email";
             }
-
-            $this->readmeGenerator->removeTag($filePart, $key);
         }
-
-        $this->readmeGenerator->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
-
-        $this->readmeGenerator->updateReadmeFile($filePart);
     }
 
-    protected function fillGettingStarted(): void
+    protected function configureCredentialsAndAccess(): void
     {
-        $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
-        $projectDirectory = basename($gitProjectPath, '.git');
-        $filePart = $this->readmeGenerator->loadReadmePart('GETTING_STARTED.md');
-
-        $this->readmeGenerator->setReadmeValue($filePart, 'git_project_path', $gitProjectPath);
-        $this->readmeGenerator->setReadmeValue($filePart, 'project_directory', $projectDirectory);
-
-        $this->readmeGenerator->updateReadmeFile($filePart);
-    }
-
-    protected function fillCredentialsAndAccess(): void
-    {
-        $filePart = $this->readmeGenerator->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
-
-        if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator->setReadmeValue($filePart, 'admin_email', $this->adminCredentials['email']);
-            $this->readmeGenerator->setReadmeValue($filePart, 'admin_password', $this->adminCredentials['password']);
-        }
-
-        $this->readmeGenerator->removeTag($filePart, 'admin_credentials', !$this->adminCredentials);
-
-        foreach (self::CREDENTIALS_ITEMS as $key => $title) {
-            if (!Arr::get($this->resources, $key)) {
-                $this->readmeGenerator->removeTag($filePart, "{$key}_credentials", true);
-
+        foreach ($this->readmeGenerator->credentialsItems as $key => &$item) {
+            if (!Arr::get($this->readmeGenerator->resourcesItems, "{$key}.active")) {
                 continue;
             }
 
-            if (!empty($this->adminCredentials) && $this->confirm("Is {$title}'s admin the same as default one?", true)) {
+            if (!empty($this->adminCredentials) && $this->confirm("Is {$item['title']}'s admin the same as default one?", true)) {
                 $adminCredentials = $this->adminCredentials;
             } else {
                 if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
                     $this->publishAdminsTableMigration();
                 }
 
-                $adminCredentials = $this->createAdminUser($key, $title);
+                $adminCredentials = $this->createAdminUser($key, $item['title']);
             }
 
-            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_email", $adminCredentials['email']);
-            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_password", $adminCredentials['password']);
-            $this->readmeGenerator->removeTag($filePart, "{$key}_credentials");
+            $item['email'] = $adminCredentials['email'];
+            $item['password'] = $adminCredentials['password'];
         }
 
-        $this->readmeGenerator->updateReadmeFile($filePart);
+        if (!empty($this->adminCredentials)) {
+            $this->readmeGenerator->credentialsItems['admin'] = [
+                'title' => 'Default admin',
+                'email' => $this->adminCredentials['email'],
+                'password' => $this->adminCredentials['password'],
+            ];
+        }
     }
 
     protected function saveRenovateJSON(): void
@@ -584,6 +526,7 @@ class InitCommand extends Command implements Isolatable
 
         shell_exec('php artisan migrate --ansi --force');
     }
+
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
     {
