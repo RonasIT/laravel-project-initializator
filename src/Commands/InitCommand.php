@@ -252,7 +252,7 @@ class InitCommand extends Command implements Isolatable
             'CACHE_STORE' => 'redis',
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
-            'DB_CONNECTION' => $this->defaulDBConnectionConfig['driver'],
+            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
             'DB_HOST' => '',
             'DB_PORT' => '',
             'DB_DATABASE' => '',
