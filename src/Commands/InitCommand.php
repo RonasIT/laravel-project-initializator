@@ -575,10 +575,10 @@ class InitCommand extends Command implements Isolatable
     protected function runMigrations(): void
     {
         config([
-            'database.default' => $this->defaulDBConnectionConfig['driver'],
-            "database.connections.{$this->defaulDBConnectionConfig['driver']}" => [
+            'database.default' => $this->defaultDBConnectionConfig['driver'],
+            "database.connections.{$this->defaultDBConnectionConfig['driver']}" => [
                 'password' => '',
-                ...$this->defaulDBConnectionConfig,
+                ...$this->defaultDBConnectionConfig,
             ],
         ]);
 
