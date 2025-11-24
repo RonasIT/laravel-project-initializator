@@ -225,11 +225,11 @@ class InitCommand extends Command implements Isolatable
     {
         $envConfig = [
             'APP_NAME' => $this->appName,
-            'DB_CONNECTION' => $this->defaulDBConnectionConfig['driver'],
-            'DB_HOST' => $this->defaulDBConnectionConfig['host'],
-            'DB_PORT' => $this->defaulDBConnectionConfig['port'],
-            'DB_DATABASE' => $this->defaulDBConnectionConfig['database'],
-            'DB_USERNAME' => $this->defaulDBConnectionConfig['username'],
+            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
+            'DB_HOST' => $this->defaultDBConnectionConfig['host'],
+            'DB_PORT' => $this->defaultDBConnectionConfig['port'],
+            'DB_DATABASE' => $this->defaultDBConnectionConfig['database'],
+            'DB_USERNAME' => $this->defaultDBConnectionConfig['username'],
             'DB_PASSWORD' => '',
         ];
 
