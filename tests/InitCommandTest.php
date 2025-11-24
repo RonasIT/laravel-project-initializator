@@ -944,17 +944,18 @@ class InitCommandTest extends TestCase
         $commandMock->shouldReceive('ask')->andReturnUsing(fn ($question, $default) => $default);
         $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
 
-        $authTypeProperty = new ReflectionProperty(InitCommand::class, 'authType');
-        $authTypeProperty->setAccessible(true);
-        $authTypeProperty->setValue($commandMock, AuthTypeEnum::None);
-
-        $kebabAppNameProperty = new ReflectionProperty(InitCommand::class, 'kebabAppName');
-        $kebabAppNameProperty->setAccessible(true);
-        $kebabAppNameProperty->setValue($commandMock, 'my-app');
+        $this->setReflectionProperty($commandMock, InitCommand::class, 'authType', AuthTypeEnum::None);
+        $this->setReflectionProperty($commandMock, InitCommand::class, 'kebabAppName', 'my-app');
 
         $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
         $credentials = $createAdminMethod->invoke($commandMock);
 
         $this->assertEquals('Admin', $credentials['name']);
+    }
+
+    protected function setReflectionProperty(object $object, string $class, string $property, mixed $value): void
+    {
+        $reflection = new ReflectionProperty($class, $property);
+        $reflection->setValue($object, $value);
     }
 }
