@@ -12,13 +12,14 @@ use Illuminate\Support\Str;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use RonasIT\ProjectInitializator\Extensions\ConfigWriter\ArrayFile;
-use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
+use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
+use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 
 class InitCommand extends Command implements Isolatable
 {
     protected $signature = 'init {application-name : The application name }';
+
     protected $description = 'Initialize required project parameters to run DEV environment';
 
     protected array $adminCredentials = [];
@@ -43,19 +44,18 @@ class InitCommand extends Command implements Isolatable
     protected bool $shouldUninstallPackage = false;
 
     protected string $appName;
-    protected string $kebabName;
+    protected string $kebabAppName;
     protected string $appUrl;
     protected AppTypeEnum $appType;
     protected AuthTypeEnum $authType;
     protected string $codeOwnerEmail;
 
-    protected string $envFile;
-    protected array $envConfig = [
-        'dbConnection' => 'pgsql',
-        'dbHost' => 'pgsql',
-        'dbPort' => '5432',
-        'dbName' => 'postgres',
-        'dbUserName' => 'postgres',
+    protected array $defaultDBConnectionConfig = [
+        'driver' => 'pgsql',
+        'host' => 'pgsql',
+        'port' => '5432',
+        'database' => 'postgres',
+        'username' => 'postgres',
     ];
 
     public function __construct(
@@ -68,15 +68,14 @@ class InitCommand extends Command implements Isolatable
     {
         $this->prepareAppName();
 
-        $this->codeOwnerEmail = $this->validateInput(
-            method: fn () => $this->ask('Please specify a Code Owner/Team Lead\'s email'),
-            field: 'email of code owner / team lead',
+        $this->codeOwnerEmail = $this->askWithValidation(
+            parameter: 'email of code owner / team lead',
             rules: 'required|email',
         );
 
-        $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabName}.com");
+        $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabAppName}.com");
 
-        $this->updateEnvFile();
+        $this->setupEnvFiles();
 
         $this->info('Project initialized successfully!');
 
@@ -94,7 +93,9 @@ class InitCommand extends Command implements Isolatable
             default: AuthTypeEnum::None->value,
         ));
 
-        $this->configureClerk();
+        if ($this->authType === AuthTypeEnum::Clerk) {
+            $this->configureClerk();
+        }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
             if ($this->authType === AuthTypeEnum::Clerk) {
@@ -146,13 +147,13 @@ class InitCommand extends Command implements Isolatable
 
         $this->setupComposerHooks();
 
-        $this->changeMiddlewareForTelescopeAuthorization();
-
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
         }
+
+        $this->changeMiddlewareForTelescopeAuthorization();
 
         $this->publishWebLogin();
 
@@ -163,16 +164,18 @@ class InitCommand extends Command implements Isolatable
         $this->runMigrations();
     }
 
-    protected function validateInput(callable $method, string $field, string|array $rules): string
+    protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
     {
-        $value = $method();
+        $question = "Please specify: {$parameter}";
 
-        $validator = Validator::make([$field => $value], [$field => $rules]);
+        $value = $this->ask($question, $default);
+
+        $validator = Validator::make([$parameter => $value], [$parameter => $rules]);
 
         if ($validator->fails()) {
             $this->warn($validator->errors()->first());
 
-            $value = $this->validateInput($method, $field, $rules);
+            $value = $this->askWithValidation($parameter, $rules, $default);
         }
 
         return $value;
@@ -180,45 +183,50 @@ class InitCommand extends Command implements Isolatable
 
     protected function prepareAppName(): void
     {
-        $this->appName = $this->argument('application-name');
+        $appName = $this->argument('application-name');
 
-        $pascalCaseAppName = ucfirst(Str::camel($this->appName));
+        $pascalCaseAppName = ucfirst(Str::camel($appName));
 
-        if ($this->appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
-            $this->appName = $pascalCaseAppName;
+        if ($appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
+            $appName = $pascalCaseAppName;
         }
 
-        $this->kebabName = Str::kebab($this->appName);
+        $this->appName = $appName;
+        $this->kebabAppName = Str::kebab($appName);
     }
 
-    protected function updateEnvFile(): void
+    protected function setupEnvFiles(): void
     {
-        $this->envFile = (file_exists('.env')) ? '.env' : '.env.example';
-
         $envConfig = [
             'APP_NAME' => $this->appName,
-            'DB_CONNECTION' => $this->envConfig['dbConnection'],
-            'DB_HOST' => $this->envConfig['dbHost'],
-            'DB_PORT' => $this->envConfig['dbPort'],
-            'DB_DATABASE' => $this->envConfig['dbName'],
-            'DB_USERNAME' => $this->envConfig['dbUserName'],
+            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
+            'DB_HOST' => $this->defaultDBConnectionConfig['host'],
+            'DB_PORT' => $this->defaultDBConnectionConfig['port'],
+            'DB_DATABASE' => $this->defaultDBConnectionConfig['database'],
+            'DB_USERNAME' => $this->defaultDBConnectionConfig['username'],
             'DB_PASSWORD' => '',
         ];
 
-        $this->writeEnvFile($this->envFile, $envConfig);
+        $this->updateEnvFile('.env.example', $envConfig);
+
+        if (!file_exists('.env')) {
+            copy('.env.example', '.env');
+        } else {
+            $this->updateEnvFile('.env', $envConfig);
+        }
 
         if (!file_exists('.env.development')) {
             copy('.env.example', '.env.development');
         }
 
-        $this->writeEnvFile('.env.development', [
+        $this->updateEnvFile('.env.development', [
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
             'APP_MAINTENANCE_DRIVER' => 'cache',
             'CACHE_STORE' => 'redis',
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
-            'DB_CONNECTION' => $this->envConfig['dbConnection'],
+            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
             'DB_HOST' => '',
             'DB_PORT' => '',
             'DB_DATABASE' => '',
@@ -229,42 +237,29 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureClerk(): void
     {
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->enableClerk();
+        $this->enableClerk();
 
-            $data = [
-                'AUTH_GUARD' => 'clerk',
-                'CLERK_ALLOWED_ISSUER' => '',
-                'CLERK_SECRET_KEY' => '',
-                'CLERK_SIGNER_KEY_PATH' => '',
-            ];
+        $data = [
+            'AUTH_GUARD' => 'clerk',
+            'CLERK_ALLOWED_ISSUER' => '',
+            'CLERK_SECRET_KEY' => '',
+            'CLERK_SIGNER_KEY_PATH' => '',
+        ];
 
-            if ($this->appType !== AppTypeEnum::Mobile) {
-                $data['CLERK_ALLOWED_ORIGINS'] = '';
-            }
-
-            $this->writeEnvFile('.env.development', $data);
-            $this->writeEnvFile($this->envFile, $data);
-
-            if ($this->envFile !== '.env.example') {
-                $this->writeEnvFile('.env.example', $data);
-            }
+        if ($this->appType !== AppTypeEnum::Mobile) {
+            $data['CLERK_ALLOWED_ORIGINS'] = '';
         }
+
+        $this->updateEnvFile('.env', $data);
+        $this->updateEnvFile('.env.example', $data);
+        $this->updateEnvFile('.env.development', $data);
     }
 
-    protected function writeEnvFile(string $fileName, array $data): void
+    protected function updateEnvFile(string $fileName, array $data): void
     {
         $env = EnvFile::open($fileName);
 
-        // TODO: After updating wintercms/laravel-config-writer, remove the key comparison check and keep only $env->addEmptyLine();
-        $envKeys = array_column($env->getAst(), 'match');
-        $dataKeys = array_keys($data);
-
-        $hasMissingKeys = count(array_intersect($dataKeys, $envKeys)) !== count($dataKeys);
-
-        if ($hasMissingKeys) {
-            $env->addEmptyLine();
-        }
+        $env->addEmptyLine();
 
         $env->set($data);
 
@@ -293,22 +288,26 @@ class InitCommand extends Command implements Isolatable
 
     protected function createAdminUser(string $serviceKey = '', string $serviceName = ''): array
     {
-        $adminEmail = when(empty($serviceKey), "admin@{$this->kebabName}.com", "admin.{$serviceKey}@{$this->kebabName}.com");
+        $isServiceAdmin = (!empty($serviceKey) && !empty($serviceName));
+
+        $adminEmail = when($isServiceAdmin, "admin.{$serviceKey}@{$this->kebabAppName}.com", "admin@{$this->kebabAppName}.com");
         $defaultPassword = substr(md5(uniqid()), 0, 8);
 
-        $serviceLabel = when(!empty($serviceName), " for {$serviceName}");
+        $serviceLabel = when($isServiceAdmin, " for {$serviceName}");
 
         $adminCredentials = [
             'email' => $this->ask("Please enter admin email{$serviceLabel}", $adminEmail),
             'password' => $this->ask("Please enter admin password{$serviceLabel}", $defaultPassword),
         ];
 
+        $adminName = when($isServiceAdmin, "{$serviceName} Admin", 'Admin');
+
         if ($this->authType === AuthTypeEnum::None) {
-            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", "{$serviceName} Admin");
+            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
         }
 
-        if (empty($serviceName)) {
+        if (!$isServiceAdmin) {
             $this->adminCredentials = $adminCredentials;
         }
 
@@ -441,10 +440,10 @@ class InitCommand extends Command implements Isolatable
 
     protected function saveRenovateJSON(): void
     {
-        $reviewer = $this->validateInput(
-            method: fn () => $this->ask('Please type username of the project reviewer', Str::before($this->codeOwnerEmail, '@')),
-            field: 'username of the project reviewer',
+        $reviewer = $this->askWithValidation(
+            parameter: 'username of the project reviewer',
             rules: 'required|alpha_dash',
+            default: Str::before($this->codeOwnerEmail, '@'),
         );
 
         $data = [
@@ -490,7 +489,7 @@ class InitCommand extends Command implements Isolatable
     {
         $config = ArrayFile::open(base_path('config/telescope.php'));
 
-        // TODO: add Authorize::class middleware after inplementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
+        // TODO: add Authorize::class middleware after implementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
         $config->set('middleware', [
             'web',
             'auth:web',
@@ -518,19 +517,16 @@ class InitCommand extends Command implements Isolatable
     protected function runMigrations(): void
     {
         config([
-            'database.default' => $this->envConfig['dbConnection'],
-            'database.connections.pgsql' => [
-                'driver' => $this->envConfig['dbConnection'],
-                'host' => $this->envConfig['dbHost'],
-                'port' => $this->envConfig['dbPort'],
-                'database' => $this->envConfig['dbName'],
-                'username' => $this->envConfig['dbUserName'],
+            'database.default' => $this->defaultDBConnectionConfig['driver'],
+            "database.connections.{$this->defaultDBConnectionConfig['driver']}" => [
                 'password' => '',
+                ...$this->defaultDBConnectionConfig,
             ],
         ]);
 
-        shell_exec('php artisan migrate --ansi');
+        shell_exec('php artisan migrate --ansi --force');
     }
+
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
     {

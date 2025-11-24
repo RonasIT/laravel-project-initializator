@@ -2,6 +2,11 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use Mockery;
+use ReflectionMethod;
+use ReflectionProperty;
+use RonasIT\ProjectInitializator\Commands\InitCommand;
+use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
@@ -11,19 +16,11 @@ class InitCommandTest extends TestCase
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -31,6 +28,7 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development', false),
 
+            $this->callCopy('.env.example', '.env'),
             $this->callCopy('.env.example', '.env.development'),
 
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
@@ -51,13 +49,13 @@ class InitCommandTest extends TestCase
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -73,19 +71,12 @@ class InitCommandTest extends TestCase
     public function testRunWithoutAdminAndReadmeCreation()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -112,12 +103,12 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this
             ->artisan('init "MyApp"')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -125,7 +116,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -134,25 +125,19 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
@@ -173,13 +158,13 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -199,27 +184,22 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
@@ -248,12 +228,11 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Generators',
-
             $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
@@ -273,7 +252,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -336,7 +315,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -345,25 +324,19 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndPartialReadmeCreation()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
@@ -383,7 +356,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -400,7 +373,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
@@ -460,25 +433,19 @@ class InitCommandTest extends TestCase
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
@@ -503,7 +470,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -525,7 +492,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
@@ -585,7 +552,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?', 'yes')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->assertExitCode(0);
@@ -594,25 +561,19 @@ class InitCommandTest extends TestCase
     public function testRunWithoutAdminAndUsingTelescope()
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
@@ -634,7 +595,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -651,7 +612,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
@@ -719,27 +680,22 @@ class InitCommandTest extends TestCase
     public function testRunWithClerkMobileAppWithPintInstalled(): void
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
+            $this->changeEnvFileCall('.env', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
@@ -766,7 +722,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -790,7 +746,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
@@ -851,7 +807,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -860,21 +816,14 @@ class InitCommandTest extends TestCase
     public function testRunWithClerkAdditionalAdminsWithoutDefaultAdmin(): void
     {
         $this->mockNativeFunction(
-            '\RonasIT\ProjectInitializator\Extensions\ConfigWriter',
-            $this->callFileExists(base_path('config/telescope.php')),
-            $this->callFileGetContent(base_path('config/telescope.php'), $this->getFixture('telescope_config.php')),
-            $this->callFileExists(base_path('config/auto-doc.php')),
-            $this->callFileGetContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc.php')),
-        );
-
-        $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
-            $this->callFilePutContent(base_path('config/telescope.php'), $this->getFixture('telescope_config_after_initialization.php')),
-            $this->callFilePutContent(base_path('config/auto-doc.php'), $this->getFixture('auto_doc_after_changes.php')),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
@@ -882,7 +831,9 @@ class InitCommandTest extends TestCase
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
 
-           $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callCopy('.env.example', '.env'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
@@ -909,7 +860,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -920,14 +871,13 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
-
             $this->callFilePutContent('README.md', $this->getFixture('partial_readme_clerk_with_credentials.md')),
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
@@ -985,5 +935,26 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
+    }
+
+    public function testDefaultAdminsCredentials(): void
+    {
+        $commandMock = Mockery::mock(InitCommand::class)->shouldAllowMockingProtectedMethods();
+
+        $commandMock->shouldReceive('ask')->andReturnUsing(fn ($question, $default) => $default);
+        $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
+
+        $authTypeProperty = new ReflectionProperty(InitCommand::class, 'authType');
+        $authTypeProperty->setAccessible(true);
+        $authTypeProperty->setValue($commandMock, AuthTypeEnum::None);
+
+        $kebabAppNameProperty = new ReflectionProperty(InitCommand::class, 'kebabAppName');
+        $kebabAppNameProperty->setAccessible(true);
+        $kebabAppNameProperty->setValue($commandMock, 'my-app');
+
+        $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
+        $credentials = $createAdminMethod->invoke($commandMock);
+
+        $this->assertEquals('Admin', $credentials['name']);
     }
 }
