@@ -74,7 +74,7 @@ class InitCommand extends Command implements Isolatable
     protected AuthTypeEnum $authType;
     protected string $codeOwnerEmail;
 
-    protected array $defaulDBConnectionConfig = [
+    protected array $defaultDBConnectionConfig = [
         'driver' => 'pgsql',
         'host' => 'pgsql',
         'port' => '5432',
