@@ -18,6 +18,10 @@ use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 
 class InitCommand extends Command implements Isolatable
 {
+    protected $signature = 'init {application-name : The application name }';
+
+    protected $description = 'Initialize required project parameters to run DEV environment';
+
     public const array RESOURCES_ITEMS = [
         'issue_tracker' => 'Issue Tracker',
         'figma' => 'Figma',
@@ -42,19 +46,9 @@ class InitCommand extends Command implements Isolatable
         'nova',
     ];
 
-    protected $signature = 'init {application-name : The application name }';
-
-    protected $description = 'Initialize required project parameters to run DEV environment';
-
-    protected string $codeOwnerEmail;
-
     protected array $resources = [];
 
     protected array $adminCredentials = [];
-
-    protected AuthTypeEnum $authType;
-
-    protected string $appUrl;
 
     protected array $emptyValuesList = [];
 
@@ -74,14 +68,19 @@ class InitCommand extends Command implements Isolatable
     protected bool $shouldUninstallPackage = false;
 
     protected string $appName;
-
-    protected string $dbConnection = 'pgsql';
-    protected string $dbHost = 'pgsql';
-    protected string $dbPort = '5432';
-    protected string $dbName = 'postgres';
-    protected string $dbUserName = 'postgres';
-
+    protected string $kebabAppName;
+    protected string $appUrl;
     protected AppTypeEnum $appType;
+    protected AuthTypeEnum $authType;
+    protected string $codeOwnerEmail;
+
+    protected array $defaultDBConnectionConfig = [
+        'driver' => 'pgsql',
+        'host' => 'pgsql',
+        'port' => '5432',
+        'database' => 'postgres',
+        'username' => 'postgres',
+    ];
 
     public function __construct(
         protected ReadmeGenerator $readmeGenerator,
@@ -93,52 +92,14 @@ class InitCommand extends Command implements Isolatable
     {
         $this->prepareAppName();
 
-        $kebabName = Str::kebab($this->appName);
-
-        $this->codeOwnerEmail = $this->validateInput(
-            method: fn () => $this->ask('Please specify a Code Owner/Team Lead\'s email'),
-            field: 'email of code owner / team lead',
+        $this->codeOwnerEmail = $this->askWithValidation(
+            parameter: 'email of code owner / team lead',
             rules: 'required|email',
         );
 
-        $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$kebabName}.com");
+        $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabAppName}.com");
 
-        $envConfig = [
-            'APP_NAME' => $this->appName,
-            'DB_CONNECTION' => $this->dbConnection,
-            'DB_HOST' => $this->dbHost,
-            'DB_PORT' => $this->dbPort,
-            'DB_DATABASE' => $this->dbName,
-            'DB_USERNAME' => $this->dbUserName,
-            'DB_PASSWORD' => '',
-        ];
-
-        $this->updateEnvFile('.env.example', $envConfig);
-
-        if (!file_exists('.env')) {
-            copy('.env.example', '.env');
-        } else {
-            $this->updateEnvFile('.env', $envConfig);
-        }
-
-        if (!file_exists('.env.development')) {
-            copy('.env.example', '.env.development');
-        }
-
-        $this->updateEnvFile('.env.development', [
-            'APP_NAME' => $this->appName,
-            'APP_URL' => $this->appUrl,
-            'APP_MAINTENANCE_DRIVER' => 'cache',
-            'CACHE_STORE' => 'redis',
-            'QUEUE_CONNECTION' => 'redis',
-            'SESSION_DRIVER' => 'redis',
-            'DB_CONNECTION' => $this->dbConnection,
-            'DB_HOST' => '',
-            'DB_PORT' => '',
-            'DB_DATABASE' => '',
-            'DB_USERNAME' => '',
-            'DB_PASSWORD' => '',
-        ]);
+        $this->setupEnvFiles();
 
         $this->info('Project initialized successfully!');
 
@@ -157,22 +118,7 @@ class InitCommand extends Command implements Isolatable
         ));
 
         if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->enableClerk();
-
-            $data = [
-                'AUTH_GUARD' => 'clerk',
-                'CLERK_ALLOWED_ISSUER' => '',
-                'CLERK_SECRET_KEY' => '',
-                'CLERK_SIGNER_KEY_PATH' => '',
-            ];
-
-            if ($this->appType !== AppTypeEnum::Mobile) {
-                $data['CLERK_ALLOWED_ORIGINS'] = '';
-            }
-
-            $this->updateEnvFile('.env', $data);
-            $this->updateEnvFile('.env.example', $data);
-            $this->updateEnvFile('.env.development', $data);
+            $this->configureClerk();
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -180,37 +126,11 @@ class InitCommand extends Command implements Isolatable
                 $this->publishAdminsTableMigration();
             }
 
-            $this->createAdminUser($kebabName);
+            $this->createAdminUser();
         }
 
         if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
-            $this->readmeGenerator->generate($this->appName, $this->appType->value, $this->appUrl);
-
-            if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
-                $this->readmeGenerator->fillResourcesAndContacts();
-                $this->fillResources();
-                $this->fillContacts();
-            }
-
-            if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-                $this->readmeGenerator->fillPrerequisites();
-            }
-
-            if ($this->confirm('Do you need a `Getting Started` part?', true)) {
-                $this->fillGettingStarted();
-            }
-
-            if ($this->confirm('Do you need an `Environments` part?', true)) {
-                $this->readmeGenerator->fillEnvironments();
-            }
-
-            if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
-                $this->fillCredentialsAndAccess($kebabName);
-
-                if ($this->authType === AuthTypeEnum::Clerk) {
-                    $this->readmeGenerator->fillClerkAuth();
-                }
-            }
+            $this->generateReadme();
         }
 
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
@@ -268,6 +188,211 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->runMigrations();
+    }
+
+    protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
+    {
+        $question = "Please specify: {$parameter}";
+
+        $value = $this->ask($question, $default);
+
+        $validator = Validator::make([$parameter => $value], [$parameter => $rules]);
+
+        if ($validator->fails()) {
+            $this->warn($validator->errors()->first());
+
+            $value = $this->askWithValidation($parameter, $rules, $default);
+        }
+
+        return $value;
+    }
+
+    protected function prepareAppName(): void
+    {
+        $appName = $this->argument('application-name');
+
+        $pascalCaseAppName = ucfirst(Str::camel($appName));
+
+        if ($appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
+            $appName = $pascalCaseAppName;
+        }
+
+        $this->appName = $appName;
+        $this->kebabAppName = Str::kebab($appName);
+    }
+
+    protected function setupEnvFiles(): void
+    {
+        $envConfig = [
+            'APP_NAME' => $this->appName,
+            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
+            'DB_HOST' => $this->defaultDBConnectionConfig['host'],
+            'DB_PORT' => $this->defaultDBConnectionConfig['port'],
+            'DB_DATABASE' => $this->defaultDBConnectionConfig['database'],
+            'DB_USERNAME' => $this->defaultDBConnectionConfig['username'],
+            'DB_PASSWORD' => '',
+        ];
+
+        $this->updateEnvFile('.env.example', $envConfig);
+
+        if (!file_exists('.env')) {
+            copy('.env.example', '.env');
+        } else {
+            $this->updateEnvFile('.env', $envConfig);
+        }
+
+        if (!file_exists('.env.development')) {
+            copy('.env.example', '.env.development');
+        }
+
+        $this->updateEnvFile('.env.development', [
+            'APP_NAME' => $this->appName,
+            'APP_URL' => $this->appUrl,
+            'APP_MAINTENANCE_DRIVER' => 'cache',
+            'CACHE_STORE' => 'redis',
+            'QUEUE_CONNECTION' => 'redis',
+            'SESSION_DRIVER' => 'redis',
+            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
+            'DB_HOST' => '',
+            'DB_PORT' => '',
+            'DB_DATABASE' => '',
+            'DB_USERNAME' => '',
+            'DB_PASSWORD' => '',
+        ]);
+    }
+
+    protected function configureClerk(): void
+    {
+        $this->enableClerk();
+
+        $data = [
+            'AUTH_GUARD' => 'clerk',
+            'CLERK_ALLOWED_ISSUER' => '',
+            'CLERK_SECRET_KEY' => '',
+            'CLERK_SIGNER_KEY_PATH' => '',
+        ];
+
+        if ($this->appType !== AppTypeEnum::Mobile) {
+            $data['CLERK_ALLOWED_ORIGINS'] = '';
+        }
+
+        $this->updateEnvFile('.env', $data);
+        $this->updateEnvFile('.env.example', $data);
+        $this->updateEnvFile('.env.development', $data);
+    }
+
+    protected function updateEnvFile(string $fileName, array $data): void
+    {
+        $env = EnvFile::open($fileName);
+
+        $env->addEmptyLine();
+
+        $env->set($data);
+
+        $env->write();
+    }
+
+    protected function enableClerk(): void
+    {
+        array_push(
+            $this->shellCommands,
+            'composer require ronasit/laravel-clerk',
+            'php artisan laravel-clerk:install',
+        );
+
+        $this->publishMigration(
+            view: view('initializator::users_add_clerk_id_field'),
+            migrationName: 'users_add_clerk_id_field',
+        );
+
+        $this->publishClass(
+            template: view('initializator::clerk_user_repository'),
+            fileName: 'ClerkUserRepository',
+            filePath: 'app/Support/Clerk',
+        );
+    }
+
+    protected function createAdminUser(string $serviceKey = '', string $serviceName = ''): array
+    {
+        $isServiceAdmin = (!empty($serviceKey) && !empty($serviceName));
+
+        $adminEmail = when($isServiceAdmin, "admin.{$serviceKey}@{$this->kebabAppName}.com", "admin@{$this->kebabAppName}.com");
+        $defaultPassword = substr(md5(uniqid()), 0, 8);
+
+        $serviceLabel = when($isServiceAdmin, " for {$serviceName}");
+
+        $adminCredentials = [
+            'email' => $this->ask("Please enter admin email{$serviceLabel}", $adminEmail),
+            'password' => $this->ask("Please enter admin password{$serviceLabel}", $defaultPassword),
+        ];
+
+        $adminName = when($isServiceAdmin, "{$serviceName} Admin", 'Admin');
+
+        if ($this->authType === AuthTypeEnum::None) {
+            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
+            $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
+        }
+
+        if (!$isServiceAdmin) {
+            $this->adminCredentials = $adminCredentials;
+        }
+
+        $this->publishAdminMigration($adminCredentials, $serviceKey);
+
+        return $adminCredentials;
+    }
+
+    protected function publishMigration(View $view, string $migrationName): void
+    {
+        $time = Carbon::now()->format('Y_m_d_His');
+
+        $migrationName = "{$time}_{$migrationName}";
+
+        $this->publishClass($view, $migrationName, 'database/migrations');
+    }
+
+    protected function publishClass(View $template, string $fileName, string $filePath): void
+    {
+        $fileName = "{$fileName}.php";
+
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777, true);
+        }
+
+        $data = $template->render();
+
+        file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
+    }
+
+    protected function generateReadme(): void
+    {
+        $this->readmeGenerator->generate($this->appName, $this->appType->value, $this->appUrl);
+
+        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
+            $this->readmeGenerator->fillResourcesAndContacts();
+            $this->fillResources();
+            $this->fillContacts();
+        }
+
+        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
+            $this->readmeGenerator->fillPrerequisites();
+        }
+
+        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
+            $this->fillGettingStarted();
+        }
+
+        if ($this->confirm('Do you need an `Environments` part?', true)) {
+            $this->readmeGenerator->fillEnvironments();
+        }
+
+        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
+            $this->fillCredentialsAndAccess();
+
+            if ($this->authType === AuthTypeEnum::Clerk) {
+                $this->readmeGenerator->fillClerkAuth();
+            }
+        }
     }
 
     protected function fillResources(): void
@@ -335,7 +460,7 @@ class InitCommand extends Command implements Isolatable
         $this->readmeGenerator->updateReadmeFile($filePart);
     }
 
-    protected function fillCredentialsAndAccess(string $kebabName): void
+    protected function fillCredentialsAndAccess(): void
     {
         $filePart = $this->readmeGenerator->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
 
@@ -360,7 +485,7 @@ class InitCommand extends Command implements Isolatable
                     $this->publishAdminsTableMigration();
                 }
 
-                $adminCredentials = $this->createAdminUser($kebabName, $key, $title);
+                $adminCredentials = $this->createAdminUser($key, $title);
             }
 
             $this->readmeGenerator->setReadmeValue($filePart, "{$key}_email", $adminCredentials['email']);
@@ -369,6 +494,24 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->readmeGenerator->updateReadmeFile($filePart);
+    }
+
+    protected function saveRenovateJSON(): void
+    {
+        $reviewer = $this->askWithValidation(
+            parameter: 'username of the project reviewer',
+            rules: 'required|alpha_dash',
+            default: Str::before($this->codeOwnerEmail, '@'),
+        );
+
+        $data = [
+            '$schema' => 'https://docs.renovatebot.com/renovate-schema.json',
+            'extends' => ['config:recommended'],
+            'enabledManagers' => ['composer'],
+            'assignees' => [$reviewer],
+        ];
+
+        file_put_contents('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
     }
 
     protected function setupComposerHooks(): void
@@ -400,6 +543,19 @@ class InitCommand extends Command implements Isolatable
         }
     }
 
+    protected function changeMiddlewareForTelescopeAuthorization(): void
+    {
+        $config = ArrayFile::open(base_path('config/telescope.php'));
+
+        // TODO: add Authorize::class middleware after implementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
+        $config->set('middleware', [
+            'web',
+            'auth:web',
+        ]);
+
+        $config->write();
+    }
+
     protected function setAutoDocContactEmail(string $email): void
     {
         $config = ArrayFile::open(base_path('config/auto-doc.php'));
@@ -409,150 +565,6 @@ class InitCommand extends Command implements Isolatable
         $config->write();
     }
 
-    protected function runMigrations(): void
-    {
-        config([
-            'database.default' => $this->dbConnection,
-            'database.connections.pgsql' => [
-                'driver' => $this->dbConnection,
-                'host' => $this->dbHost,
-                'port' => $this->dbPort,
-                'database' => $this->dbName,
-                'username' => $this->dbUserName,
-                'password' => '',
-            ],
-        ]);
-
-        shell_exec('php artisan migrate --ansi --force');
-    }
-
-    protected function createAdminUser(string $kebabName, string $serviceKey = '', string $serviceName = ''): array
-    {
-        $isServiceAdmin = (!empty($serviceKey) && !empty($serviceName));
-
-        $adminEmail = when($isServiceAdmin, "admin.{$serviceKey}@{$kebabName}.com", "admin@{$kebabName}.com");
-        $defaultPassword = substr(md5(uniqid()), 0, 8);
-
-        $serviceLabel = when($isServiceAdmin, " for {$serviceName}");
-
-        $adminCredentials = [
-            'email' => $this->ask("Please enter admin email{$serviceLabel}", $adminEmail),
-            'password' => $this->ask("Please enter admin password{$serviceLabel}", $defaultPassword),
-        ];
-
-        $adminName = when($isServiceAdmin, "{$serviceName} Admin", 'Admin');
-
-        if ($this->authType === AuthTypeEnum::None) {
-            $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
-            $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
-        }
-
-        if (!$isServiceAdmin) {
-            $this->adminCredentials = $adminCredentials;
-        }
-
-        $this->publishAdminMigration($adminCredentials, $serviceKey);
-
-        return $adminCredentials;
-    }
-
-    protected function publishClass(View $template, string $fileName, string $filePath): void
-    {
-        $fileName = "{$fileName}.php";
-
-        if (!is_dir($filePath)) {
-            mkdir($filePath, 0777, true);
-        }
-
-        $data = $template->render();
-
-        file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
-    }
-
-    protected function publishMigration(View $view, string $migrationName): void
-    {
-        $time = Carbon::now()->format('Y_m_d_His');
-
-        $migrationName = "{$time}_{$migrationName}";
-
-        $this->publishClass($view, $migrationName, 'database/migrations');
-    }
-
-    protected function updateEnvFile(string $fileName, array $data): void
-    {
-        $env = EnvFile::open($fileName);
-
-        $env->addEmptyLine();
-
-        $env->set($data);
-
-        $env->write();
-    }
-
-    protected function prepareAppName(): void
-    {
-        $this->appName = $this->argument('application-name');
-
-        $pascalCaseAppName = ucfirst(Str::camel($this->appName));
-
-        if ($this->appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
-            $this->appName = $pascalCaseAppName;
-        }
-    }
-
-    protected function saveRenovateJSON(): void
-    {
-        $reviewer = $this->validateInput(
-            method: fn () => $this->ask('Please type username of the project reviewer', Str::before($this->codeOwnerEmail, '@')),
-            field: 'username of the project reviewer',
-            rules: 'required|alpha_dash',
-        );
-
-        $data = [
-            '$schema' => 'https://docs.renovatebot.com/renovate-schema.json',
-            'extends' => ['config:recommended'],
-            'enabledManagers' => ['composer'],
-            'assignees' => [$reviewer],
-        ];
-
-        file_put_contents('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
-    }
-
-    protected function validateInput(callable $method, string $field, string|array $rules): string
-    {
-        $value = $method();
-
-        $validator = Validator::make([$field => $value], [$field => $rules]);
-
-        if ($validator->fails()) {
-            $this->warn($validator->errors()->first());
-
-            $value = $this->validateInput($method, $field, $rules);
-        }
-
-        return $value;
-    }
-
-    protected function enableClerk(): void
-    {
-        array_push(
-            $this->shellCommands,
-            'composer require ronasit/laravel-clerk',
-            'php artisan laravel-clerk:install',
-        );
-
-        $this->publishMigration(
-            view: view('initializator::users_add_clerk_id_field'),
-            migrationName: 'users_add_clerk_id_field',
-        );
-
-        $this->publishClass(
-            template: view('initializator::clerk_user_repository'),
-            fileName: 'ClerkUserRepository',
-            filePath: 'app/Support/Clerk',
-        );
-    }
-
     protected function publishWebLogin(): void
     {
         shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
@@ -560,17 +572,17 @@ class InitCommand extends Command implements Isolatable
         file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
     }
 
-    protected function changeMiddlewareForTelescopeAuthorization(): void
+    protected function runMigrations(): void
     {
-        $config = ArrayFile::open(base_path('config/telescope.php'));
-
-        // TODO: add Authorize::class middleware after inplementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
-        $config->set('middleware', [
-            'web',
-            'auth:web',
+        config([
+            'database.default' => $this->defaultDBConnectionConfig['driver'],
+            "database.connections.{$this->defaultDBConnectionConfig['driver']}" => [
+                'password' => '',
+                ...$this->defaultDBConnectionConfig,
+            ],
         ]);
 
-        $config->write();
+        shell_exec('php artisan migrate --ansi --force');
     }
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
