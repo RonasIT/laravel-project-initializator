@@ -948,7 +948,7 @@ class InitCommandTest extends TestCase
         $kebabAppNameProperty->setValue($commandMock, 'my-app');
 
         $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
-        $credentials = $createAdminMethod->invokeArgs($commandMock, ['my-app']);
+        $credentials = $createAdminMethod->invoke($commandMock);
 
         $this->assertEquals('Admin', $credentials['name']);
     }
