@@ -2,7 +2,11 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
-use Illuminate\Support\Facades\File;
+use Mockery;
+use ReflectionMethod;
+use ReflectionProperty;
+use RonasIT\ProjectInitializator\Commands\InitCommand;
+use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
@@ -11,52 +15,47 @@ class InitCommandTest extends TestCase
 
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
-
-        $this->mockFileGetContent(
-            [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
-            ],
-            [
-                'arguments' => [base_path('bootstrap/app.php')],
-                'result' => $this->getFixture('app.php'),
-            ],
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
-        $this->mockFilePutContent(
-            'env.example_app_name_pascal_case.yml',
-            'env.development_app_name_pascal_case.yml',
-            [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                base_path('bootstrap/app.php'),
-                $this->getFixture('app_after_changes.php'),
-            ],
-        );
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development', false),
 
-        $this->mockClassExists([
-            'arguments' => ['Laravel\Telescope\TelescopeServiceProvider', true],
-        ]);
+            $this->callCopy('.env.example', '.env'),
+            $this->callCopy('.env.example', '.env.development'),
 
-        $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
+            $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -67,59 +66,49 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithoutAdminAndReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
-
-        $this->mockFileGetContent(
-            [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example_app_name_pascal_case.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development_app_name_pascal_case.yml'),
-            ],
-            [
-                'arguments' => [base_path('bootstrap/app.php')],
-                'result' => $this->getFixture('app.php'),
-            ],
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
-        $this->mockFilePutContent(
-            'env.example_app_name_pascal_case.yml',
-            'env.development_app_name_pascal_case.yml',
-            [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                base_path('bootstrap/app.php'),
-                $this->getFixture('app_after_changes.php'),
-            ],
-        );
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env'),
+            $this->callFileExists('.env.development'),
 
-        $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this
             ->artisan('init "MyApp"')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -127,218 +116,148 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndWithoutReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
-
-        $this->mockFileGetContent(
-            [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
-                'arguments' => [base_path('bootstrap/app.php')],
-                'result' => $this->getFixture('app.php'),
-            ],
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
-        $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
-            [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'database/migrations/2018_11_11_111111_add_default_user.php',
-                $this->getFixture('migration.php'),
-            ],
-            [
-                base_path('bootstrap/app.php'),
-                $this->getFixture('app_after_changes.php'),
-            ],
-        );
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development'),
 
-        $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+            $this->callCopy('.env.example', '.env'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('migration.php')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
-            ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
-            ->expectsQuestion('Please enter an admin password', '123456')
-            ->expectsQuestion('Please enter an admin name', 'TestAdmin')
-            ->expectsQuestion('Please enter an admin role id', 1)
+            ->expectsQuestion('Please enter admin email', 'mail@mail.com')
+            ->expectsQuestion('Please enter admin password', '123456')
+            ->expectsQuestion('Please enter admin name', 'TestAdmin')
+            ->expectsQuestion('Please enter admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndDefaultReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
-
-        $this->mockFileGetContent(
-            [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
-                'result' => $this->getTemplate('README.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
-                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
-                'result' => $this->getTemplate('RESOURCES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
-                'result' => $this->getTemplate('CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
-                'result' => $this->getTemplate('PREREQUISITES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
-                'result' => $this->getTemplate('GETTING_STARTED.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
-                'result' => $this->getTemplate('ENVIRONMENTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
-                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md')],
-                'result' => $this->getTemplate('CLERK.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
-                'result' => $this->getTemplate('RENOVATE.md'),
-            ],
-            [
-                'arguments' => [base_path('bootstrap/app.php')],
-                'result' => $this->getFixture('app.php'),
-            ],
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
-        $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
-            [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
-                $this->getFixture('users_add_clerk_id_field_migration.php'),
-            ],
-            [
-                'app/Support/Clerk/ClerkUserRepository.php',
-                $this->getFixture('clerk_user_repository.php'),
-            ],
-            [
-                '.env.development',
-                $this->getFixture('env.development_clerk_credentials_added.yml'),
-            ],
-            [
-                '.env.example',
-                $this->getFixture('env.example_clerk_credentials_added.yml'),
-            ],
-            [
-                'database/migrations/2018_11_11_111111_admins_create_table.php',
-                $this->getFixture('admins_table_migration.php'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme.md'),
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme_after_using_renovate.md'),
-            ],
-            [
-                base_path('bootstrap/app.php'),
-                $this->getFixture('app_after_changes.php'),
-            ],
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('admins_add_default_admin.php')),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111111_admins_create_table.php')]),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('admins_add_nova_admin_migration.php')),
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
+            $this->callShellExec('php artisan laravel-clerk:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockShellExec(
-            ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
-            ['arguments' => 'php artisan laravel-clerk:install --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('default_readme_after_using_renovate.md')),
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
-            ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
-            ->expectsQuestion('Please enter an admin password', '123456')
+            ->expectsQuestion('Please enter admin email', 'mail@mail.com')
+            ->expectsQuestion('Please enter admin password', '123456')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
@@ -382,7 +301,9 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
-            ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?', 'yes')
+            ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?')
+            ->expectsQuestion('Please enter admin email for Laravel Nova', 'mail@mail.com')
+            ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
@@ -392,88 +313,65 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndPartialReadmeCreation()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
-
-        $this->mockFileGetContent(
-            [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
-                'result' => $this->getTemplate('README.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
-                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
-                'result' => $this->getTemplate('RESOURCES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
-                'result' => $this->getTemplate('CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
-                'result' => $this->getTemplate('ENVIRONMENTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
-                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-            ],
-            [
-                'arguments' => [base_path('bootstrap/app.php')],
-                'result' => $this->getFixture('app.php'),
-            ],
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
-        $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
-            [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'README.md',
-                $this->getFixture('partial_readme.md'),
-            ],
-            [
-                base_path('bootstrap/app.php'),
-                $this->getFixture('app_after_changes.php'),
-            ],
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('partial_readme.md')),
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
@@ -528,120 +426,79 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
-
-        $this->mockFileGetContent(
-            [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
-               'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
-                'result' => $this->getTemplate('README.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
-                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
-                'result' => $this->getTemplate('RESOURCES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
-                'result' => $this->getTemplate('CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
-                'result' => $this->getTemplate('PREREQUISITES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
-                'result' => $this->getTemplate('GETTING_STARTED.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
-                'result' => $this->getTemplate('ENVIRONMENTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
-                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
-                'result' => $this->getTemplate('RENOVATE.md'),
-            ],
-            [
-                'arguments' => [base_path('bootstrap/app.php')],
-                'result' => $this->getFixture('app.php'),
-            ],
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
-        $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
-            [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'database/migrations/2018_11_11_111111_add_default_user.php',
-                $this->getFixture('migration.php'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('full_readme.md'),
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('full_readme_after_using_renovate.md'),
-            ],
-            [
-                base_path('bootstrap/app.php'),
-                $this->getFixture('app_after_changes.php'),
-            ],
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-media --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockShellExec(
-            ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-media --ansi'],
-            ['arguments' => 'composer remove --dev ronasit/laravel-project-initializator --ansi'],
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('full_readme_after_using_renovate.md')),
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
-            ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
-            ->expectsQuestion('Please enter an admin password', '123456')
-            ->expectsQuestion('Please enter an admin name', 'TestAdmin')
-            ->expectsQuestion('Please enter an admin role id', 1)
+            ->expectsQuestion('Please enter admin email', 'mail@mail.com')
+            ->expectsQuestion('Please enter admin password', '123456')
+            ->expectsQuestion('Please enter admin name', 'TestAdmin')
+            ->expectsQuestion('Please enter admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
@@ -686,92 +543,73 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'nova_mail@mail.com')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '654321')
+            ->expectsQuestion('Please enter admin email for Laravel Nova', 'nova_mail@mail.com')
+            ->expectsQuestion('Please enter admin password for Laravel Nova', '654321')
+            ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
+            ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?', 'yes')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
     public function testRunWithoutAdminAndUsingTelescope()
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
-
-        $this->mockFileGetContent(
-            [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
-                'result' => $this->getTemplate('README.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
-                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
-                'result' => $this->getTemplate('RESOURCES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
-                'result' => $this->getTemplate('CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
-                'result' => $this->getTemplate('ENVIRONMENTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
-                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-            ],
-            [
-                'arguments' => [base_path('bootstrap/app.php')],
-                'result' => $this->getFixture('app.php'),
-            ],
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
-        $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
-            [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'README.md',
-                $this->getFixture('partial_readme_with_telescope.md'),
-            ],
-            [
-                base_path('bootstrap/app.php'),
-                $this->getFixture('app_after_changes.php'),
-            ],
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_telescope_admin.php', $this->getFixture('telescope_users_table_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockShellExec(
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_with_telescope.md')),
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
@@ -819,10 +657,14 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Getting Started` part?')
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
-            ->expectsQuestion('Please enter a Laravel Telescope\'s admin email', 'telescope_mail@mail.com')
-            ->expectsQuestion('Please enter a Laravel Telescope\'s admin password', '654321')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin email', 'nova_mail@mail.com')
-            ->expectsQuestion('Please enter a Laravel Nova\'s admin password', '654321')
+            ->expectsQuestion('Please enter admin email for Laravel Telescope', 'telescope_mail@mail.com')
+            ->expectsQuestion('Please enter admin password for Laravel Telescope', '654321')
+            ->expectsQuestion('Please enter admin name for Laravel Telescope', 'Telescope Admin')
+            ->expectsQuestion('Please enter admin role id for Laravel Telescope', 1)
+            ->expectsQuestion('Please enter admin email for Laravel Nova', 'nova_mail@mail.com')
+            ->expectsQuestion('Please enter admin password for Laravel Nova', '654321')
+            ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
+            ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
@@ -830,146 +672,83 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
-    public function testRunWithClerkMobileApp(): void
+    public function testRunWithClerkMobileAppWithPintInstalled(): void
     {
-        $this->mockChangeConfig('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php');
-
-        $this->mockFileGetContent(
-            [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
-                'arguments' => ['.env.development'],
-                'result' => $this->getFixture('env.development.yml'),
-            ],
-            [
-                'arguments' => ['.env.example'],
-                'result' => $this->getFixture('env.example.yml'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/README.md')],
-                'result' => $this->getTemplate('README.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES_AND_CONTACTS.md')],
-                'result' => $this->getTemplate('RESOURCES_AND_CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RESOURCES.md')],
-                'result' => $this->getTemplate('RESOURCES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CONTACTS.md')],
-                'result' => $this->getTemplate('CONTACTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/PREREQUISITES.md')],
-                'result' => $this->getTemplate('PREREQUISITES.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/GETTING_STARTED.md')],
-                'result' => $this->getTemplate('GETTING_STARTED.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/ENVIRONMENTS.md')],
-                'result' => $this->getTemplate('ENVIRONMENTS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CREDENTIALS_AND_ACCESS.md')],
-                'result' => $this->getTemplate('CREDENTIALS_AND_ACCESS.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/CLERK.md')],
-                'result' => $this->getTemplate('CLERK.md'),
-            ],
-            [
-                'arguments' => [base_path('/vendor/ronasit/laravel-project-initializator/resources/md/readme/RENOVATE.md')],
-                'result' => $this->getTemplate('RENOVATE.md'),
-            ],
-            [
-                'arguments' => [base_path('bootstrap/app.php')],
-                'result' => $this->getFixture('app.php'),
-            ],
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
 
-        $this->mockFilePutContent(
-            'env.example.yml',
-            'env.development.yml',
-            [
-                base_path('/routes/web.php'),
-                "\nAuth::routes();\n",
-                FILE_APPEND,
-            ],
-            [
-                'database/migrations/2018_11_11_111111_users_add_clerk_id_field.php',
-                $this->getFixture('users_add_clerk_id_field_migration.php'),
-            ],
-            [
-                'app/Support/Clerk/ClerkUserRepository.php',
-                $this->getFixture('clerk_user_repository.php'),
-            ],
-            [
-                '.env.development',
-                $this->getFixture('env.development_clerk_credentials_added_mobile_app.yml'),
-            ],
-            [
-                '.env.example',
-                $this->getFixture('env.example_clerk_credentials_added_mobile_app.yml'),
-            ],
-            [
-                'database/migrations/2018_11_11_111111_admins_create_table.php',
-                $this->getFixture('admins_table_migration.php'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme_with_mobile_app.md'),
-            ],
-            [
-                'renovate.json',
-                $this->getFixture('renovate.json'),
-            ],
-            [
-                'README.md',
-                $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md'),
-            ],
-            [
-                base_path('bootstrap/app.php'),
-                $this->getFixture('app_after_changes.php'),
-            ],
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('admins_add_default_admin.php')),
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
+            $this->callShellExec('php artisan laravel-clerk:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockShellExec(
-            ['arguments' => 'git ls-remote --get-url origin', 'result' => 'https://github.com/ronasit/laravel-helpers.git'],
-            ['arguments' => 'composer require ronasit/laravel-helpers --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-swagger --ansi'],
-            ['arguments' => 'php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'],
-            ['arguments' => 'composer require --dev ronasit/laravel-entity-generator --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-clerk --ansi'],
-            ['arguments' => 'php artisan laravel-clerk:install --ansi'],
-            ['arguments' => 'composer require ronasit/laravel-telescope-extension --ansi'],
-            ['arguments' => 'php artisan telescope:install --ansi'],
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md')),
         );
 
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify a Code Owner/Team Lead's email", 'test@example.com')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
-            ->expectsQuestion('Please enter an admin email', 'mail@mail.com')
-            ->expectsQuestion('Please enter an admin password', '123456')
+            ->expectsQuestion('Please enter admin email', 'mail@mail.com')
+            ->expectsQuestion('Please enter admin password', '123456')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
@@ -1023,25 +802,154 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please type username of the project reviewer', 'reviewer')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
-
-        $this->assertWebLoginPublished();
     }
 
-    protected function assertWebLoginPublished(): void
+    public function testRunWithClerkAdditionalAdminsWithoutDefaultAdmin(): void
     {
-        $this->assertFileEqualsFixture('login_controller.php', app_path('Http/Controllers/Auth/LoginController.php'));
-        $this->assertFileEqualsFixture('app.css', public_path('app.css'));
-        $this->assertFileEqualsFixture('app.js', public_path('app.js'));
-        $this->assertFileEqualsFixture('app.blade.php', resource_path('views/layouts/app.blade.php'));
-        $this->assertFileEqualsFixture('login.blade.php', resource_path('views/auth/login.blade.php'));
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
+        );
 
-        File::deleteDirectory(app_path());
-        File::deleteDirectory(public_path());
-        File::deleteDirectory(resource_path('views/layouts'));
-        File::deleteDirectory(resource_path('views/auth'));
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development'),
+
+            $this->callCopy('.env.example', '.env'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_telescope_admin.php', $this->getFixture('admins_add_telescope_admin_migration.php')),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111111_admins_create_table.php')]),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('admins_add_nova_admin_migration.php')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
+            $this->callShellExec('php artisan laravel-clerk:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators', 
+            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
+            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_clerk_with_credentials.md')),
+        );
+
+        $this
+            ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
+            ->expectsOutput('Project initialized successfully!')
+            ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Web')
+            ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
+            ->expectsConfirmation('Do you want to generate an admin user?')
+            ->expectsConfirmation('Do you want to generate a README file?', 'yes')
+            ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
+            ->expectsQuestion(
+                'Are you going to use Issue Tracker? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'no',
+            )
+            ->expectsQuestion(
+                'Are you going to use Figma? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'no',
+            )
+            ->expectsQuestion(
+                'Are you going to use Sentry? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'no',
+            )
+            ->expectsQuestion(
+                'Are you going to use DataDog? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'no',
+            )
+            ->expectsQuestion(
+                'Are you going to use ArgoCD? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'no',
+            )
+            ->expectsQuestion(
+                'Are you going to use Laravel Telescope? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later',
+            )
+            ->expectsQuestion(
+                'Are you going to use Laravel Nova? '
+                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
+                'later',
+            )
+            ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
+            ->expectsConfirmation('Do you need a `Prerequisites` part?')
+            ->expectsConfirmation('Do you need a `Getting Started` part?')
+            ->expectsConfirmation('Do you need an `Environments` part?')
+            ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
+            ->expectsQuestion('Please enter admin email for Laravel Telescope', 'telescope_mail@mail.com')
+            ->expectsQuestion('Please enter admin password for Laravel Telescope', '654321')
+            ->expectsQuestion('Please enter admin email for Laravel Nova', 'mail@mail.com')
+            ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
+            ->expectsOutput('README generated successfully!')
+            ->expectsOutput('Don`t forget to fill the following empty values:')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsConfirmation('Do you want to install media package?')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->assertExitCode(0);
+    }
+
+    public function testDefaultAdminsCredentials(): void
+    {
+        $commandMock = Mockery::mock(InitCommand::class)->shouldAllowMockingProtectedMethods();
+
+        $commandMock->shouldReceive('ask')->andReturnUsing(fn ($question, $default) => $default);
+        $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
+
+        $authTypeProperty = new ReflectionProperty(InitCommand::class, 'authType');
+        $authTypeProperty->setAccessible(true);
+        $authTypeProperty->setValue($commandMock, AuthTypeEnum::None);
+
+        $kebabAppNameProperty = new ReflectionProperty(InitCommand::class, 'kebabAppName');
+        $kebabAppNameProperty->setAccessible(true);
+        $kebabAppNameProperty->setValue($commandMock, 'my-app');
+
+        $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
+        $credentials = $createAdminMethod->invoke($commandMock);
+
+        $this->assertEquals('Admin', $credentials['name']);
     }
 }

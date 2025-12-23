@@ -22,6 +22,9 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
         ], 'initializator-web-login');
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'initializator');
-        $this->loadViewsFrom(__DIR__ . '/../stubs', 'project-initializator');
+
+        $this->publishes([
+            __DIR__ . '/../resources/pint.json' => base_path('pint.json'),
+        ], 'pint-config');
     }
 }
