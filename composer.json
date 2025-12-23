@@ -41,7 +41,8 @@
         "php-coveralls/php-coveralls": "^2.7",
         "orchestra/testbench": "^10.8.0",
         "friendsofphp/php-cs-fixer": "^3.62",
-        "brainmaestro/composer-git-hooks": "^3.0"
+        "brainmaestro/composer-git-hooks": "^3.0",
+        "ronasit/larabuilder": "dev-app-bootstrap-visitor-fixes"
     },
     "extra": {
         "laravel": {

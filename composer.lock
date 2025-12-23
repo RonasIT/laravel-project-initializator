@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0e5de9d258b1c30f1aac46d0ecd0fc68",
+    "content-hash": "2f2a8a79093e301a287c637a71eb6592",
     "packages": [
         {
             "name": "brick/math",
@@ -10792,6 +10792,57 @@
             "time": "2024-06-11T12:45:25+00:00"
         },
         {
+            "name": "ronasit/larabuilder",
+            "version": "dev-app-bootstrap-visitor-fixes",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/RonasIT/larabuilder.git",
+                "reference": "7db65eae351bf9a639c01aa447d20bf081bdc3a7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/RonasIT/larabuilder/zipball/7db65eae351bf9a639c01aa447d20bf081bdc3a7",
+                "reference": "7db65eae351bf9a639c01aa447d20bf081bdc3a7",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^12.28",
+                "nikic/php-parser": "^5.6",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.25",
+                "orchestra/testbench": "^10.6",
+                "php-coveralls/php-coveralls": "^2.8",
+                "phpunit/phpunit": "^12.3",
+                "ronasit/laravel-helpers": ">=3.5.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "RonasIT\\Larabuilder\\": "src/",
+                    "RonasIT\\Larabuilder\\Tests\\": "tests/",
+                    "RonasIT\\Larabuilder\\Tests\\Support\\": "tests/Support"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ronas IT",
+                    "homepage": "https://github.com/RonasIT/larabuilder/graphs/contributors"
+                }
+            ],
+            "description": "A great tool for creating and modifying PHP classes in Laravel, providing utilities to generate boilerplate code, add methods, properties, and annotations with ease.",
+            "support": {
+                "issues": "https://github.com/RonasIT/larabuilder/issues",
+                "source": "https://github.com/RonasIT/larabuilder/tree/app-bootstrap-visitor-fixes"
+            },
+            "time": "2025-12-23T06:20:58+00:00"
+        },
+        {
             "name": "symfony/config",
             "version": "v8.0.1",
             "source": {
@@ -11235,7 +11286,9 @@
     ],
     "aliases": [],
     "minimum-stability": "alpha",
-    "stability-flags": {},
+    "stability-flags": {
+        "ronasit/larabuilder": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
