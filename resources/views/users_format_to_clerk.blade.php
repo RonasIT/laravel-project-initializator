@@ -30,7 +30,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('clerk_id');
 
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('name')->nullable(false)->change();
             $table->string('email')->nullable(false)->change();
             $table->rememberToken();
