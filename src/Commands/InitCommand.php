@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
@@ -264,6 +265,10 @@ class InitCommand extends Command implements Isolatable
     protected function configureClerk(): void
     {
         $this->enableClerk();
+
+        (new PHPFileBuilder(app_path('Models/User.php')))
+            ->addArrayPropertyItem('fillable', 'clerk_id')
+            ->save();
 
         $data = [
             'AUTH_GUARD' => 'clerk',

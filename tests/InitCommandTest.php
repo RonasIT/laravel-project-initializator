@@ -247,6 +247,12 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('README.md', $this->getFixture('default_readme_after_using_renovate.md')),
         );
 
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
+            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
+        );
+
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
@@ -738,6 +744,12 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md')),
         );
 
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
+            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
+        );
+
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
@@ -867,6 +879,12 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
             $this->callFilePutContent('README.md', $this->getFixture('partial_readme_clerk_with_credentials.md')),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
+            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
         );
 
         $this
