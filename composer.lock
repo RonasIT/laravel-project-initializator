@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "14db43a6cacb342f18d0a014b4f3acac",
+    "content-hash": "801b4852173b4b1cd92e4cf33f32cd20",
     "packages": [
         {
             "name": "brick/math",
@@ -4824,22 +4824,22 @@
         },
         {
             "name": "ronasit/larabuilder",
-            "version": "dev-app-bootstrap-visitor-fixes",
+            "version": "0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RonasIT/larabuilder.git",
-                "reference": "414f921dee0a5c480ec9f768cd98c30d871bc003"
+                "reference": "df988e38296db1d2a1a2eb1b23597e5098d8eb85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RonasIT/larabuilder/zipball/414f921dee0a5c480ec9f768cd98c30d871bc003",
-                "reference": "414f921dee0a5c480ec9f768cd98c30d871bc003",
+                "url": "https://api.github.com/repos/RonasIT/larabuilder/zipball/df988e38296db1d2a1a2eb1b23597e5098d8eb85",
+                "reference": "df988e38296db1d2a1a2eb1b23597e5098d8eb85",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": "^12.28",
                 "nikic/php-parser": "^5.6",
-                "php": "^8.3"
+                "php": "^8.4"
             },
             "require-dev": {
                 "laravel/pint": "^1.25",
@@ -4869,9 +4869,9 @@
             "description": "A great tool for creating and modifying PHP classes in Laravel, providing utilities to generate boilerplate code, add methods, properties, and annotations with ease.",
             "support": {
                 "issues": "https://github.com/RonasIT/larabuilder/issues",
-                "source": "https://github.com/RonasIT/larabuilder/tree/app-bootstrap-visitor-fixes"
+                "source": "https://github.com/RonasIT/larabuilder/tree/0.0.2"
             },
-            "time": "2025-12-23T08:15:39+00:00"
+            "time": "2025-12-24T08:29:29+00:00"
         },
         {
             "name": "ronasit/laravel-helpers",
@@ -11286,9 +11286,7 @@
     ],
     "aliases": [],
     "minimum-stability": "alpha",
-    "stability-flags": {
-        "ronasit/larabuilder": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
