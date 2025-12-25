@@ -582,7 +582,7 @@ class InitCommand extends Command implements Isolatable
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: '
-                    return $request->expectsJson()
+                    return ($request->expectsJson())
                         ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
                         : null;
                 ',
