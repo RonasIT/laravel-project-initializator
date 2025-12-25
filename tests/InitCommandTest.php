@@ -237,7 +237,6 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
-            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -268,7 +267,10 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme_after_using_renovate.md')),
+
+            $this->callFilePutContent('README.md', $this->getFixture('default_readme.md')),
+
+            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
         );
 
         $this
@@ -489,7 +491,6 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
-            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -519,7 +520,9 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-            $this->callFilePutContent('README.md', $this->getFixture('full_readme_after_using_renovate.md')),
+            $this->callFilePutContent('README.md', $this->getFixture('full_readme.md')),
+
+            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
         );
 
         $this
@@ -752,7 +755,6 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
-            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -783,7 +785,10 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md')),
+
+            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app.md')),
+
+            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
         );
 
         $this
@@ -993,15 +998,18 @@ class InitCommandTest extends TestCase
         $commandMock->shouldReceive('ask')->andReturnUsing(fn ($question, $default) => $default);
         $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
 
-        $authTypeProperty = new ReflectionProperty(InitCommand::class, 'authType');
-        $authTypeProperty->setValue($commandMock, AuthTypeEnum::None);
-
-        $kebabAppNameProperty = new ReflectionProperty(InitCommand::class, 'kebabAppName');
-        $kebabAppNameProperty->setValue($commandMock, 'my-app');
+        $this->setReflectionProperty($commandMock, InitCommand::class, 'authType', AuthTypeEnum::None);
+        $this->setReflectionProperty($commandMock, InitCommand::class, 'kebabAppName', 'my-app');
 
         $createAdminMethod = ReflectionMethod::createFromMethodName(InitCommand::class . '::createAdminUser');
         $credentials = $createAdminMethod->invoke($commandMock);
 
         $this->assertEquals('Admin', $credentials['name']);
+    }
+
+    protected function setReflectionProperty(object $object, string $class, string $property, mixed $value): void
+    {
+        $reflection = new ReflectionProperty($class, $property);
+        $reflection->setValue($object, $value);
     }
 }
