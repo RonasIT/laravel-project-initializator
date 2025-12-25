@@ -2,18 +2,20 @@
 
 namespace RonasIT\ProjectInitializator\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Contracts\Console\Isolatable;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use Illuminate\Console\Command;
+use Illuminate\Contracts\View\View;
+use Winter\LaravelConfigWriter\EnvFile;
+use Illuminate\Support\Facades\Validator;
+use Winter\LaravelConfigWriter\ArrayFile;
+use Illuminate\Contracts\Console\Isolatable;
+use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
-use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use Winter\LaravelConfigWriter\ArrayFile;
-use Winter\LaravelConfigWriter\EnvFile;
+use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 
 class InitCommand extends Command implements Isolatable
@@ -186,6 +188,8 @@ class InitCommand extends Command implements Isolatable
         if ($this->shouldUninstallPackage) {
             shell_exec('composer remove --dev ronasit/laravel-project-initializator --ansi');
         }
+
+        $this->addDefaultHttpExceptionRender();
 
         $this->runMigrations();
     }
@@ -570,6 +574,21 @@ class InitCommand extends Command implements Isolatable
         shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
 
         file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
+    }
+
+    protected function addDefaultHttpExceptionRender(): void
+    {
+        new AppBootstrapBuilder()
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: '
+                    return ($request->expectsJson())
+                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
+                        : null;
+                ',
+                includeRequestArg: true,
+            )
+            ->save();
     }
 
     protected function runMigrations(): void

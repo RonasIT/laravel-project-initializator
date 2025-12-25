@@ -24,6 +24,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development', false),
@@ -80,6 +86,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env'),
             $this->callFileExists('.env.development'),
@@ -130,6 +142,12 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
 
         $this->mockNativeFunction(
@@ -192,6 +210,12 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
 
         $this->mockNativeFunction(
@@ -330,6 +354,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -436,6 +466,12 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
 
         $this->mockNativeFunction(
@@ -566,6 +602,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -685,6 +727,12 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
 
         $this->mockNativeFunction(
@@ -822,6 +870,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -940,14 +994,12 @@ class InitCommandTest extends TestCase
         $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
 
         $authTypeProperty = new ReflectionProperty(InitCommand::class, 'authType');
-        $authTypeProperty->setAccessible(true);
         $authTypeProperty->setValue($commandMock, AuthTypeEnum::None);
 
         $kebabAppNameProperty = new ReflectionProperty(InitCommand::class, 'kebabAppName');
-        $kebabAppNameProperty->setAccessible(true);
         $kebabAppNameProperty->setValue($commandMock, 'my-app');
 
-        $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
+        $createAdminMethod = ReflectionMethod::createFromMethodName(InitCommand::class . '::createAdminUser');
         $credentials = $createAdminMethod->invoke($commandMock);
 
         $this->assertEquals('Admin', $credentials['name']);
