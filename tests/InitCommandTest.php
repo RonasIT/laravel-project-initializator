@@ -203,7 +203,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_format_to_clerk.php', $this->getFixture('users_format_to_clerk_migration.php')),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('admins_add_default_admin.php')),
@@ -702,7 +702,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_format_to_clerk.php', $this->getFixture('users_format_to_clerk_migration.php')),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('admins_add_default_admin.php')),
@@ -842,7 +842,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_format_to_clerk.php', $this->getFixture('users_format_to_clerk_migration.php')),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),

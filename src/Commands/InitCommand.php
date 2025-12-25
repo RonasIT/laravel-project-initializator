@@ -306,8 +306,8 @@ class InitCommand extends Command implements Isolatable
         );
 
         $this->publishMigration(
-            view: view('initializator::users_add_clerk_id_field'),
-            migrationName: 'users_add_clerk_id_field',
+            view: view('initializator::users_format_to_clerk'),
+            migrationName: 'users_format_to_clerk',
         );
 
         $this->publishClass(
