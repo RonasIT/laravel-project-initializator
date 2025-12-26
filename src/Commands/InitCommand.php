@@ -2,20 +2,22 @@
 
 namespace RonasIT\ProjectInitializator\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Contracts\Console\Isolatable;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use RonasIT\Larabuilder\PHPFileBuilder;
+use Illuminate\Support\Carbon;
+use Illuminate\Console\Command;
+use Illuminate\Contracts\View\View;
+use Winter\LaravelConfigWriter\EnvFile;
+use Illuminate\Support\Facades\Validator;
+use Winter\LaravelConfigWriter\ArrayFile;
+use Illuminate\Contracts\Console\Isolatable;
+use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
-use RonasIT\ProjectInitializator\Enums\RoleEnum;
-use Winter\LaravelConfigWriter\ArrayFile;
-use Winter\LaravelConfigWriter\EnvFile;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
+use RonasIT\Larabuilder\Builders\PHPFileBuilder;
+use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -188,6 +190,8 @@ class InitCommand extends Command implements Isolatable
             shell_exec('composer remove --dev ronasit/laravel-project-initializator --ansi');
         }
 
+        $this->addDefaultHttpExceptionRender();
+
         $this->runMigrations();
     }
 
@@ -266,7 +270,7 @@ class InitCommand extends Command implements Isolatable
     {
         $this->enableClerk();
 
-        (new PHPFileBuilder(app_path('Models/User.php')))
+        new PHPFileBuilder(app_path('Models/User.php'))
             ->addArrayPropertyItem('fillable', 'clerk_id')
             ->save();
 
@@ -306,8 +310,8 @@ class InitCommand extends Command implements Isolatable
         );
 
         $this->publishMigration(
-            view: view('initializator::users_add_clerk_id_field'),
-            migrationName: 'users_add_clerk_id_field',
+            view: view('initializator::users_format_to_clerk'),
+            migrationName: 'users_format_to_clerk',
         );
 
         $this->publishClass(
@@ -575,6 +579,21 @@ class InitCommand extends Command implements Isolatable
         shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
 
         file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
+    }
+
+    protected function addDefaultHttpExceptionRender(): void
+    {
+        new AppBootstrapBuilder()
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: '
+                    return ($request->expectsJson())
+                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
+                        : null;
+                ',
+                includeRequestArg: true,
+            )
+            ->save();
     }
 
     protected function runMigrations(): void

@@ -24,6 +24,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development', false),
@@ -80,6 +86,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env'),
             $this->callFileExists('.env.development'),
@@ -130,6 +142,12 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
 
         $this->mockNativeFunction(
@@ -195,6 +213,14 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
+            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -203,7 +229,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_format_to_clerk.php', $this->getFixture('users_format_to_clerk_migration.php')),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('admins_add_default_admin.php')),
@@ -245,12 +271,6 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
             $this->callFilePutContent('README.md', $this->getFixture('default_readme_after_using_renovate.md')),
-        );
-
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
-            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
-            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
         );
 
         $this
@@ -333,6 +353,12 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
 
         $this->mockNativeFunction(
@@ -442,6 +468,12 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
 
         $this->mockNativeFunction(
@@ -572,6 +604,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -694,6 +732,14 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
+            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -702,7 +748,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_format_to_clerk.php', $this->getFixture('users_format_to_clerk_migration.php')),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('admins_add_default_admin.php')),
@@ -742,12 +788,6 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
             $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app_after_using_renovate.md')),
-        );
-
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
-            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
-            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
         );
 
         $this
@@ -834,6 +874,14 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
+            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -842,7 +890,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_clerk_id_field.php', $this->getFixture('users_add_clerk_id_field_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111111_users_format_to_clerk.php', $this->getFixture('users_format_to_clerk_migration.php')),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
@@ -879,12 +927,6 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
             $this->callFilePutContent('README.md', $this->getFixture('partial_readme_clerk_with_credentials.md')),
-        );
-
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
-            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
-            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
         );
 
         $this
@@ -958,14 +1000,12 @@ class InitCommandTest extends TestCase
         $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
 
         $authTypeProperty = new ReflectionProperty(InitCommand::class, 'authType');
-        $authTypeProperty->setAccessible(true);
         $authTypeProperty->setValue($commandMock, AuthTypeEnum::None);
 
         $kebabAppNameProperty = new ReflectionProperty(InitCommand::class, 'kebabAppName');
-        $kebabAppNameProperty->setAccessible(true);
         $kebabAppNameProperty->setValue($commandMock, 'my-app');
 
-        $createAdminMethod = new ReflectionMethod(InitCommand::class, 'createAdminUser');
+        $createAdminMethod = ReflectionMethod::createFromMethodName(InitCommand::class . '::createAdminUser');
         $credentials = $createAdminMethod->invoke($commandMock);
 
         $this->assertEquals('Admin', $credentials['name']);
