@@ -214,6 +214,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
+            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
             $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
             $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
@@ -731,6 +733,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
+            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
             $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
             $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
@@ -871,6 +875,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
+            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
             $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
             $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
