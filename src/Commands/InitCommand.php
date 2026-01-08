@@ -14,9 +14,10 @@ use Illuminate\Contracts\Console\Isolatable;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
-use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
+use RonasIT\Larabuilder\Builders\PHPFileBuilder;
+use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -242,6 +243,10 @@ class InitCommand extends Command implements Isolatable
     protected function configureClerk(): void
     {
         $this->enableClerk();
+
+        new PHPFileBuilder(app_path('Models/User.php'))
+            ->addArrayPropertyItem('fillable', 'clerk_id')
+            ->save();
 
         $data = [
             'AUTH_GUARD' => 'clerk',
