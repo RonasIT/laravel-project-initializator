@@ -227,47 +227,47 @@ class ReadmeGenerator
 
     public function addRenovate(): void
     {
-        $this->enabledParts[] = 'fillRenovate';
+        $this->enabledParts[] = [$this, 'fillRenovate'];
     }
 
     public function addResourcesAndContacts(): void
     {
-        $this->enabledParts[] = 'fillResourcesAndContacts';
+        $this->enabledParts[] = [$this, 'fillResourcesAndContacts'];
     }
 
     public function addResources(): void
     {
-        $this->enabledParts[] = 'fillResources';
+        $this->enabledParts[] = [$this, 'fillResources'];
     }
 
     public function addContacts(): void
     {
-        $this->enabledParts[] = 'fillContacts';
+        $this->enabledParts[] = [$this, 'fillContacts'];
     }
 
     public function addPrerequisites(): void
     {
-        $this->enabledParts[] = 'fillPrerequisites';
+        $this->enabledParts[] = [$this, 'fillPrerequisites'];
     }
 
     public function addGettingStarted(): void
     {
-        $this->enabledParts[] = 'fillGettingStarted';
+        $this->enabledParts[] = [$this, 'fillGettingStarted'];
     }
 
     public function addEnvironments(): void
     {
-        $this->enabledParts[] = 'fillEnvironments';
+        $this->enabledParts[] = [$this, 'fillEnvironments'];
     }
 
     public function addCredentialsAndAccess(): void
     {
-        $this->enabledParts[] = 'fillCredentialsAndAccess';
+        $this->enabledParts[] = [$this, 'fillCredentialsAndAccess'];
     }
 
     public function addClerkAuthType(): void
     {
-        $this->enabledParts[] = 'fillClerkAuthType';
+        $this->enabledParts[] = [$this, 'fillClerkAuthType'];
     }
 
     public function save(): void
@@ -275,9 +275,7 @@ class ReadmeGenerator
         $this->prepareReadme();
 
         foreach ($this->enabledParts as $part) {
-            if (method_exists($this, $part)) {
-                $this->{$part}();
-            }
+            $part();
         }
 
         $this->saveReadme();
