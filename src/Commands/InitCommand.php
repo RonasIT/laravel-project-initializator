@@ -437,11 +437,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator->credentialsItems['admin'] = [
-                'title' => 'Default admin',
-                'email' => $this->adminCredentials['email'],
-                'password' => $this->adminCredentials['password'],
-            ];
+            $this->readmeGenerator->addAdmin($this->adminCredentials['email'], $this->adminCredentials['password']);
         }
     }
 

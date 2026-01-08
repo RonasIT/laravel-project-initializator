@@ -147,14 +147,15 @@ class ReadmeGenerator
                 $this->setReadmeValue($filePart, "{$key}_email", $item['email']);
                 $this->setReadmeValue($filePart, "{$key}_password", $item['password']);
                 $this->removeTag($filePart, "{$key}_credentials");
+            } else {
+                $this->removeTag($filePart, "{$key}_credentials", true);
             }
-
-            $this->removeTag($filePart, "{$key}_credentials", true);
         }
 
         if (!Arr::has($this->credentialsItems, 'admin')) {
             $this->removeTag($filePart, 'admin_credentials', true);
         }
+
         $this->updateReadmeFile($filePart);
     }
 
@@ -211,6 +212,15 @@ class ReadmeGenerator
         $this->appType = $appType;
         $this->appUrl = $appUrl;
         $this->codeOwnerEmail = $codeOwnerEmail;
+    }
+
+    public function addAdmin(string $email, string $password): void
+    {
+        $this->credentialsItems['admin'] = [
+            'title' => 'Default admin',
+            'email' => $email,
+            'password' => $password,
+        ];
     }
 
     public function generate(array $parts): void
