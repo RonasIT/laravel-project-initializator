@@ -82,13 +82,11 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
-        $this->appType = AppTypeEnum::from(
-            $this->choice(
-                question: 'What type of application will your API serve?',
-                choices: AppTypeEnum::values(),
-                default: AppTypeEnum::Multiplatform->value,
-            ),
-        );
+        $this->appType = AppTypeEnum::from($this->choice(
+            question: 'What type of application will your API serve?',
+            choices: AppTypeEnum::values(),
+            default: AppTypeEnum::Multiplatform->value,
+        ));
 
         $this->authType = AuthTypeEnum::from($this->choice(
             question: 'Please choose the authentication type',
@@ -349,12 +347,12 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureReadmeParts(): void
     {
-        $this->readmeGenerator->appInfo = [
-            'name' => $this->appName,
-            'type' => $this->appType->value,
-            'url' => $this->appUrl,
-            'code_owner_email' => $this->codeOwnerEmail,
-        ];
+        $this->readmeGenerator->setAppInfo(
+            appName: $this->appName,
+            appType: $this->appType->value,
+            appUrl: $this->appUrl,
+            codeOwnerEmail: $this->codeOwnerEmail,
+        );
 
         if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
             $this->configureResources();
@@ -550,7 +548,6 @@ class InitCommand extends Command implements Isolatable
 
         shell_exec('php artisan migrate --ansi --force');
     }
-
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
     {

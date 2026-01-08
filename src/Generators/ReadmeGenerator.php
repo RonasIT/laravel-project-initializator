@@ -10,7 +10,10 @@ class ReadmeGenerator
 
     protected string $readmeContent = '';
 
-    public array $appInfo = [];
+    protected string $appName;
+    protected string $appType;
+    protected string $appUrl;
+    protected string $codeOwnerEmail;
 
     public array $resourcesItems = [
         'issue_tracker' => [
@@ -57,8 +60,8 @@ class ReadmeGenerator
     {
         $file = $this->loadReadmePart('README.md');
 
-        $this->setReadmeValue($file, 'project_name', $this->appInfo['name']);
-        $this->setReadmeValue($file, 'type', $this->appInfo['type']);
+        $this->setReadmeValue($file, 'project_name', $this->appName);
+        $this->setReadmeValue($file, 'type', $this->appType);
 
         $this->readmeContent = $file;
     }
@@ -87,7 +90,7 @@ class ReadmeGenerator
             $this->removeTag($filePart, $key, $resource['link'] === 'no');
         }
 
-        $this->setReadmeValue($filePart, 'api_link', $this->appInfo['url']);
+        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
         $this->updateReadmeFile($filePart);
     }
 
@@ -103,7 +106,7 @@ class ReadmeGenerator
             $this->removeTag($filePart, $key);
         }
 
-        $this->setReadmeValue($filePart, 'team_lead_link', $this->appInfo['code_owner_email']);
+        $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
 
         $this->updateReadmeFile($filePart);
     }
@@ -131,7 +134,7 @@ class ReadmeGenerator
     {
         $filePart = $this->loadReadmePart('ENVIRONMENTS.md');
 
-        $this->setReadmeValue($filePart, 'api_link', $this->appInfo['url']);
+        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
         $this->updateReadmeFile($filePart);
     }
 
@@ -200,6 +203,14 @@ class ReadmeGenerator
             : "# {0,1}{(/*){$tag}}#";
 
         $text = preg_replace($regex, '', $text);
+    }
+
+    public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
+    {
+        $this->appName = $appName;
+        $this->appType = $appType;
+        $this->appUrl = $appUrl;
+        $this->codeOwnerEmail = $codeOwnerEmail;
     }
 
     public function generate(array $parts): void
