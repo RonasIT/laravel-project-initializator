@@ -53,6 +53,8 @@ class InitCommand extends Command implements Isolatable
     protected AuthTypeEnum $authType;
     protected string $codeOwnerEmail;
 
+    protected ?ReadmeGenerator $readmeGenerator = null;
+
     protected array $defaultDBConnectionConfig = [
         'driver' => 'pgsql',
         'host' => 'pgsql',
@@ -60,12 +62,6 @@ class InitCommand extends Command implements Isolatable
         'database' => 'postgres',
         'username' => 'postgres',
     ];
-
-    public function __construct(
-        protected ReadmeGenerator $readmeGenerator,
-    ) {
-        parent::__construct();
-    }
 
     public function handle(): void
     {
@@ -113,11 +109,11 @@ class InitCommand extends Command implements Isolatable
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
-            $this->readmeParts[] = 'fillRenovate';
+            $this->readmeGenerator?->addRenovate();
         }
 
         if ($shouldGenerateReadme) {
-            $this->readmeGenerator->generate($this->readmeParts);
+            $this->readmeGenerator?->save();
 
             $this->info('README generated successfully!');
 
@@ -347,6 +343,8 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureReadmeParts(): void
     {
+        $this->readmeGenerator = app(ReadmeGenerator::class);
+
         $this->readmeGenerator->setAppInfo(
             appName: $this->appName,
             appType: $this->appType->value,
@@ -358,30 +356,30 @@ class InitCommand extends Command implements Isolatable
             $this->configureResources();
             $this->configureContacts();
 
-            $this->readmeParts[] = 'fillResourcesAndContacts';
-            $this->readmeParts[] = 'fillResources';
-            $this->readmeParts[] = 'fillContacts';
+            $this->readmeGenerator?->addResourcesAndContacts();
+            $this->readmeGenerator?->addResources();
+            $this->readmeGenerator?->addContacts();
         }
 
         if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeParts[] = 'fillPrerequisites';
+            $this->readmeGenerator?->addPrerequisites();
         }
 
         if ($this->confirm('Do you need a `Getting Started` part?', true)) {
-            $this->readmeParts[] = 'fillGettingStarted';
+            $this->readmeGenerator?->addGettingStarted();
         }
 
         if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeParts[] = 'fillEnvironments';
+            $this->readmeGenerator?->addEnvironments();
         }
 
         if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
             $this->configureCredentialsAndAccess();
 
-            $this->readmeParts[] = 'fillCredentialsAndAccess';
+            $this->readmeGenerator?->addCredentialsAndAccess();
 
             if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeParts[] = 'fillClerkAuthType';
+                $this->readmeGenerator?->addClerkAuthType();
             }
         }
     }

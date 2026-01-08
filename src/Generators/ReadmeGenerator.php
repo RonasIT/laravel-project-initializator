@@ -10,6 +10,8 @@ class ReadmeGenerator
 
     protected string $readmeContent = '';
 
+    protected array $enabledParts = [];
+
     protected string $appName;
     protected string $appType;
     protected string $appUrl;
@@ -223,11 +225,56 @@ class ReadmeGenerator
         ];
     }
 
-    public function generate(array $parts): void
+    public function addRenovate(): void
+    {
+        $this->enabledParts[] = 'fillRenovate';
+    }
+
+    public function addResourcesAndContacts(): void
+    {
+        $this->enabledParts[] = 'fillResourcesAndContacts';
+    }
+
+    public function addResources(): void
+    {
+        $this->enabledParts[] = 'fillResources';
+    }
+
+    public function addContacts(): void
+    {
+        $this->enabledParts[] = 'fillContacts';
+    }
+
+    public function addPrerequisites(): void
+    {
+        $this->enabledParts[] = 'fillPrerequisites';
+    }
+
+    public function addGettingStarted(): void
+    {
+        $this->enabledParts[] = 'fillGettingStarted';
+    }
+
+    public function addEnvironments(): void
+    {
+        $this->enabledParts[] = 'fillEnvironments';
+    }
+
+    public function addCredentialsAndAccess(): void
+    {
+        $this->enabledParts[] = 'fillCredentialsAndAccess';
+    }
+
+    public function addClerkAuthType(): void
+    {
+        $this->enabledParts[] = 'fillClerkAuthType';
+    }
+
+    public function save(): void
     {
         $this->prepareReadme();
 
-        foreach ($parts as $part) {
+        foreach ($this->enabledParts as $part) {
             if (method_exists($this, $part)) {
                 $this->{$part}();
             }
