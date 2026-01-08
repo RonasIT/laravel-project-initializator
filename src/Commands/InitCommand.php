@@ -3,10 +3,12 @@
 namespace RonasIT\ProjectInitializator\Commands;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\View\View;
+use RonasIT\ProjectInitializator\DTO\GenerateReadmeStepDTO;
 use Winter\LaravelConfigWriter\EnvFile;
 use Illuminate\Support\Facades\Validator;
 use Winter\LaravelConfigWriter\ArrayFile;
@@ -377,30 +379,56 @@ class InitCommand extends Command implements Isolatable
     {
         $this->readmeGenerator->generate($this->appName, $this->appType->value, $this->appUrl);
 
-        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
-            $this->readmeGenerator->fillResourcesAndContacts();
-            $this->fillResources();
-            $this->fillContacts();
-        }
+        $shouldGenerateAll = $this->confirm('Do you want to generate all README parts?', true);
 
-        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeGenerator->fillPrerequisites();
-        }
+        $this
+            ->getGenerateReadmeSteps()
+            ->each(function (GenerateReadmeStepDTO $step) use ($shouldGenerateAll) {
+                if ($shouldGenerateAll || $this->confirm($step->question, true)) {
+                    ($step->action)();
+                }
+            });
+    }
 
-        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
-            $this->fillGettingStarted();
-        }
+    protected function getGenerateReadmeSteps(): Collection
+    {
+        return collect([
+            new GenerateReadmeStepDTO(
+                question: 'Do you need a `Resources & Contacts` part?',
+                action: $this->fillResourcesAndContactsStep(...),
+            ),
+            new GenerateReadmeStepDTO(
+                question: 'Do you need a `Prerequisites` part?',
+                action: $this->readmeGenerator->fillPrerequisites(...),
+            ),
+            new GenerateReadmeStepDTO(
+                question: 'Do you need a `Getting Started` part?',
+                action: $this->fillGettingStarted(...),
+            ),
+            new GenerateReadmeStepDTO(
+                question: 'Do you need an `Environments` part?',
+                action: $this->readmeGenerator->fillEnvironments(...),
+            ),
+            new GenerateReadmeStepDTO(
+                question: 'Do you need a `Credentials and Access` part?',
+                action: $this->fillCredentialsAndAccessStep(...),
+            ),
+        ]);
+    }
 
-        if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeGenerator->fillEnvironments();
-        }
+    protected function fillResourcesAndContactsStep(): void
+    {
+        $this->readmeGenerator->fillResourcesAndContacts();
+        $this->fillResources();
+        $this->fillContacts();
+    }
 
-        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
-            $this->fillCredentialsAndAccess();
+    protected function fillCredentialsAndAccessStep(): void
+    {
+        $this->fillCredentialsAndAccess();
 
-            if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator->fillClerkAuth();
-            }
+        if ($this->authType === AuthTypeEnum::Clerk) {
+            $this->readmeGenerator->fillClerkAuth();
         }
     }
 
