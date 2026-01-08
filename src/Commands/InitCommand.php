@@ -379,12 +379,12 @@ class InitCommand extends Command implements Isolatable
     {
         $this->readmeGenerator->generate($this->appName, $this->appType->value, $this->appUrl);
 
-        $shouldGenerateAll = $this->confirm('Do you want to generate all README parts?', true);
+        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
 
         $this
             ->getGenerateReadmeSteps()
-            ->each(function (GenerateReadmeStepDTO $step) use ($shouldGenerateAll) {
-                if ($shouldGenerateAll || $this->confirm($step->question, true)) {
+            ->each(function (GenerateReadmeStepDTO $step) use ($shouldGenerateAllParts) {
+                if ($shouldGenerateAllParts || $this->confirm($step->question, true)) {
                     ($step->action)();
                 }
             });
