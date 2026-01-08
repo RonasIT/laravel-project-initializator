@@ -152,7 +152,7 @@ class ReadmeGenerator
             $this->removeTag($filePart, "{$key}_credentials", true);
         }
 
-        if (!Arr::has($this->credentialsItems, 'admin_credentials')) {
+        if (!Arr::has($this->credentialsItems, 'admin')) {
             $this->removeTag($filePart, 'admin_credentials', true);
         }
         $this->updateReadmeFile($filePart);
