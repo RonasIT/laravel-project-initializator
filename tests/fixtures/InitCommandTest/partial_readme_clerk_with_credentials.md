@@ -24,12 +24,24 @@ Should you need assistance or have questions, feel free to connect with the foll
 Please be mindful of each individual's preferred contact method and office hours.
 
 ## Credentials and Access
-Laravel Telescope access:
-- email `telescope_mail@mail.com`
-- password `654321`
 
+Laravel Telescope access:
+- email
+```
+telescope_mail@mail.com
+```
+- password
+```
+654321
+```
 Laravel Nova access:
-- email `mail@mail.com`
-- password `123456`
+- email
+```
+mail@mail.com
+```
+- password
+```
+123456
+```
 
 Core auth solution is [Clerk](https://clerk.com) so in `development` environment use any test phones and emails from [this list](https://clerk.com/docs/testing/test-emails-and-phones)
