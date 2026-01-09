@@ -427,7 +427,8 @@ class InitCommand extends Command implements Isolatable
                 $adminCredentials = $this->createAdminUser($key, $credential->getTitle());
             }
 
-            $credential->setCredentials($adminCredentials['email'], $adminCredentials['password']);
+            $credential->setEmail($adminCredentials['email']);
+            $credential->setPassword($adminCredentials['password']);
         }
 
         if (!empty($this->adminCredentials)) {

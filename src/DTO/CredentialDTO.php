@@ -25,9 +25,13 @@ final class CredentialDTO
         return $this->password;
     }
 
-    public function setCredentials(string $email, string $password): void
+    public function setEmail(string $email): void
     {
         $this->email = $email;
+    }
+
+    public function setPassword(string $password): void
+    {
         $this->password = $password;
     }
 }
