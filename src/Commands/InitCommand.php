@@ -357,8 +357,6 @@ class InitCommand extends Command implements Isolatable
             $this->configureContacts();
 
             $this->readmeGenerator?->addResourcesAndContacts();
-            $this->readmeGenerator?->addResources();
-            $this->readmeGenerator?->addContacts();
         }
 
         if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
@@ -386,29 +384,28 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureResources(): void
     {
-        foreach ($this->readmeGenerator->resourcesItems as $key => $resource) {
-            $defaultAnswer = (Arr::has($resource, 'default_url')) ? $this->appUrl . "/{$key}" : 'later';
-            $text = "Are you going to use {$resource['title']}? "
+        foreach ($this->readmeGenerator->getConfigurableResources() as $key => $resource) {
+            $defaultAnswer = $resource->hasDefaultUrl() ? $this->appUrl . "/{$key}" : 'later';
+            $text = "Are you going to use {$resource->getTitle()}? "
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.';
 
             $link = $this->anticipate($text, ['later', 'no'], $defaultAnswer);
 
             if ($link === 'later') {
-                $this->emptyValuesList[] = "{$resource['title']} link";
+                $this->emptyValuesList[] = "{$resource->getTitle()} link";
             }
 
-            $this->readmeGenerator->resourcesItems[$key]['link'] = $link;
-            $this->readmeGenerator->resourcesItems[$key]['active'] = ($link !== 'no');
+            $resource->setLink($link);
         }
     }
 
     protected function configureContacts(): void
     {
-        foreach ($this->readmeGenerator->contactsItems as $key => $value) {
-            if ($link = $this->ask("Please enter a {$value['title']}'s email", '')) {
-                $this->readmeGenerator->contactsItems[$key]['email'] = $link;
+        foreach ($this->readmeGenerator->getConfigurableContacts() as $key => $contact) {
+            if ($link = $this->ask("Please enter a {$contact->getTitle()}'s email", '')) {
+                $contact->setEmail($link);
             } else {
-                $this->emptyValuesList[] = "{$value['title']}'s email";
+                $this->emptyValuesList[] = "{$contact->getTitle()}'s email";
             }
         }
     }
@@ -416,7 +413,7 @@ class InitCommand extends Command implements Isolatable
     protected function configureCredentialsAndAccess(): void
     {
         foreach ($this->readmeGenerator->credentialsItems as $key => &$item) {
-            if (!Arr::get($this->readmeGenerator->resourcesItems, "{$key}.active")) {
+            if (!$this->readmeGenerator->getResource($key)?->isActive()) {
                 continue;
             }
 

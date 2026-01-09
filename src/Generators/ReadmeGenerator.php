@@ -3,6 +3,8 @@
 namespace RonasIT\ProjectInitializator\Generators;
 
 use Illuminate\Support\Arr;
+use RonasIT\ProjectInitializator\DTO\ContactDTO;
+use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 
 class ReadmeGenerator
 {
@@ -10,44 +12,16 @@ class ReadmeGenerator
 
     protected string $readmeContent = '';
 
-    protected array $enabledParts = [];
-
     protected string $appName;
     protected string $appType;
     protected string $appUrl;
     protected string $codeOwnerEmail;
 
-    public array $resourcesItems = [
-        'issue_tracker' => [
-            'title' => 'Issue Tracker',
-        ],
-        'figma' => [
-            'title' => 'Figma',
-        ],
-        'sentry' => [
-            'title' => 'Sentry',
-        ],
-        'datadog' => [
-            'title' => 'DataDog',
-        ],
-        'argocd' => [
-            'title' => 'ArgoCD',
-        ],
-        'telescope' => [
-            'title' => 'Laravel Telescope',
-            'default_url' => true,
-        ],
-        'nova' => [
-            'title' => 'Laravel Nova',
-            'default_url' => true,
-        ],
-    ];
+    protected array $enabledParts = [];
 
-    public array $contactsItems = [
-        'manager' => [
-            'title' => 'Manager',
-        ],
-    ];
+    protected array $resources = [];
+
+    protected array $contacts = [];
 
     public array $credentialsItems = [
         'telescope' => [
@@ -57,6 +31,23 @@ class ReadmeGenerator
             'title' => 'Laravel Nova',
         ],
     ];
+
+    public function __construct()
+    {
+        $this->resources = [
+            'issue_tracker' => new ResourceDTO('Issue Tracker'),
+            'figma' => new ResourceDTO('Figma'),
+            'sentry' => new ResourceDTO('Sentry'),
+            'datadog' => new ResourceDTO('DataDog'),
+            'argocd' => new ResourceDTO('ArgoCD'),
+            'telescope' => new ResourceDTO('Laravel Telescope', true),
+            'nova' => new ResourceDTO('Laravel Nova', true),
+        ];
+        
+        $this->contacts = [
+            'manager' => new ContactDTO('Manager'),
+        ];
+    }
 
     protected function prepareReadme(): void
     {
@@ -73,6 +64,10 @@ class ReadmeGenerator
         $filePart = $this->loadReadmePart('RESOURCES_AND_CONTACTS.md');
 
         $this->updateReadmeFile($filePart);
+
+        $this->fillResources();
+
+        $this->fillContacts();
     }
 
     protected function fillResources(): void
@@ -80,16 +75,16 @@ class ReadmeGenerator
         $filePart = $this->loadReadmePart('RESOURCES.md');
         $laterText = '(will be added later)';
 
-        foreach ($this->resourcesItems as $key => $resource) {
-            if ($resource['link'] === 'later') {
+        foreach ($this->resources as $key => $resource) {
+            if ($resource->getLink() === 'later') {
                 $this->setReadmeValue($filePart, "{$key}_link");
                 $this->setReadmeValue($filePart, "{$key}_later", $laterText);
-            } elseif ($resource['link'] !== 'no') {
-                $this->setReadmeValue($filePart, "{$key}_link", $resource['link']);
+            } elseif ($resource->isActive()) {
+                $this->setReadmeValue($filePart, "{$key}_link", $resource->getLink());
                 $this->setReadmeValue($filePart, "{$key}_later");
             }
 
-            $this->removeTag($filePart, $key, $resource['link'] === 'no');
+            $this->removeTag($filePart, $key, !$resource->isActive());
         }
 
         $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
@@ -100,9 +95,11 @@ class ReadmeGenerator
     {
         $filePart = $this->loadReadmePart('CONTACTS.md');
 
-        foreach ($this->contactsItems as $key => $value) {
-            if (Arr::has($value, 'email')) {
-                $this->setReadmeValue($filePart, "{$key}_link", $value['email']);
+        foreach ($this->contacts as $key => $contact) {
+            $email = $contact->getEmail();
+
+            if (!empty($email)) {
+                $this->setReadmeValue($filePart, "{$key}_link", $email);
             }
 
             $this->removeTag($filePart, $key);
@@ -225,6 +222,21 @@ class ReadmeGenerator
         ];
     }
 
+    public function getConfigurableResources(): array
+    {
+        return $this->resources;
+    }
+
+    public function getResource(string $key): ?ResourceDTO
+    {
+        return $this->resources[$key] ?? null;
+    }
+
+    public function getConfigurableContacts(): array
+    {
+        return array_values($this->contacts);
+    }
+
     public function addRenovate(): void
     {
         $this->enabledParts[] = [$this, 'fillRenovate'];
@@ -233,16 +245,6 @@ class ReadmeGenerator
     public function addResourcesAndContacts(): void
     {
         $this->enabledParts[] = [$this, 'fillResourcesAndContacts'];
-    }
-
-    public function addResources(): void
-    {
-        $this->enabledParts[] = [$this, 'fillResources'];
-    }
-
-    public function addContacts(): void
-    {
-        $this->enabledParts[] = [$this, 'fillContacts'];
     }
 
     public function addPrerequisites(): void
