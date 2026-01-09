@@ -2,9 +2,9 @@
 
 namespace RonasIT\ProjectInitializator\Generators;
 
-use Illuminate\Support\Arr;
 use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
+use RonasIT\ProjectInitializator\DTO\CredentialDTO;
 
 class ReadmeGenerator
 {
@@ -23,14 +23,7 @@ class ReadmeGenerator
 
     protected array $contacts = [];
 
-    public array $credentialsItems = [
-        'telescope' => [
-            'title' => 'Laravel Telescope',
-        ],
-        'nova' => [
-            'title' => 'Laravel Nova',
-        ],
-    ];
+    protected array $credentials = [];
 
     public function __construct()
     {
@@ -46,6 +39,11 @@ class ReadmeGenerator
         
         $this->contacts = [
             'manager' => new ContactDTO('Manager'),
+        ];
+
+        $this->credentials = [
+            'telescope' => new CredentialDTO('Laravel Telescope'),
+            'nova' => new CredentialDTO('Laravel Nova'),
         ];
     }
 
@@ -141,17 +139,19 @@ class ReadmeGenerator
     {
         $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
 
-        foreach ($this->credentialsItems as $key => $item) {
-            if (Arr::has($item, 'email')) {
-                $this->setReadmeValue($filePart, "{$key}_email", $item['email']);
-                $this->setReadmeValue($filePart, "{$key}_password", $item['password']);
+        foreach ($this->credentials as $key => $credential) {
+            $email = $credential->getEmail();
+
+            if (!empty($email)) {
+                $this->setReadmeValue($filePart, "{$key}_email", $email);
+                $this->setReadmeValue($filePart, "{$key}_password", $credential->getPassword());
                 $this->removeTag($filePart, "{$key}_credentials");
             } else {
                 $this->removeTag($filePart, "{$key}_credentials", true);
             }
         }
 
-        if (!Arr::has($this->credentialsItems, 'admin')) {
+        if (!$this->getCredential('admin')) {
             $this->removeTag($filePart, 'admin_credentials', true);
         }
 
@@ -213,15 +213,6 @@ class ReadmeGenerator
         $this->codeOwnerEmail = $codeOwnerEmail;
     }
 
-    public function addAdmin(string $email, string $password): void
-    {
-        $this->credentialsItems['admin'] = [
-            'title' => 'Default admin',
-            'email' => $email,
-            'password' => $password,
-        ];
-    }
-
     public function getConfigurableResources(): array
     {
         return $this->resources;
@@ -234,7 +225,22 @@ class ReadmeGenerator
 
     public function getConfigurableContacts(): array
     {
-        return array_values($this->contacts);
+        return $this->contacts;
+    }
+
+    public function getConfigurableCredentials(): array
+    {
+        return $this->credentials;
+    }
+
+    public function getCredential(string $key): ?CredentialDTO
+    {
+        return $this->credentials[$key] ?? null;
+    }
+
+    public function addCredential(string $key, string $title, string $email, string $password): void
+    {
+        $this->credentials[$key] = new CredentialDTO($title, $email, $password);
     }
 
     public function addRenovate(): void

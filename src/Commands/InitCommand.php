@@ -401,7 +401,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureContacts(): void
     {
-        foreach ($this->readmeGenerator->getConfigurableContacts() as $key => $contact) {
+        foreach ($this->readmeGenerator->getConfigurableContacts() as $contact) {
             if ($link = $this->ask("Please enter a {$contact->getTitle()}'s email", '')) {
                 $contact->setEmail($link);
             } else {
@@ -412,27 +412,26 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureCredentialsAndAccess(): void
     {
-        foreach ($this->readmeGenerator->credentialsItems as $key => &$item) {
+        foreach ($this->readmeGenerator->getConfigurableCredentials() as $key => $credential) {
             if (!$this->readmeGenerator->getResource($key)?->isActive()) {
                 continue;
             }
 
-            if (!empty($this->adminCredentials) && $this->confirm("Is {$item['title']}'s admin the same as default one?", true)) {
+            if (!empty($this->adminCredentials) && $this->confirm("Is {$credential->getTitle()}'s admin the same as default one?", true)) {
                 $adminCredentials = $this->adminCredentials;
             } else {
                 if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
                     $this->publishAdminsTableMigration();
                 }
 
-                $adminCredentials = $this->createAdminUser($key, $item['title']);
+                $adminCredentials = $this->createAdminUser($key, $credential->getTitle());
             }
 
-            $item['email'] = $adminCredentials['email'];
-            $item['password'] = $adminCredentials['password'];
+            $credential->setCredentials($adminCredentials['email'], $adminCredentials['password']);
         }
 
         if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator->addAdmin($this->adminCredentials['email'], $this->adminCredentials['password']);
+            $this->readmeGenerator->addCredential('admin', 'Default admin', $this->adminCredentials['email'], $this->adminCredentials['password']);
         }
     }
 
