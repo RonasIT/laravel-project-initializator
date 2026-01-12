@@ -27,9 +27,7 @@ class InitCommand extends Command implements Isolatable
 
     protected array $adminCredentials = [];
 
-    protected array $readmeParts = [];
-
-    protected array $emptyValuesList = [];
+    protected array $emptyResourcesList = [];
 
     protected array $shellCommands = [
         'composer require laravel/ui',
@@ -117,10 +115,10 @@ class InitCommand extends Command implements Isolatable
 
             $this->info('README generated successfully!');
 
-            if ($this->emptyValuesList) {
+            if ($this->emptyResourcesList) {
                 $this->warn('Don`t forget to fill the following empty values:');
 
-                foreach ($this->emptyValuesList as $value) {
+                foreach ($this->emptyResourcesList as $value) {
                     $this->warn("- {$value}");
                 }
             }
@@ -364,6 +362,9 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($this->confirm('Do you need a `Getting Started` part?', true)) {
+            $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
+            $this->readmeGenerator?->addGitProjectPath($gitProjectPath);
+
             $this->readmeGenerator?->addGettingStarted();
         }
 
@@ -384,15 +385,15 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureResources(): void
     {
-        foreach ($this->readmeGenerator->getConfigurableResources() as $key => $resource) {
-            $defaultAnswer = $resource->hasDefaultUrl() ? $this->appUrl . "/{$key}" : 'later';
-            $text = "Are you going to use {$resource->getTitle()}? "
+        foreach ($this->readmeGenerator->getConfigurableResources() as $resource) {
+            $defaultAnswer = ($resource->localPath) ? "{$this->appUrl}/{$resource->localPath}" : 'later';
+            $text = "Are you going to use {$resource->title}? "
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.';
 
             $link = $this->anticipate($text, ['later', 'no'], $defaultAnswer);
 
             if ($link === 'later') {
-                $this->emptyValuesList[] = "{$resource->getTitle()} link";
+                $this->emptyResourcesList[] = "{$resource->title} link";
             }
 
             $resource->setLink($link);
@@ -402,10 +403,10 @@ class InitCommand extends Command implements Isolatable
     protected function configureContacts(): void
     {
         foreach ($this->readmeGenerator->getConfigurableContacts() as $contact) {
-            if ($link = $this->ask("Please enter a {$contact->getTitle()}'s email", '')) {
+            if ($link = $this->ask("Please enter a {$contact->title}'s email", '')) {
                 $contact->setEmail($link);
             } else {
-                $this->emptyValuesList[] = "{$contact->getTitle()}'s email";
+                $this->emptyResourcesList[] = "{$contact->title}'s email";
             }
         }
     }
@@ -417,18 +418,17 @@ class InitCommand extends Command implements Isolatable
                 continue;
             }
 
-            if (!empty($this->adminCredentials) && $this->confirm("Is {$credential->getTitle()}'s admin the same as default one?", true)) {
+            if (!empty($this->adminCredentials) && $this->confirm("Is {$credential->title}'s admin the same as default one?", true)) {
                 $adminCredentials = $this->adminCredentials;
             } else {
                 if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
                     $this->publishAdminsTableMigration();
                 }
 
-                $adminCredentials = $this->createAdminUser($key, $credential->getTitle());
+                $adminCredentials = $this->createAdminUser($key, $credential->title);
             }
 
-            $credential->setEmail($adminCredentials['email']);
-            $credential->setPassword($adminCredentials['password']);
+            $credential->setCredentials($adminCredentials['email'], $adminCredentials['password']);
         }
 
         if (!empty($this->adminCredentials)) {

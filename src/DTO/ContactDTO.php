@@ -5,13 +5,9 @@ namespace RonasIT\ProjectInitializator\DTO;
 final class ContactDTO
 {
     public function __construct(
-        private string $title,
-        private ?string $email = null,
-    ) {}
-
-    public function getTitle(): string
-    {
-        return $this->title;
+        public readonly string $title,
+        protected ?string $email = null,
+    ) {
     }
 
     public function getEmail(): ?string

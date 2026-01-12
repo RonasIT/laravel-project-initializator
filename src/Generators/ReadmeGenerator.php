@@ -9,6 +9,7 @@ use RonasIT\ProjectInitializator\DTO\CredentialDTO;
 class ReadmeGenerator
 {
     protected const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
+    protected const string LATER_TEXT = '(will be added later)';
 
     protected string $readmeContent = '';
 
@@ -16,25 +17,24 @@ class ReadmeGenerator
     protected string $appType;
     protected string $appUrl;
     protected string $codeOwnerEmail;
+    protected string $gitProjectPath;
 
-    protected array $enabledParts = [];
+    protected array $methodsToCall = [];
 
     protected array $resources = [];
-
     protected array $contacts = [];
-
     protected array $credentials = [];
 
     public function __construct()
     {
         $this->resources = [
-            'issue_tracker' => new ResourceDTO('Issue Tracker'),
-            'figma' => new ResourceDTO('Figma'),
-            'sentry' => new ResourceDTO('Sentry'),
-            'datadog' => new ResourceDTO('DataDog'),
-            'argocd' => new ResourceDTO('ArgoCD'),
-            'telescope' => new ResourceDTO('Laravel Telescope', true),
-            'nova' => new ResourceDTO('Laravel Nova', true),
+            new ResourceDTO('issue_tracker', 'Issue Tracker'),
+            new ResourceDTO('figma', 'Figma'),
+            new ResourceDTO('sentry', 'Sentry'),
+            new ResourceDTO('datadog', 'DataDog'),
+            new ResourceDTO('argocd', 'ArgoCD'),
+            new ResourceDTO('telescope', 'Laravel Telescope',  'telescope'),
+            new ResourceDTO('nova', 'Laravel Nova', 'nova'),
         ];
         
         $this->contacts = [
@@ -45,6 +45,101 @@ class ReadmeGenerator
             'telescope' => new CredentialDTO('Laravel Telescope'),
             'nova' => new CredentialDTO('Laravel Nova'),
         ];
+    }
+
+    public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
+    {
+        $this->appName = $appName;
+        $this->appType = $appType;
+        $this->appUrl = $appUrl;
+        $this->codeOwnerEmail = $codeOwnerEmail;
+    }
+
+    public function getConfigurableResources(): array
+    {
+        return $this->resources;
+    }
+
+    public function getResource(string $key): ?ResourceDTO
+    {
+        foreach ($this->resources as $resource) {
+            if ($resource->key === $key) {
+                return $resource;
+            }
+        }
+
+        return null;
+    }
+
+    public function getConfigurableContacts(): array
+    {
+        return $this->contacts;
+    }
+
+    public function getConfigurableCredentials(): array
+    {
+        return $this->credentials;
+    }
+
+    public function getCredential(string $key): ?CredentialDTO
+    {
+        return $this->credentials[$key] ?? null;
+    }
+
+    public function addCredential(string $key, string $title, string $email, string $password): void
+    {
+        $this->credentials[$key] = new CredentialDTO($title, $email, $password);
+    }
+
+    public function addRenovate(): void
+    {
+        $this->methodsToCall[] = 'fillRenovate';
+    }
+
+    public function addResourcesAndContacts(): void
+    {
+        $this->methodsToCall[] = 'fillResourcesAndContacts';
+    }
+
+    public function addPrerequisites(): void
+    {
+        $this->methodsToCall[] = 'fillPrerequisites';
+    }
+
+    public function addGitProjectPath(string $path): void
+    {
+        $this->gitProjectPath = $path;
+    }
+
+    public function addGettingStarted(): void
+    {
+        $this->methodsToCall[] = 'fillGettingStarted';
+    }
+
+    public function addEnvironments(): void
+    {
+        $this->methodsToCall[] = 'fillEnvironments';
+    }
+
+    public function addCredentialsAndAccess(): void
+    {
+        $this->methodsToCall[] = 'fillCredentialsAndAccess';
+    }
+
+    public function addClerkAuthType(): void
+    {
+        $this->methodsToCall[] = 'fillClerkAuthType';
+    }
+
+    public function save(): void
+    {
+        $this->prepareReadme();
+
+        foreach ($this->methodsToCall as $part) {
+            $this->$part();
+        }
+
+        $this->saveReadme();
     }
 
     protected function prepareReadme(): void
@@ -71,18 +166,17 @@ class ReadmeGenerator
     protected function fillResources(): void
     {
         $filePart = $this->loadReadmePart('RESOURCES.md');
-        $laterText = '(will be added later)';
 
-        foreach ($this->resources as $key => $resource) {
+        foreach ($this->resources as $resource) {
             if ($resource->getLink() === 'later') {
-                $this->setReadmeValue($filePart, "{$key}_link");
-                $this->setReadmeValue($filePart, "{$key}_later", $laterText);
+                $this->setReadmeValue($filePart, "{$resource->key}_link");
+                $this->setReadmeValue($filePart, "{$resource->key}_later", self::LATER_TEXT);
             } elseif ($resource->isActive()) {
-                $this->setReadmeValue($filePart, "{$key}_link", $resource->getLink());
-                $this->setReadmeValue($filePart, "{$key}_later");
+                $this->setReadmeValue($filePart, "{$resource->key}_link", $resource->getLink());
+                $this->setReadmeValue($filePart, "{$resource->key}_later");
             }
 
-            $this->removeTag($filePart, $key, !$resource->isActive());
+            $this->removeTag($filePart, $resource->key, !$resource->isActive());
         }
 
         $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
@@ -117,11 +211,10 @@ class ReadmeGenerator
 
     protected function fillGettingStarted(): void
     {
-        $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
-        $projectDirectory = basename($gitProjectPath, '.git');
+        $projectDirectory = basename($this->gitProjectPath, '.git');
         $filePart = $this->loadReadmePart('GETTING_STARTED.md');
 
-        $this->setReadmeValue($filePart, 'git_project_path', $gitProjectPath);
+        $this->setReadmeValue($filePart, 'git_project_path', $this->gitProjectPath);
         $this->setReadmeValue($filePart, 'project_directory', $projectDirectory);
 
         $this->updateReadmeFile($filePart);
@@ -145,10 +238,9 @@ class ReadmeGenerator
             if (!empty($email)) {
                 $this->setReadmeValue($filePart, "{$key}_email", $email);
                 $this->setReadmeValue($filePart, "{$key}_password", $credential->getPassword());
-                $this->removeTag($filePart, "{$key}_credentials");
-            } else {
-                $this->removeTag($filePart, "{$key}_credentials", true);
-            }
+            } 
+            
+            $this->removeTag($filePart, "{$key}_credentials", empty($email));
         }
 
         if (!$this->getCredential('admin')) {
@@ -203,89 +295,5 @@ class ReadmeGenerator
             : "# {0,1}{(/*){$tag}}#";
 
         $text = preg_replace($regex, '', $text);
-    }
-
-    public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
-    {
-        $this->appName = $appName;
-        $this->appType = $appType;
-        $this->appUrl = $appUrl;
-        $this->codeOwnerEmail = $codeOwnerEmail;
-    }
-
-    public function getConfigurableResources(): array
-    {
-        return $this->resources;
-    }
-
-    public function getResource(string $key): ?ResourceDTO
-    {
-        return $this->resources[$key] ?? null;
-    }
-
-    public function getConfigurableContacts(): array
-    {
-        return $this->contacts;
-    }
-
-    public function getConfigurableCredentials(): array
-    {
-        return $this->credentials;
-    }
-
-    public function getCredential(string $key): ?CredentialDTO
-    {
-        return $this->credentials[$key] ?? null;
-    }
-
-    public function addCredential(string $key, string $title, string $email, string $password): void
-    {
-        $this->credentials[$key] = new CredentialDTO($title, $email, $password);
-    }
-
-    public function addRenovate(): void
-    {
-        $this->enabledParts[] = [$this, 'fillRenovate'];
-    }
-
-    public function addResourcesAndContacts(): void
-    {
-        $this->enabledParts[] = [$this, 'fillResourcesAndContacts'];
-    }
-
-    public function addPrerequisites(): void
-    {
-        $this->enabledParts[] = [$this, 'fillPrerequisites'];
-    }
-
-    public function addGettingStarted(): void
-    {
-        $this->enabledParts[] = [$this, 'fillGettingStarted'];
-    }
-
-    public function addEnvironments(): void
-    {
-        $this->enabledParts[] = [$this, 'fillEnvironments'];
-    }
-
-    public function addCredentialsAndAccess(): void
-    {
-        $this->enabledParts[] = [$this, 'fillCredentialsAndAccess'];
-    }
-
-    public function addClerkAuthType(): void
-    {
-        $this->enabledParts[] = [$this, 'fillClerkAuthType'];
-    }
-
-    public function save(): void
-    {
-        $this->prepareReadme();
-
-        foreach ($this->enabledParts as $part) {
-            $part();
-        }
-
-        $this->saveReadme();
     }
 }

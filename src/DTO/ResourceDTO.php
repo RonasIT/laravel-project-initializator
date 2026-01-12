@@ -5,20 +5,17 @@ namespace RonasIT\ProjectInitializator\DTO;
 class ResourceDTO
 {
     public function __construct(
-        protected string $title,
-        protected bool $defaultUrl = false,
+        public readonly string $key,
+        public readonly string $title,
+        public readonly ?string $localPath = null,
         protected ?string $link = null,
         protected bool $active = false,
-    ) {}
-
-    public function getTitle(): string
-    {
-        return $this->title;
+    ) {
     }
 
-    public function hasDefaultUrl(): bool
+    public function getLink(): ?string
     {
-        return $this->defaultUrl;
+        return $this->link;
     }
 
     public function setLink(string $link): void
@@ -30,10 +27,5 @@ class ResourceDTO
     public function isActive(): bool
     {
         return $this->active;
-    }
-
-    public function getLink(): ?string
-    {
-        return $this->link;
     }
 }
