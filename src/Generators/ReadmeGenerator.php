@@ -4,7 +4,6 @@ namespace RonasIT\ProjectInitializator\Generators;
 
 use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
-use RonasIT\ProjectInitializator\DTO\CredentialDTO;
 
 class ReadmeGenerator
 {
@@ -23,7 +22,6 @@ class ReadmeGenerator
 
     protected array $resources = [];
     protected array $contacts = [];
-    protected array $credentials = [];
 
     public function __construct()
     {
@@ -33,17 +31,12 @@ class ReadmeGenerator
             new ResourceDTO('sentry', 'Sentry'),
             new ResourceDTO('datadog', 'DataDog'),
             new ResourceDTO('argocd', 'ArgoCD'),
-            new ResourceDTO('telescope', 'Laravel Telescope',  'telescope'),
+            new ResourceDTO('telescope', 'Laravel Telescope', 'telescope'),
             new ResourceDTO('nova', 'Laravel Nova', 'nova'),
         ];
         
         $this->contacts = [
             'manager' => new ContactDTO('Manager'),
-        ];
-
-        $this->credentials = [
-            'telescope' => new CredentialDTO('Laravel Telescope'),
-            'nova' => new CredentialDTO('Laravel Nova'),
         ];
     }
 
@@ -76,19 +69,22 @@ class ReadmeGenerator
         return $this->contacts;
     }
 
-    public function getConfigurableCredentials(): array
+    public function getAccessRequiredResources(): array
     {
-        return $this->credentials;
+        return array_filter(
+            array: $this->resources, 
+            callback: fn (ResourceDTO $resource) => $resource->isActive() && ($resource->localPath),
+        );
     }
 
-    public function getCredential(string $key): ?CredentialDTO
+    public function addResource(string $key, string $title, string $email, string $password): void
     {
-        return $this->credentials[$key] ?? null;
-    }
-
-    public function addCredential(string $key, string $title, string $email, string $password): void
-    {
-        $this->credentials[$key] = new CredentialDTO($title, $email, $password);
+        $this->resources[] = new ResourceDTO(
+            key: $key,
+            title: $title, 
+            email: $email, 
+            password:$password,
+        );
     }
 
     public function addRenovate(): void
@@ -232,18 +228,18 @@ class ReadmeGenerator
     {
         $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
 
-        foreach ($this->credentials as $key => $credential) {
-            $email = $credential->getEmail();
+        foreach ($this->resources as $resource) {
+            $email = $resource->getEmail();
 
             if (!empty($email)) {
-                $this->setReadmeValue($filePart, "{$key}_email", $email);
-                $this->setReadmeValue($filePart, "{$key}_password", $credential->getPassword());
-            } 
-            
-            $this->removeTag($filePart, "{$key}_credentials", empty($email));
+                $this->setReadmeValue($filePart, "{$resource->key}_email", $email);
+                $this->setReadmeValue($filePart, "{$resource->key}_password", $resource->getPassword());
+            }
+
+            $this->removeTag($filePart, "{$resource->key}_credentials", empty($email));
         }
 
-        if (!$this->getCredential('admin')) {
+        if (!$this->getResource('admin')) {
             $this->removeTag($filePart, 'admin_credentials', true);
         }
 

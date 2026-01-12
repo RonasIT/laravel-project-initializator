@@ -413,26 +413,22 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureCredentialsAndAccess(): void
     {
-        foreach ($this->readmeGenerator->getConfigurableCredentials() as $key => $credential) {
-            if (!$this->readmeGenerator->getResource($key)?->isActive()) {
-                continue;
-            }
-
-            if (!empty($this->adminCredentials) && $this->confirm("Is {$credential->title}'s admin the same as default one?", true)) {
+        foreach ($this->readmeGenerator->getAccessRequiredResources() as $resource) {
+            if (!empty($this->adminCredentials) && $this->confirm("Is {$resource->title}'s admin the same as default one?", true)) {
                 $adminCredentials = $this->adminCredentials;
             } else {
                 if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
                     $this->publishAdminsTableMigration();
                 }
 
-                $adminCredentials = $this->createAdminUser($key, $credential->title);
+                $adminCredentials = $this->createAdminUser($resource->key, $resource->title);
             }
 
-            $credential->setCredentials($adminCredentials['email'], $adminCredentials['password']);
+            $resource->setCredentials($adminCredentials['email'], $adminCredentials['password']);
         }
 
         if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator->addCredential('admin', 'Default admin', $this->adminCredentials['email'], $this->adminCredentials['password']);
+            $this->readmeGenerator->addResource('admin', 'Default admin', $this->adminCredentials['email'], $this->adminCredentials['password']);
         }
     }
 
