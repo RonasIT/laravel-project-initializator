@@ -8,16 +8,11 @@ class ResourceDTO
         public readonly string $key,
         public readonly string $title,
         public readonly ?string $localPath = null,
-        protected ?string $link = null,
+        public private(set) ?string $link = null,
         protected bool $active = false,
-        protected ?string $email = null,
-        protected ?string $password = null,
+        public private(set) ?string $email = null,
+        public private(set) ?string $password = null,
     ) {
-    }
-
-    public function getLink(): ?string
-    {
-        return $this->link;
     }
 
     public function setLink(string $link): void
@@ -29,16 +24,6 @@ class ResourceDTO
     public function isActive(): bool
     {
         return $this->active;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
     }
 
     public function setCredentials(string $email, string $password): void

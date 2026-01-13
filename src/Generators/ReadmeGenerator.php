@@ -148,11 +148,11 @@ class ReadmeGenerator
         $filePart = $this->loadReadmePart('RESOURCES.md');
 
         foreach ($this->resources as $resource) {
-            if ($resource->getLink() === 'later') {
+            if ($resource->link === 'later') {
                 $this->setReadmeValue($filePart, "{$resource->key}_link");
                 $this->setReadmeValue($filePart, "{$resource->key}_later", self::LATER_TEXT);
             } elseif ($resource->isActive()) {
-                $this->setReadmeValue($filePart, "{$resource->key}_link", $resource->getLink());
+                $this->setReadmeValue($filePart, "{$resource->key}_link", $resource->link);
                 $this->setReadmeValue($filePart, "{$resource->key}_later");
             }
 
@@ -168,7 +168,7 @@ class ReadmeGenerator
         $filePart = $this->loadReadmePart('CONTACTS.md');
 
         foreach ($this->contacts as $contact) {
-            $email = $contact->getEmail();
+            $email = $contact->email;
 
             if (!empty($email)) {
                 $this->setReadmeValue($filePart, "{$contact->key}_link", $email);
@@ -213,14 +213,12 @@ class ReadmeGenerator
         $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
 
         foreach ($this->resources as $resource) {
-            $email = $resource->getEmail();
-
-            if (!empty($email)) {
-                $this->setReadmeValue($filePart, "{$resource->key}_email", $email);
-                $this->setReadmeValue($filePart, "{$resource->key}_password", $resource->getPassword());
+            if (!empty($resource->email)) {
+                $this->setReadmeValue($filePart, "{$resource->key}_email", $resource->email);
+                $this->setReadmeValue($filePart, "{$resource->key}_password", $resource->password);
             }
 
-            $this->removeTag($filePart, "{$resource->key}_credentials", empty($email));
+            $this->removeTag($filePart, "{$resource->key}_credentials", empty($resource->email));
         }
 
         if (!$this->getResource('admin')) {
