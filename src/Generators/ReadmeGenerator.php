@@ -4,6 +4,7 @@ namespace RonasIT\ProjectInitializator\Generators;
 
 use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
+use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 
 class ReadmeGenerator
 {
@@ -148,7 +149,7 @@ class ReadmeGenerator
         $filePart = $this->loadReadmePart('RESOURCES.md');
 
         foreach ($this->resources as $resource) {
-            if ($resource->link === 'later') {
+            if ($resource->link === UserAnswerEnum::Later->value) {
                 $this->setReadmeValue($filePart, "{$resource->key}_link");
                 $this->setReadmeValue($filePart, "{$resource->key}_later", self::LATER_TEXT);
             } elseif ($resource->isActive()) {

@@ -17,6 +17,7 @@ use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
+use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 
@@ -386,13 +387,13 @@ class InitCommand extends Command implements Isolatable
     protected function configureResources(): void
     {
         foreach ($this->readmeGenerator->getConfigurableResources() as $resource) {
-            $defaultAnswer = ($resource->localPath) ? "{$this->appUrl}/{$resource->localPath}" : 'later';
+            $defaultAnswer = ($resource->localPath) ? "{$this->appUrl}/{$resource->localPath}" : UserAnswerEnum::Later->value;
             $text = "Are you going to use {$resource->title}? "
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.';
 
-            $link = $this->anticipate($text, ['later', 'no'], $defaultAnswer);
+            $link = $this->anticipate($text, UserAnswerEnum::values(), $defaultAnswer);
 
-            if ($link === 'later') {
+            if ($link === UserAnswerEnum::Later->value) {
                 $this->emptyResourcesList[] = "{$resource->title} link";
             }
 
