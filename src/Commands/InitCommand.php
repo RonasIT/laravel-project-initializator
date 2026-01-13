@@ -11,13 +11,14 @@ use Winter\LaravelConfigWriter\EnvFile;
 use Illuminate\Support\Facades\Validator;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Illuminate\Contracts\Console\Isolatable;
+use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
+use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
+use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
-use RonasIT\Larabuilder\Builders\PHPFileBuilder;
-use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -397,6 +398,8 @@ class InitCommand extends Command implements Isolatable
             }
 
             $resource->setLink($link);
+
+            $this->readmeGenerator?->addResource($resource);
         }
     }
 
@@ -408,6 +411,8 @@ class InitCommand extends Command implements Isolatable
             } else {
                 $this->emptyResourcesList[] = "{$contact->title}'s email";
             }
+
+            $this->readmeGenerator?->addContact($contact);
         }
     }
 
@@ -428,7 +433,12 @@ class InitCommand extends Command implements Isolatable
         }
 
         if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator->addResource('admin', 'Default admin', $this->adminCredentials['email'], $this->adminCredentials['password']);
+            $this->readmeGenerator->addResource(new ResourceDTO(
+                key: 'admin',
+                title: 'Default admin',
+                email: $this->adminCredentials['email'],
+                password: $this->adminCredentials['password'],
+            ));
         }
     }
 

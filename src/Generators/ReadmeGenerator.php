@@ -23,23 +23,6 @@ class ReadmeGenerator
     protected array $resources = [];
     protected array $contacts = [];
 
-    public function __construct()
-    {
-        $this->resources = [
-            new ResourceDTO('issue_tracker', 'Issue Tracker'),
-            new ResourceDTO('figma', 'Figma'),
-            new ResourceDTO('sentry', 'Sentry'),
-            new ResourceDTO('datadog', 'DataDog'),
-            new ResourceDTO('argocd', 'ArgoCD'),
-            new ResourceDTO('telescope', 'Laravel Telescope', 'telescope'),
-            new ResourceDTO('nova', 'Laravel Nova', 'nova'),
-        ];
-        
-        $this->contacts = [
-            'manager' => new ContactDTO('Manager'),
-        ];
-    }
-
     public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
     {
         $this->appName = $appName;
@@ -50,7 +33,20 @@ class ReadmeGenerator
 
     public function getConfigurableResources(): array
     {
-        return $this->resources;
+        return [
+            new ResourceDTO('issue_tracker', 'Issue Tracker'),
+            new ResourceDTO('figma', 'Figma'),
+            new ResourceDTO('sentry', 'Sentry'),
+            new ResourceDTO('datadog', 'DataDog'),
+            new ResourceDTO('argocd', 'ArgoCD'),
+            new ResourceDTO('telescope', 'Laravel Telescope', 'telescope'),
+            new ResourceDTO('nova', 'Laravel Nova', 'nova'),
+        ];
+    }
+
+    public function addResource(ResourceDTO $resource): void
+    {
+        $this->resources[] = $resource;
     }
 
     public function getResource(string $key): ?ResourceDTO
@@ -66,7 +62,14 @@ class ReadmeGenerator
 
     public function getConfigurableContacts(): array
     {
-        return $this->contacts;
+        return $this->contacts = [
+            'manager' => new ContactDTO('Manager'),
+        ];
+    }
+
+    public function addContact(ContactDTO $contact): void
+    {
+        $this->contacts[] = $contact;
     }
 
     public function getAccessRequiredResources(): array
@@ -74,16 +77,6 @@ class ReadmeGenerator
         return array_filter(
             array: $this->resources, 
             callback: fn (ResourceDTO $resource) => $resource->isActive() && ($resource->localPath),
-        );
-    }
-
-    public function addResource(string $key, string $title, string $email, string $password): void
-    {
-        $this->resources[] = new ResourceDTO(
-            key: $key,
-            title: $title, 
-            email: $email, 
-            password:$password,
         );
     }
 
