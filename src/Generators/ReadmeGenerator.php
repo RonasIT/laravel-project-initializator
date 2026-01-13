@@ -49,7 +49,7 @@ class ReadmeGenerator
         $this->resources[] = $resource;
     }
 
-    public function getResource(string $key): ?ResourceDTO
+    protected function getResource(string $key): ?ResourceDTO
     {
         return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
     }
