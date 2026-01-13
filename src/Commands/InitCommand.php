@@ -432,7 +432,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator->addResource(new ResourceDTO(
+            $this->readmeGenerator?->addResource(new ResourceDTO(
                 key: 'admin',
                 title: 'Default admin',
                 email: $this->adminCredentials['email'],
