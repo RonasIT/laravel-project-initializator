@@ -65,7 +65,7 @@ class ReadmeGenerator
     {
         return array_filter(
             array: $this->resources, 
-            callback: fn (ResourceDTO $resource) => $resource->isActive() && ($resource->localPath),
+            callback: fn (ResourceDTO $resource) => $resource->isActive() && $resource->localPath,
         );
     }
 
