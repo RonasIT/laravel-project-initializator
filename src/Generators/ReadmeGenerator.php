@@ -56,8 +56,8 @@ class ReadmeGenerator
 
     public function getConfigurableContacts(): array
     {
-        return $this->contacts = [
-            'manager' => new ContactDTO('Manager'),
+        return [
+            new ContactDTO('Manager'),
         ];
     }
 
