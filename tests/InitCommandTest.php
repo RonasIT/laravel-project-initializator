@@ -61,7 +61,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
-            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -120,7 +120,7 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "MyApp"')
-            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -182,7 +182,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -277,7 +277,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -290,37 +290,37 @@ class InitCommandTest extends TestCase
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Figma? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use DataDog? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Nova? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion('Please enter a Manager\'s email', '')
             ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
@@ -404,7 +404,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
@@ -415,37 +415,37 @@ class InitCommandTest extends TestCase
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Figma? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'no',
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'no',
             )
             ->expectsQuestion(
                 'Are you going to use DataDog? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'no',
             )
             ->expectsQuestion(
                 'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'no',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'no',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Nova? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'no',
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
             ->expectsConfirmation('Do you need a `Prerequisites` part?')
@@ -528,7 +528,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
@@ -543,37 +543,37 @@ class InitCommandTest extends TestCase
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://gitlab.com/my-project'
+                'https://gitlab.com/my-project',
             )
             ->expectsQuestion(
                 'Are you going to use Figma? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://figma.com/my-project'
+                'https://figma.com/my-project',
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://sentry.com/my-project'
+                'https://sentry.com/my-project',
             )
             ->expectsQuestion(
                 'Are you going to use DataDog? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://datadoghq.com/my-project'
+                'https://datadoghq.com/my-project',
             )
             ->expectsQuestion(
                 'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://argocd.com/my-project'
+                'https://argocd.com/my-project',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://mypsite.com/telescope-link'
+                'https://mypsite.com/telescope-link',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Nova? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://mypsite.com/nova-link'
+                'https://mypsite.com/nova-link',
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
             ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
@@ -654,7 +654,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
@@ -665,37 +665,37 @@ class InitCommandTest extends TestCase
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Figma? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'no',
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'no',
             )
             ->expectsQuestion(
                 'Are you going to use DataDog? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'no',
             )
             ->expectsQuestion(
                 'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no'
+                'no',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Nova? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
             ->expectsConfirmation('Do you need a `Prerequisites` part?')
@@ -795,7 +795,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
@@ -808,37 +808,37 @@ class InitCommandTest extends TestCase
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Figma? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use DataDog? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Nova? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later'
+                'later',
             )
             ->expectsQuestion('Please enter a Manager\'s email', '')
             ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
@@ -921,7 +921,7 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators', 
+            'RonasIT\ProjectInitializator\Generators',
             $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
             $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
@@ -934,7 +934,7 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
-            ->expectsQuestion("Please specify: email of code owner / team lead", 'test@example.com')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
