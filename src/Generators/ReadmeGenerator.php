@@ -49,15 +49,10 @@ class ReadmeGenerator
         $this->resources[] = $resource;
     }
 
-    protected function getResource(string $key): ?ResourceDTO
-    {
-        return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
-    }
-
     public function getConfigurableContacts(): array
     {
         return [
-            new ContactDTO('Manager'),
+            new ContactDTO('manager', 'Manager'),
         ];
     }
 
@@ -122,6 +117,11 @@ class ReadmeGenerator
         $this->saveReadme();
     }
 
+    protected function getResource(string $key): ?ResourceDTO
+    {
+        return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
+    }
+
     protected function prepareReadme(): void
     {
         $file = $this->loadReadmePart('README.md');
@@ -167,14 +167,14 @@ class ReadmeGenerator
     {
         $filePart = $this->loadReadmePart('CONTACTS.md');
 
-        foreach ($this->contacts as $key => $contact) {
+        foreach ($this->contacts as $contact) {
             $email = $contact->getEmail();
 
             if (!empty($email)) {
-                $this->setReadmeValue($filePart, "{$key}_link", $email);
+                $this->setReadmeValue($filePart, "{$contact->key}_link", $email);
             }
 
-            $this->removeTag($filePart, $key);
+            $this->removeTag($filePart, $contact->key);
         }
 
         $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
