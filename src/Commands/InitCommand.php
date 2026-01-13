@@ -364,9 +364,8 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->confirm('Do you need a `Getting Started` part?', true)) {
             $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
-            $this->readmeGenerator?->addGitProjectPath($gitProjectPath);
 
-            $this->readmeGenerator?->addGettingStarted();
+            $this->readmeGenerator?->addGettingStarted($gitProjectPath);
         }
 
         if ($this->confirm('Do you need an `Environments` part?', true)) {

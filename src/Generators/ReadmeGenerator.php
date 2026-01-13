@@ -51,13 +51,7 @@ class ReadmeGenerator
 
     public function getResource(string $key): ?ResourceDTO
     {
-        foreach ($this->resources as $resource) {
-            if ($resource->key === $key) {
-                return $resource;
-            }
-        }
-
-        return null;
+        return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
     }
 
     public function getConfigurableContacts(): array
@@ -95,13 +89,10 @@ class ReadmeGenerator
         $this->methodsToCall[] = 'fillPrerequisites';
     }
 
-    public function addGitProjectPath(string $path): void
+    public function addGettingStarted(string $path): void
     {
         $this->gitProjectPath = $path;
-    }
 
-    public function addGettingStarted(): void
-    {
         $this->methodsToCall[] = 'fillGettingStarted';
     }
 
