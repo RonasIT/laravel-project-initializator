@@ -26,13 +26,16 @@ Please be mindful of each individual's preferred contact method and office hours
 ## Credentials and Access
 
 Laravel Telescope access:
+
 ```
 telescope_mail@mail.com
 ```
 ```
 654321
 ```
+
 Laravel Nova access:
+
 ```
 mail@mail.com
 ```

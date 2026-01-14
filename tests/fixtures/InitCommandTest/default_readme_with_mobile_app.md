@@ -71,20 +71,25 @@ and `testing`. Each environment is represented by an appropriate environment fil
 ## Credentials and Access
 
 Default admin access:
+
 ```
 mail@mail.com
 ```
 ```
 123456
 ```
+
 Laravel Telescope access:
+
 ```
 mail@mail.com
 ```
 ```
 123456
 ```
+
 Laravel Nova access:
+
 ```
 mail@mail.com
 ```

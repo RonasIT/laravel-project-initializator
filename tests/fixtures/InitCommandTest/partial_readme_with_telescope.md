@@ -38,13 +38,16 @@ and `testing`. Each environment is represented by an appropriate environment fil
 ## Credentials and Access
 
 Laravel Telescope access:
+
 ```
 telescope_mail@mail.com
 ```
 ```
 654321
 ```
+
 Laravel Nova access:
+
 ```
 nova_mail@mail.com
 ```
