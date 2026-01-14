@@ -3,10 +3,9 @@
 namespace RonasIT\ProjectInitializator\Tests;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\File;
+use Orchestra\Testbench\TestCase as BaseTestCase;
 use RonasIT\ProjectInitializator\ProjectInitializatorServiceProvider;
 use RonasIT\Support\Traits\FixturesTrait;
-use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
