@@ -16,7 +16,6 @@ use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
@@ -521,7 +520,7 @@ class InitCommand extends Command implements Isolatable
     {
         new AppBootstrapBuilder()
             ->addExceptionsRender(
-                exceptionClass: HttpException::class,
+                exceptionClass: 'HttpException',
                 renderBody: '
                     return ($request->expectsJson())
                         ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
@@ -529,6 +528,7 @@ class InitCommand extends Command implements Isolatable
                 ',
                 includeRequestArg: true,
             )
+            ->addImports(['Symfony\Component\HttpKernel\Exception\HttpException'])
             ->save();
     }
 
