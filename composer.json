@@ -33,7 +33,7 @@
         "ext-json": "*",
         "ronasit/laravel-helpers": ">=3.5.7",
         "winter/laravel-config-writer": ">=1.2.1",
-        "ronasit/larabuilder": ">=0.0.2"
+        "ronasit/larabuilder": ">=0.0.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23.1",
