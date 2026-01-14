@@ -4,7 +4,6 @@ namespace RonasIT\ProjectInitializator\Generators;
 
 use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
-use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 
 class ReadmeGenerator
 {
@@ -66,7 +65,7 @@ class ReadmeGenerator
     {
         return array_filter(
             array: $this->resources,
-            callback: fn (ResourceDTO $resource) => $resource->isActive() && $resource->localPath,
+            callback: fn (ResourceDTO $resource) => $resource->isActive && $resource->localPath,
         );
     }
 
@@ -149,15 +148,15 @@ class ReadmeGenerator
         $filePart = $this->loadReadmePart('RESOURCES.md');
 
         foreach ($this->resources as $resource) {
-            if ($resource->link === UserAnswerEnum::Later->value) {
+            if (empty($resource->link) && $resource->isActive) {
                 $this->setReadmeValue($filePart, "{$resource->key}_link");
                 $this->setReadmeValue($filePart, "{$resource->key}_later", self::LATER_TEXT);
-            } elseif ($resource->isActive()) {
+            } elseif ($resource->isActive) {
                 $this->setReadmeValue($filePart, "{$resource->key}_link", $resource->link);
                 $this->setReadmeValue($filePart, "{$resource->key}_later");
             }
 
-            $this->removeTag($filePart, $resource->key, !$resource->isActive());
+            $this->removeTag($filePart, $resource->key, !$resource->isActive);
         }
 
         $this->setReadmeValue($filePart, 'api_link', $this->appUrl);

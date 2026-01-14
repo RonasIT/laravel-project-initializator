@@ -388,16 +388,24 @@ class InitCommand extends Command implements Isolatable
     {
         foreach ($this->readmeGenerator->getConfigurableResources() as $resource) {
             $defaultAnswer = ($resource->localPath) ? "{$this->appUrl}/{$resource->localPath}" : UserAnswerEnum::Later->value;
-            $text = "Are you going to use {$resource->title}? "
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.';
+
+            $string = 'Are you going to use %? Please enter a link or select `%` to do it later, otherwise select `%`.';
+
+            $text = Str::replaceArray('%', [
+                $resource->title,
+                UserAnswerEnum::Later->value,
+                UserAnswerEnum::No->value,
+            ], $string);
 
             $link = $this->anticipate($text, UserAnswerEnum::values(), $defaultAnswer);
 
             if ($link === UserAnswerEnum::Later->value) {
                 $this->emptyResourcesList[] = "{$resource->title} link";
+            } else {
+                $resource->setLink($link);
             }
 
-            $resource->setLink($link);
+            $resource->setActive($link !== 'no');
 
             $this->readmeGenerator?->addResource($resource);
         }

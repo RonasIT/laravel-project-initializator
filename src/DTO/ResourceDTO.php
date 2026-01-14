@@ -9,7 +9,7 @@ class ResourceDTO
         public readonly string $title,
         public readonly ?string $localPath = null,
         public private(set) ?string $link = null,
-        protected bool $active = false,
+        public private(set) bool $isActive = false,
         public private(set) ?string $email = null,
         public private(set) ?string $password = null,
     ) {
@@ -18,12 +18,11 @@ class ResourceDTO
     public function setLink(string $link): void
     {
         $this->link = $link;
-        $this->active = ($link !== 'no');
     }
 
-    public function isActive(): bool
+    public function setActive(bool $state): void
     {
-        return $this->active;
+        $this->isActive = $state;
     }
 
     public function setCredentials(string $email, string $password): void
