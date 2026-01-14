@@ -26,20 +26,16 @@ Please be mindful of each individual's preferred contact method and office hours
 ## Credentials and Access
 
 Laravel Telescope access:
-- email
 ```
 telescope_mail@mail.com
 ```
-- password
 ```
 654321
 ```
 Laravel Nova access:
-- email
 ```
 mail@mail.com
 ```
-- password
 ```
 123456
 ```
