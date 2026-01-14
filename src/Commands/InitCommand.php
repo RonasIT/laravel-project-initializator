@@ -2,17 +2,15 @@
 
 namespace RonasIT\ProjectInitializator\Commands;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\View\View;
-use Winter\LaravelConfigWriter\EnvFile;
-use Illuminate\Support\Facades\Validator;
-use Winter\LaravelConfigWriter\ArrayFile;
 use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
-use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
@@ -20,6 +18,9 @@ use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Winter\LaravelConfigWriter\ArrayFile;
+use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
 {

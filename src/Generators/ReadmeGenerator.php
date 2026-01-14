@@ -65,7 +65,7 @@ class ReadmeGenerator
     public function getAccessRequiredResources(): array
     {
         return array_filter(
-            array: $this->resources, 
+            array: $this->resources,
             callback: fn (ResourceDTO $resource) => $resource->isActive() && $resource->localPath,
         );
     }
