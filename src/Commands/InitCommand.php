@@ -407,7 +407,7 @@ class InitCommand extends Command implements Isolatable
                 $this->emptyResourcesList[] = "{$resource->title} link";
             }
 
-            $resource->setActive($link !== 'no');
+            $resource->setActive($answer !== UserAnswerEnum::No);
 
             $this->readmeGenerator?->addResource($resource);
         }
