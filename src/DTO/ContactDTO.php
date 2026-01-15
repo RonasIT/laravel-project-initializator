@@ -7,13 +7,8 @@ final class ContactDTO
     public function __construct(
         public readonly string $key,
         public readonly string $title,
-        protected ?string $email = null,
+        public private(set) ?string $email = null,
     ) {
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
     }
 
     public function setEmail(string $email): void
