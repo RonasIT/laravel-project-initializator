@@ -75,6 +75,7 @@ Default admin access:
 ```
 mail@mail.com
 ```
+
 ```
 123456
 ```
@@ -84,6 +85,7 @@ Laravel Telescope access:
 ```
 mail@mail.com
 ```
+
 ```
 123456
 ```
@@ -93,6 +95,7 @@ Laravel Nova access:
 ```
 nova_mail@mail.com
 ```
+
 ```
 654321
 ```

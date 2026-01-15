@@ -5,6 +5,7 @@
 ```
 :admin_email
 ```
+
 ```
 :admin_password
 ```
@@ -14,6 +15,7 @@
 ```
 :telescope_email
 ```
+
 ```
 :telescope_password
 ```
@@ -23,6 +25,7 @@
 ```
 :nova_email
 ```
+
 ```
 :nova_password
 ```

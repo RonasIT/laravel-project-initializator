@@ -30,6 +30,7 @@ Laravel Telescope access:
 ```
 telescope_mail@mail.com
 ```
+
 ```
 654321
 ```
@@ -39,6 +40,7 @@ Laravel Nova access:
 ```
 mail@mail.com
 ```
+
 ```
 123456
 ```
