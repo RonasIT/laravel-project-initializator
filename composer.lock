@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "028a70bdeb8a6c4068247212e1aa8ee5",
+    "content-hash": "b1f6da5a0b3e6bff25c2447106746b90",
     "packages": [
         {
             "name": "brick/math",
@@ -4826,16 +4826,16 @@
         },
         {
             "name": "ronasit/larabuilder",
-            "version": "0.0.3",
+            "version": "0.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RonasIT/larabuilder.git",
-                "reference": "fb82161ab43cf1a6ed85527bf2ff2f8d3be56581"
+                "reference": "6394f3957c3512d16e5dd8b8e600e64eddd9b8b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RonasIT/larabuilder/zipball/fb82161ab43cf1a6ed85527bf2ff2f8d3be56581",
-                "reference": "fb82161ab43cf1a6ed85527bf2ff2f8d3be56581",
+                "url": "https://api.github.com/repos/RonasIT/larabuilder/zipball/6394f3957c3512d16e5dd8b8e600e64eddd9b8b0",
+                "reference": "6394f3957c3512d16e5dd8b8e600e64eddd9b8b0",
                 "shasum": ""
             },
             "require": {
@@ -4871,9 +4871,9 @@
             "description": "A great tool for creating and modifying PHP classes in Laravel, providing utilities to generate boilerplate code, add methods, properties, and annotations with ease.",
             "support": {
                 "issues": "https://github.com/RonasIT/larabuilder/issues",
-                "source": "https://github.com/RonasIT/larabuilder/tree/0.0.3"
+                "source": "https://github.com/RonasIT/larabuilder/tree/0.0.4"
             },
-            "time": "2026-01-14T01:51:33+00:00"
+            "time": "2026-01-15T05:29:42+00:00"
         },
         {
             "name": "ronasit/laravel-helpers",
@@ -10010,16 +10010,16 @@
         },
         {
             "name": "orchestra/testbench",
-            "version": "v10.8.0",
+            "version": "v10.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench.git",
-                "reference": "003922508c1d9f75bbe44f68364616d5ddee1939"
+                "reference": "040a37b60e1a9d7ae10b496407b6c3bb63b47038"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench/zipball/003922508c1d9f75bbe44f68364616d5ddee1939",
-                "reference": "003922508c1d9f75bbe44f68364616d5ddee1939",
+                "url": "https://api.github.com/repos/orchestral/testbench/zipball/040a37b60e1a9d7ae10b496407b6c3bb63b47038",
+                "reference": "040a37b60e1a9d7ae10b496407b6c3bb63b47038",
                 "shasum": ""
             },
             "require": {
@@ -10027,8 +10027,8 @@
                 "fakerphp/faker": "^1.23",
                 "laravel/framework": "^12.40.0",
                 "mockery/mockery": "^1.6.10",
-                "orchestra/testbench-core": "^10.8.0",
-                "orchestra/workbench": "^10.0.7",
+                "orchestra/testbench-core": "^10.9.0",
+                "orchestra/workbench": "^10.0.8",
                 "php": "^8.2",
                 "phpunit/phpunit": "^11.5.3|^12.0.1",
                 "symfony/process": "^7.2",
@@ -10059,9 +10059,9 @@
             ],
             "support": {
                 "issues": "https://github.com/orchestral/testbench/issues",
-                "source": "https://github.com/orchestral/testbench/tree/v10.8.0"
+                "source": "https://github.com/orchestral/testbench/tree/v10.9.0"
             },
-            "time": "2025-11-24T09:44:51+00:00"
+            "time": "2026-01-14T03:26:57+00:00"
         },
         {
             "name": "orchestra/testbench-core",
