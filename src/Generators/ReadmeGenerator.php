@@ -151,7 +151,7 @@ class ReadmeGenerator
             if (empty($resource->link) && $resource->isActive) {
                 $this->setReadmeValue($filePart, "{$resource->key}_link");
                 $this->setReadmeValue($filePart, "{$resource->key}_later", self::LATER_TEXT);
-            } elseif ($resource->isActive) {
+            } elseif (!empty($resource->link)) {
                 $this->setReadmeValue($filePart, "{$resource->key}_link", $resource->link);
                 $this->setReadmeValue($filePart, "{$resource->key}_later");
             }

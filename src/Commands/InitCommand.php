@@ -399,10 +399,12 @@ class InitCommand extends Command implements Isolatable
 
             $link = $this->anticipate($text, UserAnswerEnum::values(), $defaultAnswer);
 
-            if ($link === UserAnswerEnum::Later->value) {
-                $this->emptyResourcesList[] = "{$resource->title} link";
-            } else {
+            $answer = UserAnswerEnum::tryFrom($link);
+
+            if (empty($answer)) {
                 $resource->setLink($link);
+            } elseif ($answer === UserAnswerEnum::Later) {
+                $this->emptyResourcesList[] = "{$resource->title} link";
             }
 
             $resource->setActive($link !== 'no');
