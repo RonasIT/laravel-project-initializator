@@ -8,37 +8,21 @@ class ResourceDTO
         public readonly string $key,
         public readonly string $title,
         public readonly ?string $localPath = null,
-        protected ?string $link = null,
-        protected bool $active = false,
-        protected ?string $email = null,
-        protected ?string $password = null,
+        public private(set) ?string $link = null,
+        public private(set) bool $isActive = false,
+        public private(set) ?string $email = null,
+        public private(set) ?string $password = null,
     ) {
-    }
-
-    public function getLink(): ?string
-    {
-        return $this->link;
     }
 
     public function setLink(string $link): void
     {
         $this->link = $link;
-        $this->active = ($link !== 'no');
     }
 
-    public function isActive(): bool
+    public function setActive(bool $state): void
     {
-        return $this->active;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
+        $this->isActive = $state;
     }
 
     public function setCredentials(string $email, string $password): void
