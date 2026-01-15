@@ -7,10 +7,12 @@ use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
+use RonasIT\ProjectInitializator\DTO\GenerateReadmeStepDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
@@ -112,7 +114,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme) {
-            $this->readmeGenerator?->save();
+            $this->readmeGenerator->save();
 
             $this->info('README generated successfully!');
 
@@ -351,36 +353,67 @@ class InitCommand extends Command implements Isolatable
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
-            $this->configureResources();
-            $this->configureContacts();
+        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
 
-            $this->readmeGenerator?->addResourcesAndContacts();
+        $this
+            ->getGenerateReadmeSteps()
+            ->each(function (GenerateReadmeStepDTO $step) use ($shouldGenerateAllParts) {
+                if ($shouldGenerateAllParts || $this->confirm($step->question, true)) {
+                    ($step->action)();
+                }
+            });
+    }
+
+    protected function getGenerateReadmeSteps(): Collection
+    {
+        return collect([
+            new GenerateReadmeStepDTO(
+                question: 'Do you need a `Resources & Contacts` part?',
+                action: $this->configureResourcesAndContactsStep(...),
+            ),
+            new GenerateReadmeStepDTO(
+                question: 'Do you need a `Prerequisites` part?',
+                action: $this->readmeGenerator->addPrerequisites(...),
+            ),
+            new GenerateReadmeStepDTO(
+                question: 'Do you need a `Getting Started` part?',
+                action: $this->configureGettingStartedStep(...),
+            ),
+            new GenerateReadmeStepDTO(
+                question: 'Do you need an `Environments` part?',
+                action: $this->readmeGenerator->addEnvironments(...),
+            ),
+            new GenerateReadmeStepDTO(
+                question: 'Do you need a `Credentials and Access` part?',
+                action: $this->configureCredentialsAndAccessStep(...),
+            ),
+        ]);
+    }
+
+    protected function configureResourcesAndContactsStep(): void
+    {
+        $this->configureResources();
+        $this->configureContacts();
+
+        $this->readmeGenerator->addResourcesAndContacts();
+    }
+
+    protected function configureCredentialsAndAccessStep(): void
+    {
+        $this->configureCredentialsAndAccess();
+
+        $this->readmeGenerator->addCredentialsAndAccess();
+
+        if ($this->authType === AuthTypeEnum::Clerk) {
+            $this->readmeGenerator->addClerkAuthType();
         }
+    }
 
-        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeGenerator?->addPrerequisites();
-        }
+    protected function configureGettingStartedStep(): void
+    {
+        $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
 
-        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
-            $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
-
-            $this->readmeGenerator?->addGettingStarted($gitProjectPath);
-        }
-
-        if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeGenerator?->addEnvironments();
-        }
-
-        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
-            $this->configureCredentialsAndAccess();
-
-            $this->readmeGenerator?->addCredentialsAndAccess();
-
-            if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator?->addClerkAuthType();
-            }
-        }
+        $this->readmeGenerator->addGettingStarted($gitProjectPath);
     }
 
     protected function configureResources(): void
@@ -408,7 +441,7 @@ class InitCommand extends Command implements Isolatable
 
             $resource->setActive($answer !== UserAnswerEnum::No);
 
-            $this->readmeGenerator?->addResource($resource);
+            $this->readmeGenerator->addResource($resource);
         }
     }
 
@@ -421,7 +454,7 @@ class InitCommand extends Command implements Isolatable
                 $this->emptyResourcesList[] = "{$contact->title}'s email";
             }
 
-            $this->readmeGenerator?->addContact($contact);
+            $this->readmeGenerator->addContact($contact);
         }
     }
 
@@ -442,7 +475,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator?->addResource(new ResourceDTO(
+            $this->readmeGenerator->addResource(new ResourceDTO(
                 key: 'admin',
                 title: 'Default admin',
                 email: $this->adminCredentials['email'],

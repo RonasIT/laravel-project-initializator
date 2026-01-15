@@ -4,7 +4,7 @@ namespace RonasIT\ProjectInitializator\DTO;
 
 use Closure;
 
-readonly class GenerateReadmeStepDTO
+final readonly class GenerateReadmeStepDTO
 {
     public function __construct(
         public string $question,
