@@ -520,7 +520,7 @@ class InitCommand extends Command implements Isolatable
     {
         new AppBootstrapBuilder()
             ->addExceptionsRender(
-                exceptionClass: 'HttpException',
+                exceptionClass: 'Symfony\Component\HttpKernel\Exception\HttpException',
                 renderBody: '
                     return ($request->expectsJson())
                         ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
@@ -528,7 +528,6 @@ class InitCommand extends Command implements Isolatable
                 ',
                 includeRequestArg: true,
             )
-            ->addImports(['Symfony\Component\HttpKernel\Exception\HttpException'])
             ->save();
     }
 
