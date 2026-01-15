@@ -15,6 +15,7 @@ use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
+use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
@@ -385,17 +386,27 @@ class InitCommand extends Command implements Isolatable
     protected function configureResources(): void
     {
         foreach ($this->readmeGenerator->getConfigurableResources() as $resource) {
-            $defaultAnswer = ($resource->localPath) ? "{$this->appUrl}/{$resource->localPath}" : 'later';
-            $text = "Are you going to use {$resource->title}? "
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.';
+            $defaultAnswer = ($resource->localPath) ? "{$this->appUrl}/{$resource->localPath}" : UserAnswerEnum::Later->value;
 
-            $link = $this->anticipate($text, ['later', 'no'], $defaultAnswer);
+            $string = 'Are you going to use %? Please enter a link or select `%` to do it later, otherwise select `%`.';
 
-            if ($link === 'later') {
+            $text = Str::replaceArray('%', [
+                $resource->title,
+                UserAnswerEnum::Later->value,
+                UserAnswerEnum::No->value,
+            ], $string);
+
+            $link = $this->anticipate($text, UserAnswerEnum::values(), $defaultAnswer);
+
+            $answer = UserAnswerEnum::tryFrom($link);
+
+            if (empty($answer)) {
+                $resource->setLink($link);
+            } elseif ($answer === UserAnswerEnum::Later) {
                 $this->emptyResourcesList[] = "{$resource->title} link";
             }
 
-            $resource->setLink($link);
+            $resource->setActive($answer !== UserAnswerEnum::No);
 
             $this->readmeGenerator?->addResource($resource);
         }
