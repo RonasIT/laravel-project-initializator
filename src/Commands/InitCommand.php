@@ -2,24 +2,23 @@
 
 namespace RonasIT\ProjectInitializator\Commands;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\View\View;
-use RonasIT\ProjectInitializator\DTO\GenerateReadmeStepDTO;
-use Winter\LaravelConfigWriter\EnvFile;
-use Illuminate\Support\Facades\Validator;
-use Winter\LaravelConfigWriter\ArrayFile;
 use Illuminate\Contracts\Console\Isolatable;
-use RonasIT\ProjectInitializator\Enums\RoleEnum;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
+use RonasIT\Larabuilder\Builders\PHPFileBuilder;
+use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use RonasIT\ProjectInitializator\Enums\RoleEnum;
+use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
-use RonasIT\Larabuilder\Builders\PHPFileBuilder;
-use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
+use Winter\LaravelConfigWriter\ArrayFile;
+use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -27,35 +26,9 @@ class InitCommand extends Command implements Isolatable
 
     protected $description = 'Initialize required project parameters to run DEV environment';
 
-    public const array RESOURCES_ITEMS = [
-        'issue_tracker' => 'Issue Tracker',
-        'figma' => 'Figma',
-        'sentry' => 'Sentry',
-        'datadog' => 'DataDog',
-        'argocd' => 'ArgoCD',
-        'telescope' => 'Laravel Telescope',
-        'nova' => 'Laravel Nova',
-    ];
-
-    public const array CONTACTS_ITEMS = [
-        'manager' => 'Manager',
-    ];
-
-    public const array CREDENTIALS_ITEMS = [
-        'telescope' => 'Laravel Telescope',
-        'nova' => 'Laravel Nova',
-    ];
-
-    public const array DEFAULT_URLS = [
-        'telescope',
-        'nova',
-    ];
-
-    protected array $resources = [];
-
     protected array $adminCredentials = [];
 
-    protected array $emptyValuesList = [];
+    protected array $emptyResourcesList = [];
 
     protected array $shellCommands = [
         'composer require laravel/ui',
@@ -79,6 +52,8 @@ class InitCommand extends Command implements Isolatable
     protected AuthTypeEnum $authType;
     protected string $codeOwnerEmail;
 
+    protected ?ReadmeGenerator $readmeGenerator = null;
+
     protected array $defaultDBConnectionConfig = [
         'driver' => 'pgsql',
         'host' => 'pgsql',
@@ -86,12 +61,6 @@ class InitCommand extends Command implements Isolatable
         'database' => 'postgres',
         'username' => 'postgres',
     ];
-
-    public function __construct(
-        protected ReadmeGenerator $readmeGenerator,
-    ) {
-        parent::__construct();
-    }
 
     public function handle(): void
     {
@@ -108,13 +77,11 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
-        $this->appType = AppTypeEnum::from(
-            $this->choice(
-                question: 'What type of application will your API serve?',
-                choices: AppTypeEnum::values(),
-                default: AppTypeEnum::Multiplatform->value,
-            ),
-        );
+        $this->appType = AppTypeEnum::from($this->choice(
+            question: 'What type of application will your API serve?',
+            choices: AppTypeEnum::values(),
+            default: AppTypeEnum::Multiplatform->value,
+        ));
 
         $this->authType = AuthTypeEnum::from($this->choice(
             question: 'Please choose the authentication type',
@@ -135,26 +102,24 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
-            $this->generateReadme();
+            $this->configureReadmeParts();
         }
 
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
-            if ($shouldGenerateReadme) {
-                $this->readmeGenerator->fillRenovate();
-            }
+            $this->readmeGenerator?->addRenovate();
         }
 
         if ($shouldGenerateReadme) {
-            $this->readmeGenerator->save();
+            $this->readmeGenerator?->save();
 
             $this->info('README generated successfully!');
 
-            if ($this->emptyValuesList) {
+            if ($this->emptyResourcesList) {
                 $this->warn('Don`t forget to fill the following empty values:');
 
-                foreach ($this->emptyValuesList as $value) {
+                foreach ($this->emptyResourcesList as $value) {
                     $this->warn("- {$value}");
                 }
             }
@@ -375,162 +340,115 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
     }
 
-    protected function generateReadme(): void
+    protected function configureReadmeParts(): void
     {
-        $this->readmeGenerator->generate($this->appName, $this->appType->value, $this->appUrl);
+        $this->readmeGenerator = app(ReadmeGenerator::class);
 
-        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
+        $this->readmeGenerator->setAppInfo(
+            appName: $this->appName,
+            appType: $this->appType->value,
+            appUrl: $this->appUrl,
+            codeOwnerEmail: $this->codeOwnerEmail,
+        );
 
-        $this
-            ->getGenerateReadmeSteps()
-            ->each(function (GenerateReadmeStepDTO $step) use ($shouldGenerateAllParts) {
-                if ($shouldGenerateAllParts || $this->confirm($step->question, true)) {
-                    ($step->action)();
-                }
-            });
-    }
+        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
+            $this->configureResources();
+            $this->configureContacts();
 
-    protected function getGenerateReadmeSteps(): Collection
-    {
-        return collect([
-            new GenerateReadmeStepDTO(
-                question: 'Do you need a `Resources & Contacts` part?',
-                action: $this->fillResourcesAndContactsStep(...),
-            ),
-            new GenerateReadmeStepDTO(
-                question: 'Do you need a `Prerequisites` part?',
-                action: $this->readmeGenerator->fillPrerequisites(...),
-            ),
-            new GenerateReadmeStepDTO(
-                question: 'Do you need a `Getting Started` part?',
-                action: $this->fillGettingStarted(...),
-            ),
-            new GenerateReadmeStepDTO(
-                question: 'Do you need an `Environments` part?',
-                action: $this->readmeGenerator->fillEnvironments(...),
-            ),
-            new GenerateReadmeStepDTO(
-                question: 'Do you need a `Credentials and Access` part?',
-                action: $this->fillCredentialsAndAccessStep(...),
-            ),
-        ]);
-    }
+            $this->readmeGenerator?->addResourcesAndContacts();
+        }
 
-    protected function fillResourcesAndContactsStep(): void
-    {
-        $this->readmeGenerator->fillResourcesAndContacts();
-        $this->fillResources();
-        $this->fillContacts();
-    }
+        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
+            $this->readmeGenerator?->addPrerequisites();
+        }
 
-    protected function fillCredentialsAndAccessStep(): void
-    {
-        $this->fillCredentialsAndAccess();
+        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
+            $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
 
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->readmeGenerator->fillClerkAuth();
+            $this->readmeGenerator?->addGettingStarted($gitProjectPath);
+        }
+
+        if ($this->confirm('Do you need an `Environments` part?', true)) {
+            $this->readmeGenerator?->addEnvironments();
+        }
+
+        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
+            $this->configureCredentialsAndAccess();
+
+            $this->readmeGenerator?->addCredentialsAndAccess();
+
+            if ($this->authType === AuthTypeEnum::Clerk) {
+                $this->readmeGenerator?->addClerkAuthType();
+            }
         }
     }
 
-    protected function fillResources(): void
+    protected function configureResources(): void
     {
-        $filePart = $this->readmeGenerator->loadReadmePart('RESOURCES.md');
-        $laterText = '(will be added later)';
+        foreach ($this->readmeGenerator->getConfigurableResources() as $resource) {
+            $defaultAnswer = ($resource->localPath) ? "{$this->appUrl}/{$resource->localPath}" : UserAnswerEnum::Later->value;
 
-        foreach (self::RESOURCES_ITEMS as $key => $title) {
-            $defaultAnswer = (in_array($key, self::DEFAULT_URLS)) ? $this->appUrl . "/{$key}" : 'later';
-            $text = "Are you going to use {$title}? "
-                . "Please enter a link or select `later` to do it later, otherwise select `no`.";
+            $string = 'Are you going to use %? Please enter a link or select `%` to do it later, otherwise select `%`.';
 
-            $link = $this->anticipate(
-                $text,
-                ['later', 'no'],
-                $defaultAnswer
-            );
+            $text = Str::replaceArray('%', [
+                $resource->title,
+                UserAnswerEnum::Later->value,
+                UserAnswerEnum::No->value,
+            ], $string);
 
-            if ($link === 'later') {
-                $this->emptyValuesList[] = "{$title} link";
-                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_link");
-                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_later", $laterText);
-            } elseif ($link !== 'no') {
-                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_link", $link);
-                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_later");
+            $link = $this->anticipate($text, UserAnswerEnum::values(), $defaultAnswer);
+
+            $answer = UserAnswerEnum::tryFrom($link);
+
+            if (empty($answer)) {
+                $resource->setLink($link);
+            } elseif ($answer === UserAnswerEnum::Later) {
+                $this->emptyResourcesList[] = "{$resource->title} link";
             }
 
-            $this->resources[$key] = ($link !== 'no');
+            $resource->setActive($answer !== UserAnswerEnum::No);
 
-            $this->readmeGenerator->removeTag($filePart, $key, $link === 'no');
+            $this->readmeGenerator?->addResource($resource);
         }
-
-        $this->readmeGenerator->setReadmeValue($filePart, 'api_link', $this->appUrl);
-        $this->readmeGenerator->updateReadmeFile($filePart);
     }
 
-    protected function fillContacts(): void
+    protected function configureContacts(): void
     {
-        $filePart = $this->readmeGenerator->loadReadmePart('CONTACTS.md');
-
-        foreach (self::CONTACTS_ITEMS as $key => $title) {
-            if ($link = $this->ask("Please enter a {$title}'s email", '')) {
-                $this->readmeGenerator->setReadmeValue($filePart, "{$key}_link", $link);
+        foreach ($this->readmeGenerator->getConfigurableContacts() as $contact) {
+            if ($link = $this->ask("Please enter a {$contact->title}'s email", '')) {
+                $contact->setEmail($link);
             } else {
-                $this->emptyValuesList[] = "{$title}'s email";
+                $this->emptyResourcesList[] = "{$contact->title}'s email";
             }
 
-            $this->readmeGenerator->removeTag($filePart, $key);
+            $this->readmeGenerator?->addContact($contact);
         }
-
-        $this->readmeGenerator->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
-
-        $this->readmeGenerator->updateReadmeFile($filePart);
     }
 
-    protected function fillGettingStarted(): void
+    protected function configureCredentialsAndAccess(): void
     {
-        $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
-        $projectDirectory = basename($gitProjectPath, '.git');
-        $filePart = $this->readmeGenerator->loadReadmePart('GETTING_STARTED.md');
-
-        $this->readmeGenerator->setReadmeValue($filePart, 'git_project_path', $gitProjectPath);
-        $this->readmeGenerator->setReadmeValue($filePart, 'project_directory', $projectDirectory);
-
-        $this->readmeGenerator->updateReadmeFile($filePart);
-    }
-
-    protected function fillCredentialsAndAccess(): void
-    {
-        $filePart = $this->readmeGenerator->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
-
-        if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator->setReadmeValue($filePart, 'admin_email', $this->adminCredentials['email']);
-            $this->readmeGenerator->setReadmeValue($filePart, 'admin_password', $this->adminCredentials['password']);
-        }
-
-        $this->readmeGenerator->removeTag($filePart, 'admin_credentials', !$this->adminCredentials);
-
-        foreach (self::CREDENTIALS_ITEMS as $key => $title) {
-            if (!Arr::get($this->resources, $key)) {
-                $this->readmeGenerator->removeTag($filePart, "{$key}_credentials", true);
-
-                continue;
-            }
-
-            if (!empty($this->adminCredentials) && $this->confirm("Is {$title}'s admin the same as default one?", true)) {
+        foreach ($this->readmeGenerator->getAccessRequiredResources() as $resource) {
+            if (!empty($this->adminCredentials) && $this->confirm("Is {$resource->title}'s admin the same as default one?", true)) {
                 $adminCredentials = $this->adminCredentials;
             } else {
                 if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
                     $this->publishAdminsTableMigration();
                 }
 
-                $adminCredentials = $this->createAdminUser($key, $title);
+                $adminCredentials = $this->createAdminUser($resource->key, $resource->title);
             }
 
-            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_email", $adminCredentials['email']);
-            $this->readmeGenerator->setReadmeValue($filePart, "{$key}_password", $adminCredentials['password']);
-            $this->readmeGenerator->removeTag($filePart, "{$key}_credentials");
+            $resource->setCredentials($adminCredentials['email'], $adminCredentials['password']);
         }
 
-        $this->readmeGenerator->updateReadmeFile($filePart);
+        if (!empty($this->adminCredentials)) {
+            $this->readmeGenerator?->addResource(new ResourceDTO(
+                key: 'admin',
+                title: 'Default admin',
+                email: $this->adminCredentials['email'],
+                password: $this->adminCredentials['password'],
+            ));
+        }
     }
 
     protected function saveRenovateJSON(): void
@@ -613,7 +531,7 @@ class InitCommand extends Command implements Isolatable
     {
         new AppBootstrapBuilder()
             ->addExceptionsRender(
-                exceptionClass: HttpException::class,
+                exceptionClass: 'Symfony\Component\HttpKernel\Exception\HttpException',
                 renderBody: '
                     return ($request->expectsJson())
                         ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())

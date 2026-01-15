@@ -2,42 +2,205 @@
 
 namespace RonasIT\ProjectInitializator\Generators;
 
+use RonasIT\ProjectInitializator\DTO\ContactDTO;
+use RonasIT\ProjectInitializator\DTO\ResourceDTO;
+
 class ReadmeGenerator
 {
-    public const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
+    protected const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
+    protected const string LATER_TEXT = '(will be added later)';
 
-    protected string $content = '';
+    protected string $readmeContent = '';
 
+    protected string $appName;
+    protected string $appType;
     protected string $appUrl;
+    protected string $codeOwnerEmail;
+    protected string $gitProjectPath;
 
-    public function generate(string $appName, string $appType, string $appUrl): void
+    protected array $methodsToCall = [];
+
+    protected array $resources = [];
+    protected array $contacts = [];
+
+    public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
     {
+        $this->appName = $appName;
+        $this->appType = $appType;
         $this->appUrl = $appUrl;
-
-        $file = $this->loadReadmePart('README.md');
-
-        $this->setReadmeValue($file, 'project_name', $appName);
-
-        $this->setReadmeValue($file, 'type', $appType);
-
-        $this->content = $file;
+        $this->codeOwnerEmail = $codeOwnerEmail;
     }
 
-    public function fillResourcesAndContacts(): void
+    public function getConfigurableResources(): array
+    {
+        return [
+            new ResourceDTO('issue_tracker', 'Issue Tracker'),
+            new ResourceDTO('figma', 'Figma'),
+            new ResourceDTO('sentry', 'Sentry'),
+            new ResourceDTO('datadog', 'DataDog'),
+            new ResourceDTO('argocd', 'ArgoCD'),
+            new ResourceDTO('telescope', 'Laravel Telescope', 'telescope'),
+            new ResourceDTO('nova', 'Laravel Nova', 'nova'),
+        ];
+    }
+
+    public function addResource(ResourceDTO $resource): void
+    {
+        $this->resources[] = $resource;
+    }
+
+    public function getConfigurableContacts(): array
+    {
+        return [
+            new ContactDTO('manager', 'Manager'),
+        ];
+    }
+
+    public function addContact(ContactDTO $contact): void
+    {
+        $this->contacts[] = $contact;
+    }
+
+    public function getAccessRequiredResources(): array
+    {
+        return array_filter(
+            array: $this->resources,
+            callback: fn (ResourceDTO $resource) => $resource->isActive && $resource->localPath,
+        );
+    }
+
+    public function addRenovate(): void
+    {
+        $this->methodsToCall[] = 'fillRenovate';
+    }
+
+    public function addResourcesAndContacts(): void
+    {
+        $this->methodsToCall[] = 'fillResourcesAndContacts';
+    }
+
+    public function addPrerequisites(): void
+    {
+        $this->methodsToCall[] = 'fillPrerequisites';
+    }
+
+    public function addGettingStarted(string $path): void
+    {
+        $this->gitProjectPath = $path;
+
+        $this->methodsToCall[] = 'fillGettingStarted';
+    }
+
+    public function addEnvironments(): void
+    {
+        $this->methodsToCall[] = 'fillEnvironments';
+    }
+
+    public function addCredentialsAndAccess(): void
+    {
+        $this->methodsToCall[] = 'fillCredentialsAndAccess';
+    }
+
+    public function addClerkAuthType(): void
+    {
+        $this->methodsToCall[] = 'fillClerkAuthType';
+    }
+
+    public function save(): void
+    {
+        $this->prepareReadme();
+
+        foreach ($this->methodsToCall as $part) {
+            $this->$part();
+        }
+
+        $this->saveReadme();
+    }
+
+    protected function getResource(string $key): ?ResourceDTO
+    {
+        return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
+    }
+
+    protected function prepareReadme(): void
+    {
+        $file = $this->loadReadmePart('README.md');
+
+        $this->setReadmeValue($file, 'project_name', $this->appName);
+        $this->setReadmeValue($file, 'type', $this->appType);
+
+        $this->readmeContent = $file;
+    }
+
+    protected function fillResourcesAndContacts(): void
     {
         $filePart = $this->loadReadmePart('RESOURCES_AND_CONTACTS.md');
 
         $this->updateReadmeFile($filePart);
+
+        $this->fillResources();
+
+        $this->fillContacts();
     }
 
-    public function fillPrerequisites(): void
+    protected function fillResources(): void
+    {
+        $filePart = $this->loadReadmePart('RESOURCES.md');
+
+        foreach ($this->resources as $resource) {
+            if (empty($resource->link) && $resource->isActive) {
+                $this->setReadmeValue($filePart, "{$resource->key}_link");
+                $this->setReadmeValue($filePart, "{$resource->key}_later", self::LATER_TEXT);
+            } elseif (!empty($resource->link)) {
+                $this->setReadmeValue($filePart, "{$resource->key}_link", $resource->link);
+                $this->setReadmeValue($filePart, "{$resource->key}_later");
+            }
+
+            $this->removeTag($filePart, $resource->key, !$resource->isActive);
+        }
+
+        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillContacts(): void
+    {
+        $filePart = $this->loadReadmePart('CONTACTS.md');
+
+        foreach ($this->contacts as $contact) {
+            $email = $contact->email;
+
+            if (!empty($email)) {
+                $this->setReadmeValue($filePart, "{$contact->key}_link", $email);
+            }
+
+            $this->removeTag($filePart, $contact->key);
+        }
+
+        $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillPrerequisites(): void
     {
         $filePart = $this->loadReadmePart('PREREQUISITES.md');
 
         $this->updateReadmeFile($filePart);
     }
 
-    public function fillEnvironments(): void
+    protected function fillGettingStarted(): void
+    {
+        $projectDirectory = basename($this->gitProjectPath, '.git');
+        $filePart = $this->loadReadmePart('GETTING_STARTED.md');
+
+        $this->setReadmeValue($filePart, 'git_project_path', $this->gitProjectPath);
+        $this->setReadmeValue($filePart, 'project_directory', $projectDirectory);
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillEnvironments(): void
     {
         $filePart = $this->loadReadmePart('ENVIRONMENTS.md');
 
@@ -45,53 +208,70 @@ class ReadmeGenerator
         $this->updateReadmeFile($filePart);
     }
 
-    public function fillClerkAuth(): void
+    protected function fillCredentialsAndAccess(): void
+    {
+        $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
+
+        foreach ($this->resources as $resource) {
+            if (!empty($resource->email)) {
+                $this->setReadmeValue($filePart, "{$resource->key}_email", $resource->email);
+                $this->setReadmeValue($filePart, "{$resource->key}_password", $resource->password);
+            }
+
+            $this->removeTag($filePart, "{$resource->key}_credentials", empty($resource->email));
+        }
+
+        if (!$this->getResource('admin')) {
+            $this->removeTag($filePart, 'admin_credentials', true);
+        }
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillClerkAuthType(): void
     {
         $filePart = $this->loadReadmePart('CLERK.md');
 
         $this->updateReadmeFile($filePart);
     }
 
-    //TODO: make protected after refactoring completed
-    public function loadReadmePart(string $fileName): string
+    protected function fillRenovate(): void
+    {
+        $filePart = $this->loadReadmePart('RENOVATE.md');
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function saveReadme(): void
+    {
+        file_put_contents('README.md', $this->readmeContent);
+    }
+
+    protected function loadReadmePart(string $fileName): string
     {
         $file = base_path(self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
 
         return file_get_contents($file);
     }
 
-    //TODO: make protected after refactoring completed
-    public function updateReadmeFile(string $filePart): void
+    protected function setReadmeValue(string &$file, string $key, string $value = ''): void
+    {
+        $file = str_replace(":{$key}", $value, $file);
+    }
+
+    protected function updateReadmeFile(string $filePart): void
     {
         $filePart = preg_replace('#(\n){3,}#', "\n", $filePart);
 
-        $this->content .= "\n" . $filePart;
+        $this->readmeContent .= "\n" . $filePart;
     }
 
-    public function removeTag(string &$text, string $tag, bool $removeWholeString = false): void
+    protected function removeTag(string &$text, string $tag, bool $removeWholeString = false): void
     {
         $regex = ($removeWholeString)
             ? "#({{$tag}})(.|\s)*?({/{$tag}})#"
             : "# {0,1}{(/*){$tag}}#";
 
         $text = preg_replace($regex, '', $text);
-    }
-
-    //TODO: make protected after refactoring completed
-    public function setReadmeValue(string &$file, string $key, string $value = ''): void
-    {
-        $file = str_replace(":{$key}", $value, $file);
-    }
-
-    public function save(): void
-    {
-        file_put_contents('README.md', $this->content);
-    }
-
-    public function fillRenovate(): void
-    {
-        $filePart = $this->loadReadmePart('RENOVATE.md');
-
-        $this->updateReadmeFile($filePart);
     }
 }
