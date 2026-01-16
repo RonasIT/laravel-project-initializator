@@ -322,7 +322,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function publishRoleMigrations(): void
     {
-        if (!$this->isMigrationExists('create_roles_table') && !$this->isMigrationExists('roles_create_table')) {
+        if (!$this->isMigrationExists('roles_create_table') && !$this->isMigrationExists('create_roles_table')) {
             $this->publishMigration(
                 view: view('initializator::roles_create_table'),
                 migrationName: 'roles_create_table',

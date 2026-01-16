@@ -159,8 +159,8 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('migration.php')),
@@ -490,11 +490,10 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), [base_path('database/migrations/2018_11_11_111111_roles_create_table.php')]),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_default_admin.php', $this->getFixture('migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
@@ -629,11 +628,10 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), [base_path('database/migrations/2018_11_11_111111_roles_create_table.php')]),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_telescope_admin.php', $this->getFixture('telescope_users_table_migration.php')),
             $this->callFilePutContent('database/migrations/2018_11_11_111111_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
