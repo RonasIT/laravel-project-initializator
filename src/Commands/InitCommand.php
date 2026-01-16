@@ -307,6 +307,8 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::None) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
+
+            $this->publishRoleMigrations();
         }
 
         if (!$isServiceAdmin) {
@@ -316,6 +318,21 @@ class InitCommand extends Command implements Isolatable
         $this->publishAdminMigration($adminCredentials, $serviceKey);
 
         return $adminCredentials;
+    }
+
+    protected function publishRoleMigrations(): void
+    {
+        if (!$this->isMigrationExists('create_roles_table')) {
+            $this->publishMigration(
+                view: view('initializator::create_roles_table'),
+                migrationName: 'create_roles_table',
+            );
+
+            $this->publishMigration(
+                view: view('initializator::users_add_role_id'),
+                migrationName: 'users_add_role_id',
+            );
+        }
     }
 
     protected function publishMigration(View $view, string $migrationName): void
