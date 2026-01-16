@@ -62,6 +62,8 @@ class InitCommand extends Command implements Isolatable
         'username' => 'postgres',
     ];
 
+    protected ?Carbon $lastMigrationTimestamp = null;
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -337,9 +339,15 @@ class InitCommand extends Command implements Isolatable
 
     protected function publishMigration(View $view, string $migrationName): void
     {
-        $time = Carbon::now()->format('Y_m_d_His');
+        $time = Carbon::now();
 
-        $migrationName = "{$time}_{$migrationName}";
+        if ($this->lastMigrationTimestamp && $time->lte($this->lastMigrationTimestamp)) {
+            $time = $this->lastMigrationTimestamp->clone()->addSecond();
+        }
+
+        $this->lastMigrationTimestamp = $time;
+
+        $migrationName = "{$time->format('Y_m_d_His')}_{$migrationName}";
 
         $this->publishClass($view, $migrationName, 'database/migrations');
     }
