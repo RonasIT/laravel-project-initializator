@@ -62,6 +62,8 @@ class InitCommand extends Command implements Isolatable
         'username' => 'postgres',
     ];
 
+    protected ?Carbon $lastMigrationTimestamp = null;
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -307,6 +309,8 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::None) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
+
+            $this->publishRoleMigrations();
         }
 
         if (!$isServiceAdmin) {
@@ -318,11 +322,36 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
+    protected function publishRoleMigrations(): void
+    {
+        if (!$this->isMigrationExists('roles_create_table') && !$this->isMigrationExists('create_roles_table')) {
+            $this->publishMigration(
+                view: view('initializator::roles_create_table'),
+                migrationName: 'roles_create_table',
+            );
+
+            $this->publishMigration(
+                view: view('initializator::users_add_role_id'),
+                migrationName: 'users_add_role_id',
+            );
+        }
+    }
+
     protected function publishMigration(View $view, string $migrationName): void
     {
-        $time = Carbon::now()->format('Y_m_d_His');
+        $time = Carbon::now();
 
-        $migrationName = "{$time}_{$migrationName}";
+        if (empty($this->lastMigrationTimestamp)) {
+            $this->lastMigrationTimestamp = $time;
+        }
+
+        if ($time->lte($this->lastMigrationTimestamp)) {
+            $time = $this->lastMigrationTimestamp->copy()->addSecond();
+        }
+
+        $this->lastMigrationTimestamp = $time;
+
+        $migrationName = "{$time->format('Y_m_d_His')}_{$migrationName}";
 
         $this->publishClass($view, $migrationName, 'database/migrations');
     }
