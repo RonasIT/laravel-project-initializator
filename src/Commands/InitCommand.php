@@ -341,7 +341,7 @@ class InitCommand extends Command implements Isolatable
     {
         $time = Carbon::now();
 
-        if ($this->lastMigrationTimestamp && $time->lte($this->lastMigrationTimestamp)) {
+        if (!empty($this->lastMigrationTimestamp) && $time->lte($this->lastMigrationTimestamp)) {
             $time = $this->lastMigrationTimestamp->clone()->addSecond();
         }
 
