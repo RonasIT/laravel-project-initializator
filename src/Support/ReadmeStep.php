@@ -1,10 +1,10 @@
 <?php
 
-namespace RonasIT\ProjectInitializator\DTO;
+namespace RonasIT\ProjectInitializator\Support;
 
 use Closure;
 
-final readonly class GenerateReadmeStepDTO
+final readonly class ReadmeStep
 {
     public function __construct(
         public string $question,
