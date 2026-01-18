@@ -12,13 +12,13 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
-use RonasIT\ProjectInitializator\DTO\GenerateReadmeStepDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
+use RonasIT\ProjectInitializator\Support\ReadmeStep;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
@@ -356,34 +356,34 @@ class InitCommand extends Command implements Isolatable
         $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
 
         $this
-            ->getGenerateReadmeSteps()
-            ->each(function (GenerateReadmeStepDTO $step) use ($shouldGenerateAllParts) {
+            ->getReadmeSteps()
+            ->each(function (ReadmeStep $step) use ($shouldGenerateAllParts) {
                 if ($shouldGenerateAllParts || $this->confirm($step->question, true)) {
                     ($step->action)();
                 }
             });
     }
 
-    protected function getGenerateReadmeSteps(): Collection
+    protected function getReadmeSteps(): Collection
     {
         return collect([
-            new GenerateReadmeStepDTO(
+            new ReadmeStep(
                 question: 'Do you need a `Resources & Contacts` part?',
                 action: $this->configureResourcesAndContactsStep(...),
             ),
-            new GenerateReadmeStepDTO(
+            new ReadmeStep(
                 question: 'Do you need a `Prerequisites` part?',
                 action: $this->readmeGenerator->addPrerequisites(...),
             ),
-            new GenerateReadmeStepDTO(
+            new ReadmeStep(
                 question: 'Do you need a `Getting Started` part?',
                 action: $this->configureGettingStartedStep(...),
             ),
-            new GenerateReadmeStepDTO(
+            new ReadmeStep(
                 question: 'Do you need an `Environments` part?',
                 action: $this->readmeGenerator->addEnvironments(...),
             ),
-            new GenerateReadmeStepDTO(
+            new ReadmeStep(
                 question: 'Do you need a `Credentials and Access` part?',
                 action: $this->configureCredentialsAndAccessStep(...),
             ),
