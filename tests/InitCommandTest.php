@@ -286,7 +286,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
+            ->expectsConfirmation('Do you want to generate all README parts?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
@@ -323,10 +323,6 @@ class InitCommandTest extends TestCase
                 'later',
             )
             ->expectsQuestion('Please enter a Manager\'s email', '')
-            ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
-            ->expectsConfirmation('Do you need a `Getting Started` part?', 'yes')
-            ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
-            ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?')
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'mail@mail.com')
@@ -411,6 +407,7 @@ class InitCommandTest extends TestCase
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
+            ->expectsConfirmation('Do you want to generate all README parts?')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
@@ -539,6 +536,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin name', 'TestAdmin')
             ->expectsQuestion('Please enter admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
+            ->expectsConfirmation('Do you want to generate all README parts?')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
@@ -661,6 +659,7 @@ class InitCommandTest extends TestCase
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
+            ->expectsConfirmation('Do you want to generate all README parts?')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
@@ -804,6 +803,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
+            ->expectsConfirmation('Do you want to generate all README parts?')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
@@ -941,6 +941,7 @@ class InitCommandTest extends TestCase
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
+            ->expectsConfirmation('Do you want to generate all README parts?')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
