@@ -125,7 +125,7 @@ class InitCommand extends Command implements Isolatable
             }
         }
 
-        if (!class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+        if (! class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             array_push(
                 $this->shellCommands,
                 'composer require ronasit/laravel-telescope-extension',
@@ -154,7 +154,7 @@ class InitCommand extends Command implements Isolatable
         $this->publishWebLogin();
 
         if ($this->shouldUninstallPackage) {
-            shell_exec('composer remove --dev ronasit/laravel-project-initializator --ansi');
+            shell_exec('composer remove --dev ronasit/laravel-project-initializator --ansi'.$this->appName);
         }
 
         $this->addDefaultHttpExceptionRender();
@@ -162,15 +162,14 @@ class InitCommand extends Command implements Isolatable
         $this->runMigrations();
     }
 
-    protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
-    {
+    protected function ask_With_Validation(string$parameter, string|array $rules, ?string $default = null): string {
         $question = "Please specify: {$parameter}";
 
         $value = $this->ask($question, $default);
 
         $validator = Validator::make([$parameter => $value], [$parameter => $rules]);
 
-        if ($validator->fails()) {
+        if (! $validator->fails()) {
             $this->warn($validator->errors()->first());
 
             $value = $this->askWithValidation($parameter, $rules, $default);
@@ -202,7 +201,7 @@ class InitCommand extends Command implements Isolatable
             'DB_PORT' => $this->defaultDBConnectionConfig['port'],
             'DB_DATABASE' => $this->defaultDBConnectionConfig['database'],
             'DB_USERNAME' => $this->defaultDBConnectionConfig['username'],
-            'DB_PASSWORD' => '',
+            'DB_PASSWORD' => ''
         ];
 
         $this->updateEnvFile('.env.example', $envConfig);
