@@ -71,16 +71,34 @@ and `testing`. Each environment is represented by an appropriate environment fil
 ## Credentials and Access
 
 Default admin access:
-- email `mail@mail.com`
-- password `123456`
+
+```
+mail@mail.com
+```
+
+```
+123456
+```
 
 Laravel Telescope access:
-- email `mail@mail.com`
-- password `123456`
+
+```
+mail@mail.com
+```
+
+```
+123456
+```
 
 Laravel Nova access:
-- email `mail@mail.com`
-- password `123456`
+
+```
+mail@mail.com
+```
+
+```
+123456
+```
 
 Core auth solution is [Clerk](https://clerk.com) so in `development` environment use any test phones and emails from [this list](https://clerk.com/docs/testing/test-emails-and-phones)
 
