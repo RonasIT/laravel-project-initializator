@@ -4,6 +4,7 @@ namespace RonasIT\ProjectInitializator\Generators;
 
 use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
+use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 
 class ReadmeGenerator
 {
@@ -20,10 +21,13 @@ class ReadmeGenerator
     protected array $resources = [];
     protected array $contacts = [];
 
-    public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
+    public function __construct()
     {
-        $this->appName = $appName;
-        $this->appType = $appType;
+        $this->readmeContent = $this->loadReadmePart('README.md');
+    }
+
+    public function setAppInfo(string $appUrl, string $codeOwnerEmail): void
+    {
         $this->appUrl = $appUrl;
         $this->codeOwnerEmail = $codeOwnerEmail;
     }
@@ -66,14 +70,10 @@ class ReadmeGenerator
         );
     }
 
-    public function prepareReadme(): void
+    public function fillProjectInfo(string $name, AppTypeEnum $type): void
     {
-        $file = $this->loadReadmePart('README.md');
-
-        $this->setReadmeValue($file, 'project_name', $this->appName);
-        $this->setReadmeValue($file, 'type', $this->appType);
-
-        $this->readmeContent = $file;
+        $this->setReadmeValue($this->readmeContent, 'project_name', $name);
+        $this->setReadmeValue($this->readmeContent, 'type', $type->value);
     }
 
     public function fillResourcesAndContacts(): void
@@ -147,7 +147,7 @@ class ReadmeGenerator
         $this->updateReadmeFile($filePart);
     }
 
-    public function saveReadme(): void
+    public function save(): void
     {
         file_put_contents('README.md', $this->readmeContent);
     }

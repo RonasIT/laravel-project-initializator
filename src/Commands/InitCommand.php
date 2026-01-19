@@ -112,7 +112,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme) {
-            $this->readmeGenerator?->saveReadme();
+            $this->readmeGenerator?->save();
 
             $this->info('README generated successfully!');
 
@@ -345,13 +345,11 @@ class InitCommand extends Command implements Isolatable
         $this->readmeGenerator = app(ReadmeGenerator::class);
 
         $this->readmeGenerator->setAppInfo(
-            appName: $this->appName,
-            appType: $this->appType->value,
             appUrl: $this->appUrl,
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        $this->readmeGenerator?->prepareReadme();
+        $this->readmeGenerator?->fillProjectInfo($this->appName, $this->appType);
 
         if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
             $this->configureResources();
