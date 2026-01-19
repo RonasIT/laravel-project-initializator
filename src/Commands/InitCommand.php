@@ -107,7 +107,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($this->confirm('Will project work with media files? (upload, store and return content)')) {
-            $this->configureMediaStorage();
+            $this->setupMediaStorage();
         }
 
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
@@ -452,7 +452,7 @@ class InitCommand extends Command implements Isolatable
         }
     }
 
-    protected function configureMediaStorage(): void
+    protected function setupMediaStorage(): void
     {
         $this->shellCommands[] = 'composer require ronasit/laravel-media';
 
