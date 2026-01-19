@@ -105,6 +105,10 @@ class InitCommand extends Command implements Isolatable
             $this->configureReadmeParts();
         }
 
+        if ($this->confirm('Will project work with media files? (upload, store and return content)')) {
+            $this->shellCommands[] = 'composer require ronasit/laravel-media';
+        }
+
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
@@ -131,10 +135,6 @@ class InitCommand extends Command implements Isolatable
                 'composer require ronasit/laravel-telescope-extension',
                 'php artisan telescope:install',
             );
-        }
-
-        if ($this->confirm('Do you want to install media package?')) {
-            $this->shellCommands[] = 'composer require ronasit/laravel-media';
         }
 
         if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
