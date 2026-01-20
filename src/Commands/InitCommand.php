@@ -109,7 +109,7 @@ class InitCommand extends Command implements Isolatable
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
-            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::Renovate);
+            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::Renovate);
         }
 
         if ($shouldGenerateReadme) {
@@ -356,11 +356,11 @@ class InitCommand extends Command implements Isolatable
             $this->configureResources();
             $this->configureContacts();
 
-            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::ResourcesAndContacts);
+            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::ResourcesAndContacts);
         }
 
         if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::Prerequisites);
+            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::Prerequisites);
         }
 
         if ($this->confirm('Do you need a `Getting Started` part?', true)) {
@@ -368,20 +368,20 @@ class InitCommand extends Command implements Isolatable
 
             $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
 
-            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::GettingStarted);
+            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::GettingStarted);
         }
 
         if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::Environments);
+            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::Environments);
         }
 
         if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
             $this->configureCredentialsAndAccess();
 
-            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::CredentialsAndAccess);
+            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::CredentialsAndAccess);
 
             if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator?->addReadmePart(ReadmePartEnum::ClerkAuthType);
+                $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::ClerkAuthType);
             }
         }
     }

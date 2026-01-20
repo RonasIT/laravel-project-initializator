@@ -88,7 +88,7 @@ class ReadmeGenerator
         );
     }
 
-    public function addReadmePart(ReadmePartEnum $part): void
+    public function enableReadmePart(ReadmePartEnum $part): void
     {
         $this->readmeParts[$part->value] = true;
     }
