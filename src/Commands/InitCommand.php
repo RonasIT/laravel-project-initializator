@@ -221,6 +221,7 @@ class InitCommand extends Command implements Isolatable
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
             'APP_MAINTENANCE_DRIVER' => 'cache',
+            'APP_MAINTENANCE_STORE' => 'redis',
             'CACHE_STORE' => 'redis',
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
