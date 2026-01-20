@@ -14,6 +14,7 @@ use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
+use RonasIT\ProjectInitializator\Enums\ReadmePartEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
@@ -108,7 +109,7 @@ class InitCommand extends Command implements Isolatable
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
-            $this->readmeGenerator?->addRenovate();
+            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::Renovate);
         }
 
         if ($shouldGenerateReadme) {
@@ -344,7 +345,7 @@ class InitCommand extends Command implements Isolatable
     {
         $this->readmeGenerator = app(ReadmeGenerator::class);
 
-        $this->readmeGenerator->setAppInfo(
+        $this->readmeGenerator?->setAppInfo(
             appName: $this->appName,
             appType: $this->appType->value,
             appUrl: $this->appUrl,
@@ -355,30 +356,32 @@ class InitCommand extends Command implements Isolatable
             $this->configureResources();
             $this->configureContacts();
 
-            $this->readmeGenerator?->addResourcesAndContacts();
+            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::ResourcesAndContacts);
         }
 
         if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeGenerator?->addPrerequisites();
+            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::Prerequisites);
         }
 
         if ($this->confirm('Do you need a `Getting Started` part?', true)) {
             $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
 
-            $this->readmeGenerator?->addGettingStarted($gitProjectPath);
+            $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
+
+            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::GettingStarted);
         }
 
         if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeGenerator?->addEnvironments();
+            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::Environments);
         }
 
         if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
             $this->configureCredentialsAndAccess();
 
-            $this->readmeGenerator?->addCredentialsAndAccess();
+            $this->readmeGenerator?->addReadmePart(ReadmePartEnum::CredentialsAndAccess);
 
             if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator?->addClerkAuthType();
+                $this->readmeGenerator?->addReadmePart(ReadmePartEnum::ClerkAuthType);
             }
         }
     }

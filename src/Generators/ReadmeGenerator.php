@@ -4,6 +4,7 @@ namespace RonasIT\ProjectInitializator\Generators;
 
 use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
+use RonasIT\ProjectInitializator\Enums\ReadmePartEnum;
 
 class ReadmeGenerator
 {
@@ -22,13 +23,13 @@ class ReadmeGenerator
     protected array $contacts = [];
 
     protected array $readmeParts = [
-        'fillResourcesAndContacts' => false,
-        'fillPrerequisites' => false,
-        'fillGettingStarted' => false,
-        'fillEnvironments' => false,
-        'fillCredentialsAndAccess' => false,
-        'fillClerkAuthType' => false,
-        'fillRenovate' => false,
+        ReadmePartEnum::ResourcesAndContacts->value => false,
+        ReadmePartEnum::Prerequisites->value => false,
+        ReadmePartEnum::GettingStarted->value => false,
+        ReadmePartEnum::Environments->value => false,
+        ReadmePartEnum::CredentialsAndAccess->value => false,
+        ReadmePartEnum::ClerkAuthType->value => false,
+        ReadmePartEnum::Renovate->value => false,
     ];
 
     public function __construct()
@@ -42,6 +43,11 @@ class ReadmeGenerator
         $this->appType = $appType;
         $this->appUrl = $appUrl;
         $this->codeOwnerEmail = $codeOwnerEmail;
+    }
+
+    public function setGitProjectPath(string $path): void
+    {
+        $this->gitProjectPath = $path;
     }
 
     public function getConfigurableResources(): array
@@ -82,41 +88,9 @@ class ReadmeGenerator
         );
     }
 
-    public function addResourcesAndContacts(): void
+    public function addReadmePart(ReadmePartEnum $part): void
     {
-        $this->readmeParts['fillResourcesAndContacts'] = true;
-    }
-
-    public function addPrerequisites(): void
-    {
-        $this->readmeParts['fillPrerequisites'] = true;
-    }
-
-    public function addGettingStarted(string $path): void
-    {
-        $this->gitProjectPath = $path;
-
-        $this->readmeParts['fillGettingStarted'] = true;
-    }
-
-    public function addEnvironments(): void
-    {
-        $this->readmeParts['fillEnvironments'] = true;
-    }
-
-    public function addCredentialsAndAccess(): void
-    {
-        $this->readmeParts['fillCredentialsAndAccess'] = true;
-    }
-
-    public function addClerkAuthType(): void
-    {
-        $this->readmeParts['fillClerkAuthType'] = true;
-    }
-
-    public function addRenovate(): void
-    {
-        $this->readmeParts['fillRenovate'] = true;
+        $this->readmeParts[$part->value] = true;
     }
 
     public function save(): void
