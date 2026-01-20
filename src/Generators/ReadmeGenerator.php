@@ -124,7 +124,7 @@ class ReadmeGenerator
         $this->fillProjectInfo();
 
         foreach ($this->readmeParts as $part => $enabled) {
-            if ($enabled && isset($this->readmeParts[$part])) {
+            if ($enabled) {
                 $this->$part();
             }
         }
