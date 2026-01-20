@@ -108,7 +108,7 @@ class InitCommand extends Command implements Isolatable
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
-            $this->readmeGenerator?->fillRenovate();
+            $this->readmeGenerator?->addRenovate();
         }
 
         if ($shouldGenerateReadme) {
@@ -345,40 +345,40 @@ class InitCommand extends Command implements Isolatable
         $this->readmeGenerator = app(ReadmeGenerator::class);
 
         $this->readmeGenerator->setAppInfo(
+            appName: $this->appName,
+            appType: $this->appType->value,
             appUrl: $this->appUrl,
             codeOwnerEmail: $this->codeOwnerEmail,
         );
-
-        $this->readmeGenerator?->fillProjectInfo($this->appName, $this->appType);
 
         if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
             $this->configureResources();
             $this->configureContacts();
 
-            $this->readmeGenerator?->fillResourcesAndContacts();
+            $this->readmeGenerator?->addResourcesAndContacts();
         }
 
         if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeGenerator?->fillPrerequisites();
+            $this->readmeGenerator?->addPrerequisites();
         }
 
         if ($this->confirm('Do you need a `Getting Started` part?', true)) {
             $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
 
-            $this->readmeGenerator?->fillGettingStarted($gitProjectPath);
+            $this->readmeGenerator?->addGettingStarted($gitProjectPath);
         }
 
         if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeGenerator?->fillEnvironments();
+            $this->readmeGenerator?->addEnvironments();
         }
 
         if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
             $this->configureCredentialsAndAccess();
 
-            $this->readmeGenerator?->fillCredentialsAndAccess();
+            $this->readmeGenerator?->addCredentialsAndAccess();
 
             if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator?->fillClerkAuthType();
+                $this->readmeGenerator?->addClerkAuthType();
             }
         }
     }

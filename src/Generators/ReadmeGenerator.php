@@ -4,7 +4,6 @@ namespace RonasIT\ProjectInitializator\Generators;
 
 use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
-use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 
 class ReadmeGenerator
 {
@@ -17,17 +16,30 @@ class ReadmeGenerator
     protected string $appType;
     protected string $appUrl;
     protected string $codeOwnerEmail;
+    protected string $gitProjectPath;
 
     protected array $resources = [];
     protected array $contacts = [];
+
+    protected array $readmeParts = [
+        'fillResourcesAndContacts' => false,
+        'fillPrerequisites' => false,
+        'fillGettingStarted' => false,
+        'fillEnvironments' => false,
+        'fillCredentialsAndAccess' => false,
+        'fillClerkAuthType' => false,
+        'fillRenovate' => false,
+    ];
 
     public function __construct()
     {
         $this->readmeContent = $this->loadReadmePart('README.md');
     }
 
-    public function setAppInfo(string $appUrl, string $codeOwnerEmail): void
+    public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
     {
+        $this->appName = $appName;
+        $this->appType = $appType;
         $this->appUrl = $appUrl;
         $this->codeOwnerEmail = $codeOwnerEmail;
     }
@@ -70,13 +82,63 @@ class ReadmeGenerator
         );
     }
 
-    public function fillProjectInfo(string $name, AppTypeEnum $type): void
+    public function addResourcesAndContacts(): void
     {
-        $this->setReadmeValue($this->readmeContent, 'project_name', $name);
-        $this->setReadmeValue($this->readmeContent, 'type', $type->value);
+        $this->readmeParts['fillResourcesAndContacts'] = true;
     }
 
-    public function fillResourcesAndContacts(): void
+    public function addPrerequisites(): void
+    {
+        $this->readmeParts['fillPrerequisites'] = true;
+    }
+
+    public function addGettingStarted(string $gitProjectPath): void
+    {
+        $this->gitProjectPath = $gitProjectPath;
+
+        $this->readmeParts['fillGettingStarted'] = true;
+    }
+
+    public function addEnvironments(): void
+    {
+        $this->readmeParts['fillEnvironments'] = true;
+    }
+
+    public function addCredentialsAndAccess(): void
+    {
+        $this->readmeParts['fillCredentialsAndAccess'] = true;
+    }
+
+    public function addClerkAuthType(): void
+    {
+        $this->readmeParts['fillClerkAuthType'] = true;
+    }
+
+    public function addRenovate(): void
+    {
+        $this->readmeParts['fillRenovate'] = true;
+    }
+
+    public function save(): void
+    {
+        $this->fillProjectInfo();
+
+        foreach ($this->readmeParts as $part => $enabled) {
+            if ($enabled && isset($this->readmeParts[$part])) {
+                $this->$part();
+            }
+        }
+
+        file_put_contents('README.md', $this->readmeContent);
+    }
+
+    protected function fillProjectInfo(): void
+    {
+        $this->setReadmeValue($this->readmeContent, 'project_name', $this->appName);
+        $this->setReadmeValue($this->readmeContent, 'type', $this->appType);
+    }
+
+    protected function fillResourcesAndContacts(): void
     {
         $filePart = $this->loadReadmePart('RESOURCES_AND_CONTACTS.md');
 
@@ -85,76 +147,6 @@ class ReadmeGenerator
         $this->fillResources();
 
         $this->fillContacts();
-    }
-
-    public function fillPrerequisites(): void
-    {
-        $filePart = $this->loadReadmePart('PREREQUISITES.md');
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    public function fillGettingStarted(string $gitProjectPath): void
-    {
-        $projectDirectory = basename($gitProjectPath, '.git');
-        $filePart = $this->loadReadmePart('GETTING_STARTED.md');
-
-        $this->setReadmeValue($filePart, 'git_project_path', $gitProjectPath);
-        $this->setReadmeValue($filePart, 'project_directory', $projectDirectory);
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    public function fillEnvironments(): void
-    {
-        $filePart = $this->loadReadmePart('ENVIRONMENTS.md');
-
-        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
-        $this->updateReadmeFile($filePart);
-    }
-
-    public function fillCredentialsAndAccess(): void
-    {
-        $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
-
-        foreach ($this->resources as $resource) {
-            if (!empty($resource->email)) {
-                $this->setReadmeValue($filePart, "{$resource->key}_email", $resource->email);
-                $this->setReadmeValue($filePart, "{$resource->key}_password", $resource->password);
-            }
-
-            $this->removeTag($filePart, "{$resource->key}_credentials", empty($resource->email));
-        }
-
-        if (!$this->getResource('admin')) {
-            $this->removeTag($filePart, 'admin_credentials', true);
-        }
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    public function fillClerkAuthType(): void
-    {
-        $filePart = $this->loadReadmePart('CLERK.md');
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    public function fillRenovate(): void
-    {
-        $filePart = $this->loadReadmePart('RENOVATE.md');
-
-        $this->updateReadmeFile($filePart);
-    }
-
-    public function save(): void
-    {
-        file_put_contents('README.md', $this->readmeContent);
-    }
-
-    protected function getResource(string $key): ?ResourceDTO
-    {
-        return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
     }
 
     protected function fillResources(): void
@@ -194,6 +186,71 @@ class ReadmeGenerator
         $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
 
         $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillPrerequisites(): void
+    {
+        $filePart = $this->loadReadmePart('PREREQUISITES.md');
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillGettingStarted(): void
+    {
+        $projectDirectory = basename($this->gitProjectPath, '.git');
+        $filePart = $this->loadReadmePart('GETTING_STARTED.md');
+
+        $this->setReadmeValue($filePart, 'git_project_path', $this->gitProjectPath);
+        $this->setReadmeValue($filePart, 'project_directory', $projectDirectory);
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillEnvironments(): void
+    {
+        $filePart = $this->loadReadmePart('ENVIRONMENTS.md');
+
+        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillCredentialsAndAccess(): void
+    {
+        $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
+
+        foreach ($this->resources as $resource) {
+            if (!empty($resource->email)) {
+                $this->setReadmeValue($filePart, "{$resource->key}_email", $resource->email);
+                $this->setReadmeValue($filePart, "{$resource->key}_password", $resource->password);
+            }
+
+            $this->removeTag($filePart, "{$resource->key}_credentials", empty($resource->email));
+        }
+
+        if (!$this->getResource('admin')) {
+            $this->removeTag($filePart, 'admin_credentials', true);
+        }
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillClerkAuthType(): void
+    {
+        $filePart = $this->loadReadmePart('CLERK.md');
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function fillRenovate(): void
+    {
+        $filePart = $this->loadReadmePart('RENOVATE.md');
+
+        $this->updateReadmeFile($filePart);
+    }
+
+    protected function getResource(string $key): ?ResourceDTO
+    {
+        return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
     }
 
     protected function loadReadmePart(string $fileName): string
