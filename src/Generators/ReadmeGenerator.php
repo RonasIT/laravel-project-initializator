@@ -92,9 +92,9 @@ class ReadmeGenerator
         $this->readmeParts['fillPrerequisites'] = true;
     }
 
-    public function addGettingStarted(string $gitProjectPath): void
+    public function addGettingStarted(string $path): void
     {
-        $this->gitProjectPath = $gitProjectPath;
+        $this->gitProjectPath = $path;
 
         $this->readmeParts['fillGettingStarted'] = true;
     }
