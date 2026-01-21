@@ -16,11 +16,6 @@ return new class extends Migration
         $this->addRoles();
     }
 
-    public function down(): void
-    {
-        Schema::dropIfExists('roles');
-    }
-
     public function createTable(): void
     {
         if (!Schema::hasTable('roles')) {
@@ -52,5 +47,10 @@ return new class extends Migration
         ];
 
         DB::table('roles')->insert($roles);
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('roles');
     }
 };
