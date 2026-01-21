@@ -490,7 +490,7 @@ class InitCommand extends Command implements Isolatable
         ));
 
         if ($storage === StorageEnum::Gcs) {
-            $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage package';
+            $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage';
 
             $this->updateEnvFile('.env.development', [
                 'FILESYSTEM_DISK' => StorageEnum::Gcs->value,

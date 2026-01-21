@@ -1048,6 +1048,10 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
@@ -1062,7 +1066,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
-            $this->callShellExec('composer require spatie/laravel-google-cloud-storage package --ansi'),
+            $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
