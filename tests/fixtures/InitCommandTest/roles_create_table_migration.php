@@ -12,12 +12,6 @@ return new class extends Migration
 
     public function up(): void
     {
-        $this->createTable();
-        $this->addRoles();
-    }
-
-    public function createTable(): void
-    {
         if (!Schema::hasTable('roles')) {
             Schema::create('roles', function (Blueprint $table) {
                 $table->id();
@@ -25,6 +19,13 @@ return new class extends Migration
                 $table->timestamps();
             });
         }
+
+        $this->addRoles();
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('roles');
     }
 
     public function addRoles(): void
@@ -47,10 +48,5 @@ return new class extends Migration
         ];
 
         DB::table('roles')->insert($roles);
-    }
-
-    public function down(): void
-    {
-        Schema::dropIfExists('roles');
     }
 };
