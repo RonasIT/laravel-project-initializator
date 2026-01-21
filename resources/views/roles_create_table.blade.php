@@ -16,9 +16,9 @@ return new class extends Migration
                 $table->string('name')->unique();
                 $table->timestamps();
             });
-        }
 
-        $this->addRoles();
+            $this->addRoles();
+        }
     }
 
     public function down(): void
