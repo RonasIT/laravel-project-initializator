@@ -24,7 +24,7 @@ return new class extends Migration
         if (!Schema::hasTable('roles')) {
             Schema::create('roles', function (Blueprint $table) {
                 $table->id();
-                $table->string('name');
+                $table->string('name')->unique();
                 $table->timestamps();
             });
         }
@@ -32,14 +32,20 @@ return new class extends Migration
 
     public function addRoles(): void
     {
+        $now = now();
+
         $roles = [
             [
                 'id' => 1,
-                'name' => 'administrator',
+                'name' => 'admin',
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
             [
                 'id' => 2,
                 'name' => 'user',
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
         ];
 

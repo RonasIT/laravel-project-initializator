@@ -64,6 +64,13 @@ class InitCommand extends Command implements Isolatable
 
     protected ?Carbon $lastMigrationTimestamp = null;
 
+    public function __construct()
+    {
+        $this->lastMigrationTimestamp = Carbon::now();
+
+        parent::__construct();
+    }
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -93,6 +100,8 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->configureClerk();
+        } else {
+            $this->publishRoleMigrations();
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -309,8 +318,6 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::None) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
-
-            $this->publishRoleMigrations();
         }
 
         if (!$isServiceAdmin) {
@@ -339,17 +346,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function publishMigration(View $view, string $migrationName): void
     {
-        $time = Carbon::now();
-
-        if (empty($this->lastMigrationTimestamp)) {
-            $this->lastMigrationTimestamp = $time;
-        }
-
-        if ($time->lte($this->lastMigrationTimestamp)) {
-            $time = $this->lastMigrationTimestamp->copy()->addSecond();
-        }
-
-        $this->lastMigrationTimestamp = $time;
+        $time = $this->lastMigrationTimestamp->addSecond();
 
         $migrationName = "{$time->format('Y_m_d_His')}_{$migrationName}";
 
