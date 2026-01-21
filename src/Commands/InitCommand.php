@@ -63,6 +63,15 @@ class InitCommand extends Command implements Isolatable
         'username' => 'postgres',
     ];
 
+    protected ?Carbon $lastMigrationTimestamp = null;
+
+    public function __construct()
+    {
+        $this->lastMigrationTimestamp = Carbon::now();
+
+        parent::__construct();
+    }
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -92,6 +101,8 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->configureClerk();
+        } else {
+            $this->publishRoleMigrations();
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -222,6 +233,7 @@ class InitCommand extends Command implements Isolatable
             'APP_NAME' => $this->appName,
             'APP_URL' => $this->appUrl,
             'APP_MAINTENANCE_DRIVER' => 'cache',
+            'APP_MAINTENANCE_STORE' => 'redis',
             'CACHE_STORE' => 'redis',
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
@@ -319,11 +331,26 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
+    protected function publishRoleMigrations(): void
+    {
+        if (!$this->isMigrationExists('roles_create_table') && !$this->isMigrationExists('create_roles_table')) {
+            $this->publishMigration(
+                view: view('initializator::roles_create_table'),
+                migrationName: 'roles_create_table',
+            );
+
+            $this->publishMigration(
+                view: view('initializator::users_add_role_id'),
+                migrationName: 'users_add_role_id',
+            );
+        }
+    }
+
     protected function publishMigration(View $view, string $migrationName): void
     {
-        $time = Carbon::now()->format('Y_m_d_His');
+        $time = $this->lastMigrationTimestamp->addSecond();
 
-        $migrationName = "{$time}_{$migrationName}";
+        $migrationName = "{$time->format('Y_m_d_His')}_{$migrationName}";
 
         $this->publishClass($view, $migrationName, 'database/migrations');
     }
