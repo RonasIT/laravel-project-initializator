@@ -72,8 +72,8 @@ class InitCommandTest extends TestCase
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
-            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -135,9 +135,9 @@ class InitCommandTest extends TestCase
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
-            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -205,8 +205,8 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin name', 'TestAdmin')
             ->expectsQuestion('Please enter admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
-            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -351,9 +351,9 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- DataDog link')
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
-            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -471,8 +471,8 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
-            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -523,9 +523,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
-            $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
             $this->callShellExec('php artisan migrate --ansi --force'),
@@ -607,9 +607,9 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
             ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
             ->expectsOutput('README generated successfully!')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
-            ->expectsConfirmation('Do you want to install media package?', 'yes')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->assertExitCode(0);
     }
@@ -737,8 +737,8 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
-            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -879,9 +879,9 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- DataDog link')
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
-            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -1012,8 +1012,8 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
-            ->expectsConfirmation('Do you want to install media package?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
