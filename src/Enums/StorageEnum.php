@@ -8,7 +8,7 @@ enum StorageEnum: string
 {
     use EnumTrait;
 
-    case Gcs = 'gcs';
+    case GCS = 'gcs';
     case Local = 'local';
     case S3 = 's3';
 }
