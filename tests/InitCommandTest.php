@@ -343,6 +343,9 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?')
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
@@ -351,9 +354,6 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- DataDog link')
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -468,11 +468,11 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Getting Started` part?')
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -608,6 +608,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
+            ->expectsChoice('Which storage will be used for media files?', 's3', ['gcs', 'local', 's3'])
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
@@ -734,11 +735,11 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin password for Laravel Nova', '654321')
             ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
             ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -871,6 +872,9 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?', 'yes')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
@@ -879,9 +883,6 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- DataDog link')
             ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
-            ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
@@ -1011,9 +1012,81 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
             ->expectsOutput('README generated successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->assertExitCode(0);
+    }
+
+    public function testRunWithoutAdminAndWithoutReadmeAndWithMediaStorageGcs()
+    {
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_pascal_case.yml', 'env.development_storage_gcs.yml'),
+            $this->changeConfigFileCall('config/filesystems.php', 'filesystems.php', 'filesystems_after_changes.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileExists('.env', false),
+            $this->callFileExists('.env.development', false),
+
+            $this->callCopy('.env.example', '.env'),
+            $this->callCopy('.env.example', '.env.development'),
+
+            $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
+            $this->callShellExec('./vendor/bin/cghooks update --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-media --ansi'),
+            $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan migrate --ansi --force'),
+        );
+
+        $this
+            ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
+            ->expectsOutput('Project initialized successfully!')
+            ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
+            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsConfirmation('Do you want to generate an admin user?')
+            ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
+            ->expectsChoice('Which storage will be used for media files?', 'gcs', ['gcs', 'local', 's3'])
+            ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsOutput('Don`t forget to fill the following empty values:')
+            ->expectsOutput('- GOOGLE_CLOUD_STORAGE_BUCKET')
+            ->expectsOutput('- GOOGLE_CLOUD_PROJECT_ID')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
