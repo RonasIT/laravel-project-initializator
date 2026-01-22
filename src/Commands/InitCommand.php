@@ -486,14 +486,14 @@ class InitCommand extends Command implements Isolatable
         $storage = StorageEnum::from($this->choice(
             question: 'Which storage will be used for media files?',
             choices: StorageEnum::values(),
-            default: StorageEnum::Gcs->value,
+            default: StorageEnum::GCS->value,
         ));
 
-        if ($storage === StorageEnum::Gcs) {
+        if ($storage === StorageEnum::GCS) {
             $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage';
 
             $this->updateEnvFile('.env.development', [
-                'FILESYSTEM_DISK' => StorageEnum::Gcs->value,
+                'FILESYSTEM_DISK' => StorageEnum::GCS->value,
                 'GOOGLE_CLOUD_STORAGE_PATH_PREFIX' => 'api',
                 'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
                 'GOOGLE_CLOUD_PROJECT_ID' => '',
@@ -511,7 +511,7 @@ class InitCommand extends Command implements Isolatable
         $config = ArrayFile::open(base_path('config/filesystems.php'));
 
         $config
-            ->set('disks.gcs.driver', StorageEnum::Gcs->value)
+            ->set('disks.gcs.driver', StorageEnum::GCS->value)
             ->set('disks.gcs.key_file_path', null)
             ->set('disks.gcs.key_file', [])
             ->set('disks.gcs.project_id', $config->function('env', ['GOOGLE_CLOUD_PROJECT_ID', 'your-project-id']))
