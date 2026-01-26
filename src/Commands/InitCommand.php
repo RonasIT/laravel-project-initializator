@@ -16,6 +16,7 @@ use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\ReadmePartEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
+use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 use Winter\LaravelConfigWriter\ArrayFile;
@@ -118,7 +119,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($this->confirm('Will project work with media files? (upload, store and return content)')) {
-            $this->shellCommands[] = 'composer require ronasit/laravel-media';
+            $this->setupMediaStorage();
         }
 
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
@@ -131,13 +132,13 @@ class InitCommand extends Command implements Isolatable
             $this->readmeGenerator?->save();
 
             $this->info('README generated successfully!');
+        }
 
-            if ($this->emptyResourcesList) {
-                $this->warn('Don`t forget to fill the following empty values:');
+        if ($this->emptyResourcesList) {
+            $this->warn('Don`t forget to fill the following empty values:');
 
-                foreach ($this->emptyResourcesList as $value) {
-                    $this->warn("- {$value}");
-                }
+            foreach ($this->emptyResourcesList as $value) {
+                $this->warn("- {$value}");
             }
         }
 
@@ -479,6 +480,54 @@ class InitCommand extends Command implements Isolatable
                 password: $this->adminCredentials['password'],
             ));
         }
+    }
+
+    protected function setupMediaStorage(): void
+    {
+        $this->shellCommands[] = 'composer require ronasit/laravel-media';
+
+        $storage = StorageEnum::from($this->choice(
+            question: 'Which storage will be used for media files?',
+            choices: StorageEnum::values(),
+            default: StorageEnum::GCS->value,
+        ));
+
+        if ($storage === StorageEnum::GCS) {
+            $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage';
+
+            $this->updateEnvFile('.env.development', [
+                'FILESYSTEM_DISK' => StorageEnum::GCS->value,
+                'GOOGLE_CLOUD_STORAGE_PATH_PREFIX' => 'api',
+                'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
+                'GOOGLE_CLOUD_PROJECT_ID' => '',
+            ]);
+
+            $this->emptyResourcesList[] = 'GOOGLE_CLOUD_STORAGE_BUCKET';
+            $this->emptyResourcesList[] = 'GOOGLE_CLOUD_PROJECT_ID';
+
+            $this->addGcsDiskToConfig();
+        }
+    }
+
+    protected function addGcsDiskToConfig(): void
+    {
+        $config = ArrayFile::open(base_path('config/filesystems.php'));
+
+        $config
+            ->set('disks.gcs.driver', StorageEnum::GCS->value)
+            ->set('disks.gcs.key_file_path', null)
+            ->set('disks.gcs.key_file', [])
+            ->set('disks.gcs.project_id', $config->function('env', ['GOOGLE_CLOUD_PROJECT_ID', 'your-project-id']))
+            ->set('disks.gcs.bucket', $config->function('env', ['GOOGLE_CLOUD_STORAGE_BUCKET', 'your-bucket']))
+            ->set('disks.gcs.path_prefix', $config->function('env', ['GOOGLE_CLOUD_STORAGE_PATH_PREFIX', '']))
+            ->set('disks.gcs.storage_api_uri', $config->function('env', ['GOOGLE_CLOUD_STORAGE_API_URI', null]))
+            ->set('disks.gcs.api_endpoint', $config->function('env', ['GOOGLE_CLOUD_STORAGE_API_ENDPOINT', null]))
+            ->set('disks.gcs.visibility', 'public')
+            ->set('disks.gcs.visibility_handler', null)
+            ->set('disks.gcs.throw', true)
+            ->set('disks.gcs.metadata', ['cacheControl' => 'public,max-age=86400']);
+
+        $config->write();
     }
 
     protected function saveRenovateJSON(): void
