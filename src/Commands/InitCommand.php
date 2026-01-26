@@ -14,7 +14,7 @@ use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
-use RonasIT\ProjectInitializator\Enums\ReadmePartEnum;
+use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
@@ -125,7 +125,7 @@ class InitCommand extends Command implements Isolatable
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
-            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::Renovate);
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Renovate);
         }
 
         if ($shouldGenerateReadme) {
@@ -383,12 +383,10 @@ class InitCommand extends Command implements Isolatable
         if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
             $this->configureResources();
             $this->configureContacts();
-
-            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::ResourcesAndContacts);
         }
 
         if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::Prerequisites);
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Prerequisites);
         }
 
         if ($this->confirm('Do you need a `Getting Started` part?', true)) {
@@ -396,20 +394,20 @@ class InitCommand extends Command implements Isolatable
 
             $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
 
-            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::GettingStarted);
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::GettingStarted);
         }
 
         if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::Environments);
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Environments);
         }
 
         if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
             $this->configureCredentialsAndAccess();
 
-            $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::CredentialsAndAccess);
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
 
             if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator?->enableReadmePart(ReadmePartEnum::ClerkAuthType);
+                $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Clerk);
             }
         }
     }

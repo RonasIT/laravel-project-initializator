@@ -4,7 +4,7 @@ namespace RonasIT\ProjectInitializator\Generators;
 
 use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
-use RonasIT\ProjectInitializator\Enums\ReadmePartEnum;
+use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 
 class ReadmeGenerator
 {
@@ -22,15 +22,17 @@ class ReadmeGenerator
     protected array $resources = [];
     protected array $contacts = [];
 
-    protected array $readmeParts = [
-        ReadmePartEnum::ResourcesAndContacts->value => false,
-        ReadmePartEnum::Prerequisites->value => false,
-        ReadmePartEnum::GettingStarted->value => false,
-        ReadmePartEnum::Environments->value => false,
-        ReadmePartEnum::CredentialsAndAccess->value => false,
-        ReadmePartEnum::ClerkAuthType->value => false,
-        ReadmePartEnum::Renovate->value => false,
+    protected array $blocksMethodsMap = [
+        ReadmeBlockEnum::ResourcesAndContacts->value => 'fillResourcesAndContacts',
+        ReadmeBlockEnum::Prerequisites->value => 'fillPrerequisites',
+        ReadmeBlockEnum::GettingStarted->value => 'fillGettingStarted',
+        ReadmeBlockEnum::Environments->value => 'fillEnvironments',
+        ReadmeBlockEnum::CredentialsAndAccess->value => 'fillCredentialsAndAccess',
+        ReadmeBlockEnum::Clerk->value => 'fillClerkAuthType',
+        ReadmeBlockEnum::Renovate->value => 'fillRenovate',
     ];
+
+    protected array $enabledBlocks = [];
 
     public function __construct()
     {
@@ -88,18 +90,22 @@ class ReadmeGenerator
         );
     }
 
-    public function enableReadmePart(ReadmePartEnum $part): void
+    public function addBlock(ReadmeBlockEnum $block): void
     {
-        $this->readmeParts[$part->value] = true;
+        $this->enabledBlocks[] = $block->value;
     }
 
     public function save(): void
     {
         $this->fillProjectInfo();
 
-        foreach ($this->readmeParts as $part => $enabled) {
-            if ($enabled) {
-                $this->$part();
+        if (!empty($this->resources) || !empty($this->contacts)) {
+            $this->addBlock(ReadmeBlockEnum::ResourcesAndContacts);
+        }
+
+        foreach ($this->blocksMethodsMap as $block => $method) {
+            if (in_array($block, $this->enabledBlocks)) {
+                $this->$method();
             }
         }
 
