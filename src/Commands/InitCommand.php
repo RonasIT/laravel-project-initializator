@@ -232,6 +232,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateEnvFile('.env.development', [
             'APP_NAME' => $this->appName,
+            'APP_ENV' => 'development',
             'APP_URL' => $this->appUrl,
             'APP_MAINTENANCE_DRIVER' => 'cache',
             'APP_MAINTENANCE_STORE' => 'redis',
