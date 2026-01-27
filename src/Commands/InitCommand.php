@@ -14,6 +14,7 @@ use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
+use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
@@ -114,7 +115,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
-            $this->configureReadmeParts();
+            $this->configureReadme();
         }
 
         if ($this->confirm('Will project work with media files? (upload, store and return content)')) {
@@ -124,7 +125,7 @@ class InitCommand extends Command implements Isolatable
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
-            $this->readmeGenerator?->addRenovate();
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Renovate);
         }
 
         if ($shouldGenerateReadme) {
@@ -369,11 +370,11 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
     }
 
-    protected function configureReadmeParts(): void
+    protected function configureReadme(): void
     {
         $this->readmeGenerator = app(ReadmeGenerator::class);
 
-        $this->readmeGenerator->setAppInfo(
+        $this->readmeGenerator?->setAppInfo(
             appName: $this->appName,
             appType: $this->appType->value,
             appUrl: $this->appUrl,
@@ -383,31 +384,31 @@ class InitCommand extends Command implements Isolatable
         if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
             $this->configureResources();
             $this->configureContacts();
-
-            $this->readmeGenerator?->addResourcesAndContacts();
         }
 
         if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeGenerator?->addPrerequisites();
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Prerequisites);
         }
 
         if ($this->confirm('Do you need a `Getting Started` part?', true)) {
             $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
 
-            $this->readmeGenerator?->addGettingStarted($gitProjectPath);
+            $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
+
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::GettingStarted);
         }
 
         if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeGenerator?->addEnvironments();
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Environments);
         }
 
         if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
             $this->configureCredentialsAndAccess();
 
-            $this->readmeGenerator?->addCredentialsAndAccess();
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
 
             if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator?->addClerkAuthType();
+                $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Clerk);
             }
         }
     }
