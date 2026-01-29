@@ -28,7 +28,7 @@ class ReadmeGenerator
         ReadmeBlockEnum::GettingStarted->value => 'fillGettingStarted',
         ReadmeBlockEnum::Environments->value => 'fillEnvironments',
         ReadmeBlockEnum::CredentialsAndAccess->value => 'fillCredentialsAndAccess',
-        ReadmeBlockEnum::Clerk->value => 'fillClerkAuthType',
+        ReadmeBlockEnum::Clerk->value => 'fillClerk',
         ReadmeBlockEnum::Renovate->value => 'fillRenovate',
     ];
 
@@ -58,8 +58,6 @@ class ReadmeGenerator
             new ResourceDTO('issue_tracker', 'Issue Tracker'),
             new ResourceDTO('figma', 'Figma'),
             new ResourceDTO('sentry', 'Sentry'),
-            new ResourceDTO('datadog', 'DataDog'),
-            new ResourceDTO('argocd', 'ArgoCD'),
             new ResourceDTO('telescope', 'Laravel Telescope', 'telescope'),
             new ResourceDTO('nova', 'Laravel Nova', 'nova'),
         ];
@@ -214,7 +212,7 @@ class ReadmeGenerator
         $this->updateReadmeFile($filePart);
     }
 
-    protected function fillClerkAuthType(): void
+    protected function fillClerk(): void
     {
         $filePart = $this->loadReadmePart('CLERK.md');
 

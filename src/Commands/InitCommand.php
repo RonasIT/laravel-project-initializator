@@ -114,7 +114,7 @@ class InitCommand extends Command implements Isolatable
             $this->createAdminUser();
         }
 
-        if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
+        if ($this->confirm('Do you want to generate a README file?', true)) {
             $this->configureReadme();
         }
 
@@ -128,8 +128,8 @@ class InitCommand extends Command implements Isolatable
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Renovate);
         }
 
-        if ($shouldGenerateReadme) {
-            $this->readmeGenerator?->save();
+        if (!empty($this->readmeGenerator)) {
+            $this->readmeGenerator->save();
 
             $this->info('README generated successfully!');
         }
@@ -374,12 +374,7 @@ class InitCommand extends Command implements Isolatable
     {
         $this->readmeGenerator = app(ReadmeGenerator::class);
 
-        $this->readmeGenerator?->setAppInfo(
-            appName: $this->appName,
-            appType: $this->appType->value,
-            appUrl: $this->appUrl,
-            codeOwnerEmail: $this->codeOwnerEmail,
-        );
+        $this->readmeGenerator?->setAppInfo($this->appName, $this->appType->value, $this->appUrl, $this->codeOwnerEmail);
 
         if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
             $this->configureResources();

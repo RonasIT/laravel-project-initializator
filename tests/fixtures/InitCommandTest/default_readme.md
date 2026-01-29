@@ -14,8 +14,6 @@ Below are links to tools and services used in this project:
 - [Issue Tracker](): Here, you can report any issues or bugs related to the project. (will be added later)
 - [Figma](): This is where we maintain all our design assets and mock-ups. (will be added later)
 - [Sentry](): To monitor application performance and error tracking. (will be added later)
-- [DataDog](): This is where we monitor our logs, and server performance, and receive alerts. (will be added later)
-- [ArgoCD](): Is a kubernetes controller which continuously monitors running applications. (will be added later)
 - [Laravel Telescope](): This is debug assistant for the Laravel framework. (will be added later)
 - [Laravel Nova](): This is admin panel for the Laravel framework. (will be added later)
 - [API Documentation](https://mysite.com)
