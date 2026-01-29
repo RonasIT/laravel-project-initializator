@@ -315,16 +315,6 @@ class InitCommandTest extends TestCase
                 'later',
             )
             ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later',
-            )
-            ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'later',
@@ -351,8 +341,6 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- Issue Tracker link')
             ->expectsOutput('- Figma link')
             ->expectsOutput('- Sentry link')
-            ->expectsOutput('- DataDog link')
-            ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -440,16 +428,6 @@ class InitCommandTest extends TestCase
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'no',
             )
@@ -576,16 +554,6 @@ class InitCommandTest extends TestCase
                 'https://sentry.com/my-project',
             )
             ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://datadoghq.com/my-project',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://argocd.com/my-project',
-            )
-            ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'https://mypsite.com/telescope-link',
@@ -699,16 +667,6 @@ class InitCommandTest extends TestCase
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'no',
             )
@@ -846,16 +804,6 @@ class InitCommandTest extends TestCase
                 'later',
             )
             ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later',
-            )
-            ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'later',
@@ -880,8 +828,6 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- Issue Tracker link')
             ->expectsOutput('- Figma link')
             ->expectsOutput('- Sentry link')
-            ->expectsOutput('- DataDog link')
-            ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -979,16 +925,6 @@ class InitCommandTest extends TestCase
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'no',
             )
