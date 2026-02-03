@@ -104,7 +104,7 @@ class ReadmeGenerator
         file_put_contents('README.md', $this->readmeContent);
     }
 
-    public function fillProjectInfo(): void
+    protected function fillProjectInfo(): void
     {
         $this->readmeContent = $this->renderBlade('readme', [
             'projectName' => $this->appName,
@@ -129,11 +129,11 @@ class ReadmeGenerator
 
         foreach ($this->resources as $resource) {
             $resources[$resource->key] = [
+                'isActive' => $resource->isActive,
                 'title' => $resource->title,
                 'link' => $resource->link ?: null,
                 'description' => $resource->description ?: null,
                 'laterText' => empty($resource->link) && $resource->isActive ? ' ' . self::LATER_TEXT : null,
-                'isActive' => $resource->isActive,
             ];
         }
 
