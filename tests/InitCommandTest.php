@@ -272,17 +272,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-
             $this->callFilePutContent('README.md', $this->getFixture('default_readme.md')),
         );
 
@@ -396,12 +385,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFilePutContent('README.md', $this->getFixture('partial_readme.md')),
         );
 
@@ -511,15 +494,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
             $this->callFilePutContent('README.md', $this->getFixture('full_readme.md')),
         );
 
@@ -635,12 +609,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
             $this->callFilePutContent('README.md', $this->getFixture('partial_readme_with_telescope.md')),
         );
 
@@ -761,17 +729,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-
             $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app.md')),
         );
 
@@ -893,12 +850,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
             $this->callFilePutContent('README.md', $this->getFixture('partial_readme_clerk_with_credentials.md')),
         );
 

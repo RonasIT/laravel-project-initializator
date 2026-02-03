@@ -21,6 +21,7 @@ class ReadmeGenerator
 
     protected array $resources = [];
     protected array $contacts = [];
+    protected array $enabledBlocks = [];
 
     protected array $blocksMethodsMap = [
         ReadmeBlockEnum::ResourcesAndContacts->value => 'fillResourcesAndContacts',
@@ -31,13 +32,6 @@ class ReadmeGenerator
         ReadmeBlockEnum::Clerk->value => 'fillClerk',
         ReadmeBlockEnum::Renovate->value => 'fillRenovate',
     ];
-
-    protected array $enabledBlocks = [];
-
-    public function __construct()
-    {
-        $this->readmeContent = $this->loadReadmePart('README.md');
-    }
 
     public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
     {
@@ -55,11 +49,11 @@ class ReadmeGenerator
     public function getConfigurableResources(): array
     {
         return [
-            new ResourceDTO('issue_tracker', 'Issue Tracker'),
-            new ResourceDTO('figma', 'Figma'),
-            new ResourceDTO('sentry', 'Sentry'),
-            new ResourceDTO('telescope', 'Laravel Telescope', 'telescope'),
-            new ResourceDTO('nova', 'Laravel Nova', 'nova'),
+            new ResourceDTO('issue_tracker', 'Issue Tracker', 'Here, you can report any issues or bugs related to the project.'),
+            new ResourceDTO('figma', 'Figma', 'This is where we maintain all our design assets and mock-ups.'),
+            new ResourceDTO('sentry', 'Sentry', 'To monitor application performance and error tracking.'),
+            new ResourceDTO('telescope', 'Laravel Telescope', 'This is debug assistant for the Laravel framework.', 'telescope'),
+            new ResourceDTO('nova', 'Laravel Nova', 'This is admin panel for the Laravel framework.', 'nova'),
         ];
     }
 
@@ -110,15 +104,17 @@ class ReadmeGenerator
         file_put_contents('README.md', $this->readmeContent);
     }
 
-    protected function fillProjectInfo(): void
+    public function fillProjectInfo(): void
     {
-        $this->setReadmeValue($this->readmeContent, 'project_name', $this->appName);
-        $this->setReadmeValue($this->readmeContent, 'type', $this->appType);
+        $this->readmeContent .= $this->renderBlade('readme', [
+            'projectName' => $this->appName,
+            'appType' => $this->appType,
+        ]);
     }
 
     protected function fillResourcesAndContacts(): void
     {
-        $filePart = $this->loadReadmePart('RESOURCES_AND_CONTACTS.md');
+        $filePart = $this->renderBlade('resources_and_contacts');
 
         $this->updateReadmeFile($filePart);
 
@@ -129,46 +125,49 @@ class ReadmeGenerator
 
     protected function fillResources(): void
     {
-        $filePart = $this->loadReadmePart('RESOURCES.md');
+        $resources = [];
 
         foreach ($this->resources as $resource) {
-            if (empty($resource->link) && $resource->isActive) {
-                $this->setReadmeValue($filePart, "{$resource->key}_link");
-                $this->setReadmeValue($filePart, "{$resource->key}_later", self::LATER_TEXT);
-            } elseif (!empty($resource->link)) {
-                $this->setReadmeValue($filePart, "{$resource->key}_link", $resource->link);
-                $this->setReadmeValue($filePart, "{$resource->key}_later");
-            }
-
-            $this->removeTag($filePart, $resource->key, !$resource->isActive);
+            $resources[$resource->key] = [
+                'title' => $resource->title,
+                'link' => $resource->link ?: null,
+                'description' => $resource->description ?: null,
+                'laterText' => empty($resource->link) && $resource->isActive ? ' ' . self::LATER_TEXT : null,
+                'isActive' => $resource->isActive,
+            ];
         }
 
-        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
+        $filePart = $this->renderBlade('resources', [
+            'resources' => $resources,
+            'apiLink' => $this->appUrl,
+        ]);
+
         $this->updateReadmeFile($filePart);
     }
 
     protected function fillContacts(): void
     {
-        $filePart = $this->loadReadmePart('CONTACTS.md');
+        $contacts = [];
 
         foreach ($this->contacts as $contact) {
-            $email = $contact->email;
-
-            if (!empty($email)) {
-                $this->setReadmeValue($filePart, "{$contact->key}_link", $email);
+            if (!empty($contact->email)) {
+                $contacts[$contact->key] = [
+                    'email' => $contact->email,
+                ];
             }
-
-            $this->removeTag($filePart, $contact->key);
         }
 
-        $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
+        $filePart = $this->renderBlade('contacts', [
+            'contacts' => $contacts,
+            'teamLead' => $this->codeOwnerEmail,
+        ]);
 
         $this->updateReadmeFile($filePart);
     }
 
     protected function fillPrerequisites(): void
     {
-        $filePart = $this->loadReadmePart('PREREQUISITES.md');
+        $filePart = $this->renderBlade('prerequisites');
 
         $this->updateReadmeFile($filePart);
     }
@@ -176,86 +175,67 @@ class ReadmeGenerator
     protected function fillGettingStarted(): void
     {
         $projectDirectory = basename($this->gitProjectPath, '.git');
-        $filePart = $this->loadReadmePart('GETTING_STARTED.md');
 
-        $this->setReadmeValue($filePart, 'git_project_path', $this->gitProjectPath);
-        $this->setReadmeValue($filePart, 'project_directory', $projectDirectory);
+        $filePart = $this->renderBlade('getting_started', [
+            'gitProjectPath' => $this->gitProjectPath,
+            'projectDirectory' => $projectDirectory,
+        ]);
 
         $this->updateReadmeFile($filePart);
     }
 
     protected function fillEnvironments(): void
     {
-        $filePart = $this->loadReadmePart('ENVIRONMENTS.md');
+        $filePart = $this->renderBlade('environments', [
+            'apiLink' => $this->appUrl,
+        ]);
 
-        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
         $this->updateReadmeFile($filePart);
     }
 
     protected function fillCredentialsAndAccess(): void
     {
-        $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
+        $credentials = [];
 
         foreach ($this->resources as $resource) {
             if (!empty($resource->email)) {
-                $this->setReadmeValue($filePart, "{$resource->key}_email", $resource->email);
-                $this->setReadmeValue($filePart, "{$resource->key}_password", $resource->password);
+                $credentials[$resource->key] = [
+                    'email' => $resource->email,
+                    'password' => $resource->password,
+                ];
             }
-
-            $this->removeTag($filePart, "{$resource->key}_credentials", empty($resource->email));
         }
 
-        if (!$this->getResource('admin')) {
-            $this->removeTag($filePart, 'admin_credentials', true);
-        }
+        $filePart = $this->renderBlade('credentials_and_access', [
+            'admin' => $credentials['admin'] ?? null,
+            'telescope' => $credentials['telescope'] ?? null,
+            'nova' => $credentials['nova'] ?? null,
+        ]);
 
         $this->updateReadmeFile($filePart);
     }
 
     protected function fillClerk(): void
     {
-        $filePart = $this->loadReadmePart('CLERK.md');
+        $filePart = $this->renderBlade('clerk');
 
         $this->updateReadmeFile($filePart);
     }
 
     protected function fillRenovate(): void
     {
-        $filePart = $this->loadReadmePart('RENOVATE.md');
+        $filePart = $this->renderBlade('renovate');
 
         $this->updateReadmeFile($filePart);
     }
 
-    protected function getResource(string $key): ?ResourceDTO
+    protected function renderBlade(string $view, array $data = []): string
     {
-        return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
-    }
-
-    protected function loadReadmePart(string $fileName): string
-    {
-        $file = base_path(self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
-
-        return file_get_contents($file);
-    }
-
-    protected function setReadmeValue(string &$file, string $key, string $value = ''): void
-    {
-        $file = str_replace(":{$key}", $value, $file);
+        return view("initializator::readme.$view", $data)->render();
     }
 
     protected function updateReadmeFile(string $filePart): void
     {
-        $filePart = preg_replace('#(\n){3,}#', "\n", $filePart);
-
         $this->readmeContent .= "\n" . $filePart;
-    }
-
-    protected function removeTag(string &$text, string $tag, bool $removeWholeString = false): void
-    {
-        $regex = ($removeWholeString)
-            ? "#({{$tag}})(.|\s)*?({/{$tag}})#"
-            : "# {0,1}{(/*){$tag}}#";
-
-        $text = preg_replace($regex, '', $text);
     }
 }

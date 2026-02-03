@@ -27,11 +27,11 @@ Please be mindful of each individual's preferred contact method and office hours
 This repository by default supports three environments: `local`, `development`,
 and `testing`. Each environment is represented by an appropriate environment file:
 
-| Environment | File | URL                                  |
-| --- | --- |--------------------------------------|
-| local | .env | [http://localhost](http://localhost) |
-| testing | .env.testing | -                                    |
-| development | .env.development | [https://mysite.com](https://mysite.com)               |
+| Environment  | File             | URL
+| ------------ | ---------------- | --------------------------------------
+| local        | .env             | [http://localhost](http://localhost)
+| testing      | .env.testing     | -
+| development  | .env.development | [https://mysite.com](https://mysite.com)
 
 ## Credentials and Access
 
