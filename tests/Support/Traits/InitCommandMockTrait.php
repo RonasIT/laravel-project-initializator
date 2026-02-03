@@ -60,4 +60,12 @@ trait InitCommandMockTrait
             $this->callFilePutContent(base_path($fileName), $this->getFixture($resultFixture)),
         ];
     }
+
+    protected function mockReadmeFileWrite(string $fileName)
+    {
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFilePutContent('README.md', $this->getFixture("readme/{$fileName}")),
+        );
+    }
 }

@@ -270,10 +270,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme.md')),
-        );
+        $this->mockReadmeFileWrite('default_readme.md');
 
         $this
             ->artisan('init "My App"')
@@ -383,10 +380,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFilePutContent('README.md', $this->getFixture('partial_readme.md')),
-        );
+        $this->mockReadmeFileWrite('partial_readme.md');
 
         $this
             ->artisan('init "My App"')
@@ -492,10 +486,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFilePutContent('README.md', $this->getFixture('full_readme.md')),
-        );
+        $this->mockReadmeFileWrite('full_readme.md');
 
         $this
             ->artisan('init "My App"')
@@ -607,10 +598,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_with_telescope.md')),
-        );
+        $this->mockReadmeFileWrite('partial_readme_with_telescope.md');
 
         $this
             ->artisan('init "My App"')
@@ -727,10 +715,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app.md')),
-        );
+        $this->mockReadmeFileWrite('default_readme_with_mobile_app.md');
 
         $this
             ->artisan('init "My App"')
@@ -848,10 +833,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_clerk_with_credentials.md')),
-        );
+        $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md');
 
         $this
             ->artisan('init "My App"')
