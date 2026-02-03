@@ -104,9 +104,9 @@ class ReadmeGenerator
         file_put_contents('README.md', $this->readmeContent);
     }
 
-    protected function fillProjectInfo(): void
+    public function fillProjectInfo(): void
     {
-        $this->readmeContent .= $this->renderBlade('readme', [
+        $this->readmeContent = $this->renderBlade('readme', [
             'projectName' => $this->appName,
             'appType' => $this->appType,
         ]);
