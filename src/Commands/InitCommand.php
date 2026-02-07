@@ -622,27 +622,17 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
+        $envParams = [
+            "DB_CONNECTION={$this->defaultDBConnectionConfig['driver']}",
+            "DB_HOST={$this->defaultDBConnectionConfig['host']}",
+            "DB_PORT={$this->defaultDBConnectionConfig['port']}",
+            "DB_DATABASE={$this->defaultDBConnectionConfig['database']}",
+            "DB_USERNAME={$this->defaultDBConnectionConfig['username']}",
+        ];
 
-        shell_exec('php artisan config:show database.default');
+        $command = implode(' ', $envParams) . ' php artisan migrate --ansi --force';
 
-        shell_exec('php artisan config:clear');
-        shell_exec('php artisan config:show database.default');
-
-
-        shell_exec('php artisan optimize:clear');
-        shell_exec('php artisan config:show database.default');
-        
-        config([
-            'database.default' => $this->defaultDBConnectionConfig['driver'],
-            "database.connections.{$this->defaultDBConnectionConfig['driver']}" => [
-                'password' => '',
-                ...$this->defaultDBConnectionConfig,
-            ],
-        ]);
-
-        shell_exec('php artisan config:show database.default');
-
-        shell_exec('php artisan migrate --ansi --force');
+        shell_exec($command);
     }
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
