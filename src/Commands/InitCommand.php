@@ -622,14 +622,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
-        config([
-            'database.default' => $this->defaultDBConnectionConfig['driver'],
-            "database.connections.{$this->defaultDBConnectionConfig['driver']}" => [
-                'password' => '',
-                ...$this->defaultDBConnectionConfig,
-            ],
-        ]);
-
+        shell_exec('php artisan config:clear');
         shell_exec('php artisan migrate --ansi --force');
     }
 
