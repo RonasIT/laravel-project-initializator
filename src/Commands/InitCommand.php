@@ -622,29 +622,27 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
-        $cmd = function ($command) {
-            echo "\n\n>>> RUN: $command\n";
-            $out = shell_exec($command . ' 2>&1');
-            echo $out;
-            echo "\n<<< END\n";
-        };
 
-        $cmd('pwd');
-        $cmd('which php');
-        $cmd('php -v');
+        shell_exec('php artisan config:show database.default');
 
-        $cmd('php artisan env');
-        $cmd('php artisan config:show database.default');
+        shell_exec('php artisan config:clear');
+        shell_exec('php artisan config:show database.default');
 
-        $cmd('ls -la bootstrap/cache/');
-        $cmd('php artisan config:clear');
 
-        $cmd('php artisan tinker --execute="dump(config(\'database.default\'))"');
-        $cmd('php artisan tinker --execute="dump(DB::connection()->getDriverName())"');
-        $cmd('php artisan tinker --execute="dump(DB::connection()->getDatabaseName())"');
+        shell_exec('php artisan optimize:clear');
+        shell_exec('php artisan config:show database.default');
+        
+        config([
+            'database.default' => $this->defaultDBConnectionConfig['driver'],
+            "database.connections.{$this->defaultDBConnectionConfig['driver']}" => [
+                'password' => '',
+                ...$this->defaultDBConnectionConfig,
+            ],
+        ]);
 
-        $cmd('php artisan migrate --ansi --force');
-        $cmd('php artisan migrate:status');
+        shell_exec('php artisan config:show database.default');
+
+        shell_exec('php artisan migrate --ansi --force');
     }
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
