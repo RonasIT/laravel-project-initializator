@@ -7,7 +7,6 @@ use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
@@ -15,10 +14,11 @@ use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
+use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
+use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
-use RonasIT\ProjectInitializator\Support\ReadmeStep;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
@@ -64,6 +64,15 @@ class InitCommand extends Command implements Isolatable
         'username' => 'postgres',
     ];
 
+    protected ?Carbon $lastMigrationTimestamp = null;
+
+    public function __construct()
+    {
+        $this->lastMigrationTimestamp = Carbon::now();
+
+        parent::__construct();
+    }
+
     public function handle(): void
     {
         $this->prepareAppName();
@@ -93,6 +102,8 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->configureClerk();
+        } else {
+            $this->publishRoleMigrations();
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -104,26 +115,30 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
-            $this->configureReadmeParts();
+            $this->configureReadme();
+        }
+
+        if ($this->confirm('Will project work with media files? (upload, store and return content)')) {
+            $this->setupMediaStorage();
         }
 
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
-            $this->readmeGenerator?->addRenovate();
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Renovate);
         }
 
         if ($shouldGenerateReadme) {
-            $this->readmeGenerator->save();
+            $this->readmeGenerator?->save();
 
             $this->info('README generated successfully!');
+        }
 
-            if ($this->emptyResourcesList) {
-                $this->warn('Don`t forget to fill the following empty values:');
+        if ($this->emptyResourcesList) {
+            $this->warn('Don`t forget to fill the following empty values:');
 
-                foreach ($this->emptyResourcesList as $value) {
-                    $this->warn("- {$value}");
-                }
+            foreach ($this->emptyResourcesList as $value) {
+                $this->warn("- {$value}");
             }
         }
 
@@ -133,10 +148,6 @@ class InitCommand extends Command implements Isolatable
                 'composer require ronasit/laravel-telescope-extension',
                 'php artisan telescope:install',
             );
-        }
-
-        if ($this->confirm('Do you want to install media package?')) {
-            $this->shellCommands[] = 'composer require ronasit/laravel-media';
         }
 
         if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
@@ -221,8 +232,10 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateEnvFile('.env.development', [
             'APP_NAME' => $this->appName,
+            'APP_ENV' => 'development',
             'APP_URL' => $this->appUrl,
             'APP_MAINTENANCE_DRIVER' => 'cache',
+            'APP_MAINTENANCE_STORE' => 'redis',
             'CACHE_STORE' => 'redis',
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
@@ -320,11 +333,26 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
+    protected function publishRoleMigrations(): void
+    {
+        if (!$this->isMigrationExists('roles_create_table') && !$this->isMigrationExists('create_roles_table')) {
+            $this->publishMigration(
+                view: view('initializator::roles_create_table'),
+                migrationName: 'roles_create_table',
+            );
+
+            $this->publishMigration(
+                view: view('initializator::users_add_role_id'),
+                migrationName: 'users_add_role_id',
+            );
+        }
+    }
+
     protected function publishMigration(View $view, string $migrationName): void
     {
-        $time = Carbon::now()->format('Y_m_d_His');
+        $time = $this->lastMigrationTimestamp->addSecond();
 
-        $migrationName = "{$time}_{$migrationName}";
+        $migrationName = "{$time->format('Y_m_d_His')}_{$migrationName}";
 
         $this->publishClass($view, $migrationName, 'database/migrations');
     }
@@ -342,78 +370,47 @@ class InitCommand extends Command implements Isolatable
         file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
     }
 
-    protected function configureReadmeParts(): void
+    protected function configureReadme(): void
     {
         $this->readmeGenerator = app(ReadmeGenerator::class);
 
-        $this->readmeGenerator->setAppInfo(
+        $this->readmeGenerator?->setAppInfo(
             appName: $this->appName,
             appType: $this->appType->value,
             appUrl: $this->appUrl,
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
-
-        $this
-            ->getReadmeSteps()
-            ->each(function (ReadmeStep $step) use ($shouldGenerateAllParts) {
-                if ($shouldGenerateAllParts || $this->confirm($step->question, true)) {
-                    ($step->action)();
-                }
-            });
-    }
-
-    protected function getReadmeSteps(): Collection
-    {
-        return collect([
-            new ReadmeStep(
-                question: 'Do you need a `Resources & Contacts` part?',
-                action: $this->configureResourcesAndContactsStep(...),
-            ),
-            new ReadmeStep(
-                question: 'Do you need a `Prerequisites` part?',
-                action: $this->readmeGenerator->addPrerequisites(...),
-            ),
-            new ReadmeStep(
-                question: 'Do you need a `Getting Started` part?',
-                action: $this->configureGettingStartedStep(...),
-            ),
-            new ReadmeStep(
-                question: 'Do you need an `Environments` part?',
-                action: $this->readmeGenerator->addEnvironments(...),
-            ),
-            new ReadmeStep(
-                question: 'Do you need a `Credentials and Access` part?',
-                action: $this->configureCredentialsAndAccessStep(...),
-            ),
-        ]);
-    }
-
-    protected function configureResourcesAndContactsStep(): void
-    {
-        $this->configureResources();
-        $this->configureContacts();
-
-        $this->readmeGenerator->addResourcesAndContacts();
-    }
-
-    protected function configureCredentialsAndAccessStep(): void
-    {
-        $this->configureCredentialsAndAccess();
-
-        $this->readmeGenerator->addCredentialsAndAccess();
-
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->readmeGenerator->addClerkAuthType();
+        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
+            $this->configureResources();
+            $this->configureContacts();
         }
-    }
 
-    protected function configureGettingStartedStep(): void
-    {
-        $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
+        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Prerequisites);
+        }
 
-        $this->readmeGenerator->addGettingStarted($gitProjectPath);
+        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
+            $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
+
+            $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
+
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::GettingStarted);
+        }
+
+        if ($this->confirm('Do you need an `Environments` part?', true)) {
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Environments);
+        }
+
+        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
+            $this->configureCredentialsAndAccess();
+
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
+
+            if ($this->authType === AuthTypeEnum::Clerk) {
+                $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Clerk);
+            }
+        }
     }
 
     protected function configureResources(): void
@@ -441,7 +438,7 @@ class InitCommand extends Command implements Isolatable
 
             $resource->setActive($answer !== UserAnswerEnum::No);
 
-            $this->readmeGenerator->addResource($resource);
+            $this->readmeGenerator?->addResource($resource);
         }
     }
 
@@ -454,7 +451,7 @@ class InitCommand extends Command implements Isolatable
                 $this->emptyResourcesList[] = "{$contact->title}'s email";
             }
 
-            $this->readmeGenerator->addContact($contact);
+            $this->readmeGenerator?->addContact($contact);
         }
     }
 
@@ -475,13 +472,61 @@ class InitCommand extends Command implements Isolatable
         }
 
         if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator->addResource(new ResourceDTO(
+            $this->readmeGenerator?->addResource(new ResourceDTO(
                 key: 'admin',
                 title: 'Default admin',
                 email: $this->adminCredentials['email'],
                 password: $this->adminCredentials['password'],
             ));
         }
+    }
+
+    protected function setupMediaStorage(): void
+    {
+        $this->shellCommands[] = 'composer require ronasit/laravel-media';
+
+        $storage = StorageEnum::from($this->choice(
+            question: 'Which storage will be used for media files?',
+            choices: StorageEnum::values(),
+            default: StorageEnum::GCS->value,
+        ));
+
+        if ($storage === StorageEnum::GCS) {
+            $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage';
+
+            $this->updateEnvFile('.env.development', [
+                'FILESYSTEM_DISK' => StorageEnum::GCS->value,
+                'GOOGLE_CLOUD_STORAGE_PATH_PREFIX' => 'api',
+                'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
+                'GOOGLE_CLOUD_PROJECT_ID' => '',
+            ]);
+
+            $this->emptyResourcesList[] = 'GOOGLE_CLOUD_STORAGE_BUCKET';
+            $this->emptyResourcesList[] = 'GOOGLE_CLOUD_PROJECT_ID';
+
+            $this->addGcsDiskToConfig();
+        }
+    }
+
+    protected function addGcsDiskToConfig(): void
+    {
+        $config = ArrayFile::open(base_path('config/filesystems.php'));
+
+        $config
+            ->set('disks.gcs.driver', StorageEnum::GCS->value)
+            ->set('disks.gcs.key_file_path', null)
+            ->set('disks.gcs.key_file', [])
+            ->set('disks.gcs.project_id', $config->function('env', ['GOOGLE_CLOUD_PROJECT_ID', 'your-project-id']))
+            ->set('disks.gcs.bucket', $config->function('env', ['GOOGLE_CLOUD_STORAGE_BUCKET', 'your-bucket']))
+            ->set('disks.gcs.path_prefix', $config->function('env', ['GOOGLE_CLOUD_STORAGE_PATH_PREFIX', '']))
+            ->set('disks.gcs.storage_api_uri', $config->function('env', ['GOOGLE_CLOUD_STORAGE_API_URI', null]))
+            ->set('disks.gcs.api_endpoint', $config->function('env', ['GOOGLE_CLOUD_STORAGE_API_ENDPOINT', null]))
+            ->set('disks.gcs.visibility', 'public')
+            ->set('disks.gcs.visibility_handler', null)
+            ->set('disks.gcs.throw', true)
+            ->set('disks.gcs.metadata', ['cacheControl' => 'public,max-age=86400']);
+
+        $config->write();
     }
 
     protected function saveRenovateJSON(): void

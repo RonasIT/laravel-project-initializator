@@ -4,6 +4,7 @@ namespace RonasIT\ProjectInitializator\Generators;
 
 use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
+use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 
 class ReadmeGenerator
 {
@@ -18,10 +19,25 @@ class ReadmeGenerator
     protected string $codeOwnerEmail;
     protected string $gitProjectPath;
 
-    protected array $methodsToCall = [];
-
     protected array $resources = [];
     protected array $contacts = [];
+
+    protected array $blocksMethodsMap = [
+        ReadmeBlockEnum::ResourcesAndContacts->value => 'fillResourcesAndContacts',
+        ReadmeBlockEnum::Prerequisites->value => 'fillPrerequisites',
+        ReadmeBlockEnum::GettingStarted->value => 'fillGettingStarted',
+        ReadmeBlockEnum::Environments->value => 'fillEnvironments',
+        ReadmeBlockEnum::CredentialsAndAccess->value => 'fillCredentialsAndAccess',
+        ReadmeBlockEnum::Clerk->value => 'fillClerkAuthType',
+        ReadmeBlockEnum::Renovate->value => 'fillRenovate',
+    ];
+
+    protected array $enabledBlocks = [];
+
+    public function __construct()
+    {
+        $this->readmeContent = $this->loadReadmePart('README.md');
+    }
 
     public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
     {
@@ -29,6 +45,11 @@ class ReadmeGenerator
         $this->appType = $appType;
         $this->appUrl = $appUrl;
         $this->codeOwnerEmail = $codeOwnerEmail;
+    }
+
+    public function setGitProjectPath(string $path): void
+    {
+        $this->gitProjectPath = $path;
     }
 
     public function getConfigurableResources(): array
@@ -69,67 +90,32 @@ class ReadmeGenerator
         );
     }
 
-    public function addRenovate(): void
+    public function addBlock(ReadmeBlockEnum $block): void
     {
-        $this->methodsToCall[] = 'fillRenovate';
-    }
-
-    public function addResourcesAndContacts(): void
-    {
-        $this->methodsToCall[] = 'fillResourcesAndContacts';
-    }
-
-    public function addPrerequisites(): void
-    {
-        $this->methodsToCall[] = 'fillPrerequisites';
-    }
-
-    public function addGettingStarted(string $path): void
-    {
-        $this->gitProjectPath = $path;
-
-        $this->methodsToCall[] = 'fillGettingStarted';
-    }
-
-    public function addEnvironments(): void
-    {
-        $this->methodsToCall[] = 'fillEnvironments';
-    }
-
-    public function addCredentialsAndAccess(): void
-    {
-        $this->methodsToCall[] = 'fillCredentialsAndAccess';
-    }
-
-    public function addClerkAuthType(): void
-    {
-        $this->methodsToCall[] = 'fillClerkAuthType';
+        $this->enabledBlocks[] = $block->value;
     }
 
     public function save(): void
     {
-        $this->prepareReadme();
+        $this->fillProjectInfo();
 
-        foreach ($this->methodsToCall as $part) {
-            $this->$part();
+        if (!empty($this->resources) || !empty($this->contacts)) {
+            $this->addBlock(ReadmeBlockEnum::ResourcesAndContacts);
         }
 
-        $this->saveReadme();
+        foreach ($this->blocksMethodsMap as $block => $method) {
+            if (in_array($block, $this->enabledBlocks)) {
+                $this->$method();
+            }
+        }
+
+        file_put_contents('README.md', $this->readmeContent);
     }
 
-    protected function getResource(string $key): ?ResourceDTO
+    protected function fillProjectInfo(): void
     {
-        return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
-    }
-
-    protected function prepareReadme(): void
-    {
-        $file = $this->loadReadmePart('README.md');
-
-        $this->setReadmeValue($file, 'project_name', $this->appName);
-        $this->setReadmeValue($file, 'type', $this->appType);
-
-        $this->readmeContent = $file;
+        $this->setReadmeValue($this->readmeContent, 'project_name', $this->appName);
+        $this->setReadmeValue($this->readmeContent, 'type', $this->appType);
     }
 
     protected function fillResourcesAndContacts(): void
@@ -242,9 +228,9 @@ class ReadmeGenerator
         $this->updateReadmeFile($filePart);
     }
 
-    protected function saveReadme(): void
+    protected function getResource(string $key): ?ResourceDTO
     {
-        file_put_contents('README.md', $this->readmeContent);
+        return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
     }
 
     protected function loadReadmePart(string $fileName): string
