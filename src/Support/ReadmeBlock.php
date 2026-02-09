@@ -4,7 +4,7 @@ namespace RonasIT\ProjectInitializator\Support;
 
 use Closure;
 
-final readonly class ReadmeStep
+final readonly class ReadmeBlock
 {
     public function __construct(
         public string $question,
