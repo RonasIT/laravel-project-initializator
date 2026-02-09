@@ -651,9 +651,9 @@ class InitCommand extends Command implements Isolatable
             ReadmeBlockEnum::CredentialsAndAccess->value => $this->configureCredentialsAndAccessStep(...),
         ]);
 
-        return $steps->map(fn (callable|null $action, string $block) => new ReadmeBlock(
+        return $steps->map(fn (?callable $action, string $block) => new ReadmeBlock(
             question: $this->getReadmeQuestion(ReadmeBlockEnum::from($block)),
-            action: $action ?? fn () => $this->readmeGenerator->addBlock(ReadmeBlockEnum::from($block))
+            action: $action ?? fn () => $this->readmeGenerator->addBlock(ReadmeBlockEnum::from($block)),
         ));
     }
 
