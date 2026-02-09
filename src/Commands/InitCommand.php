@@ -7,6 +7,7 @@ use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
@@ -19,6 +20,7 @@ use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
+use RonasIT\ProjectInitializator\Support\ReadmeBlock;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
@@ -129,7 +131,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateReadme) {
-            $this->readmeGenerator?->save();
+            $this->readmeGenerator->save();
 
             $this->info('README generated successfully!');
         }
@@ -374,43 +376,22 @@ class InitCommand extends Command implements Isolatable
     {
         $this->readmeGenerator = app(ReadmeGenerator::class);
 
-        $this->readmeGenerator?->setAppInfo(
+        $this->readmeGenerator->setAppInfo(
             appName: $this->appName,
             appType: $this->appType->value,
             appUrl: $this->appUrl,
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
-            $this->configureResources();
-            $this->configureContacts();
-        }
+        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
 
-        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Prerequisites);
-        }
-
-        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
-            $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
-
-            $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
-
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::GettingStarted);
-        }
-
-        if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Environments);
-        }
-
-        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
-            $this->configureCredentialsAndAccess();
-
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
-
-            if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Clerk);
-            }
-        }
+        $this
+            ->getReadmeBlocks()
+            ->each(function (ReadmeBlock $block) use ($shouldGenerateAllParts) {
+                if ($shouldGenerateAllParts || $this->confirm($block->question, true)) {
+                    ($block->action)();
+                }
+            });
     }
 
     protected function configureResources(): void
@@ -438,7 +419,7 @@ class InitCommand extends Command implements Isolatable
 
             $resource->setActive($answer !== UserAnswerEnum::No);
 
-            $this->readmeGenerator?->addResource($resource);
+            $this->readmeGenerator->addResource($resource);
         }
     }
 
@@ -451,7 +432,7 @@ class InitCommand extends Command implements Isolatable
                 $this->emptyResourcesList[] = "{$contact->title}'s email";
             }
 
-            $this->readmeGenerator?->addContact($contact);
+            $this->readmeGenerator->addContact($contact);
         }
     }
 
@@ -472,7 +453,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator?->addResource(new ResourceDTO(
+            $this->readmeGenerator->addResource(new ResourceDTO(
                 key: 'admin',
                 title: 'Default admin',
                 email: $this->adminCredentials['email'],
@@ -658,5 +639,58 @@ class InitCommand extends Command implements Isolatable
             view: view('initializator::admins_create_table'),
             migrationName: 'admins_create_table',
         );
+    }
+
+    protected function getReadmeBlocks(): Collection
+    {
+        $steps = collect([
+            ReadmeBlockEnum::ResourcesAndContacts->value => $this->configureResourcesAndContactsStep(...),
+            ReadmeBlockEnum::Prerequisites->value => null,
+            ReadmeBlockEnum::GettingStarted->value => $this->configureGettingStartedStep(...),
+            ReadmeBlockEnum::Environments->value => null,
+            ReadmeBlockEnum::CredentialsAndAccess->value => $this->configureCredentialsAndAccessStep(...),
+        ]);
+
+        return $steps->map(fn (callable|null $action, string $block) => new ReadmeBlock(
+            question: $this->getReadmeQuestion(ReadmeBlockEnum::from($block)),
+            action: $action ?? fn () => $this->readmeGenerator->addBlock(ReadmeBlockEnum::from($block))
+        ));
+    }
+
+    protected function getReadmeQuestion(ReadmeBlockEnum $readmeBlock): string
+    {
+        return match ($readmeBlock) {
+            ReadmeBlockEnum::ResourcesAndContacts => 'Do you need a `Resources & Contacts` part?',
+            ReadmeBlockEnum::Prerequisites => 'Do you need a `Prerequisites` part?',
+            ReadmeBlockEnum::GettingStarted => 'Do you need a `Getting Started` part?',
+            ReadmeBlockEnum::Environments => 'Do you need an `Environments` part?',
+            ReadmeBlockEnum::CredentialsAndAccess => 'Do you need a `Credentials and Access` part?',
+        };
+    }
+
+    protected function configureResourcesAndContactsStep(): void
+    {
+        $this->configureResources();
+        $this->configureContacts();
+    }
+
+    protected function configureCredentialsAndAccessStep(): void
+    {
+        $this->configureCredentialsAndAccess();
+
+        $this->readmeGenerator->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
+
+        if ($this->authType === AuthTypeEnum::Clerk) {
+            $this->readmeGenerator->addBlock(ReadmeBlockEnum::Clerk);
+        }
+    }
+
+    protected function configureGettingStartedStep(): void
+    {
+        $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
+
+        $this->readmeGenerator->setGitProjectPath($gitProjectPath);
+
+        $this->readmeGenerator->addBlock(ReadmeBlockEnum::GettingStarted);
     }
 }
