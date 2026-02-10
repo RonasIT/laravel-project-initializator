@@ -43,6 +43,7 @@ class InitCommand extends Command implements Isolatable
         'composer require --dev brainmaestro/composer-git-hooks',
         './vendor/bin/cghooks update',
         'php artisan lang:publish',
+        'php artisan key:generate',
     ];
 
     protected bool $shouldUninstallPackage = false;
