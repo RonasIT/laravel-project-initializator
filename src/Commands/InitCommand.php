@@ -115,7 +115,7 @@ class InitCommand extends Command implements Isolatable
             $this->createAdminUser();
         }
 
-        if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
+        if ($this->confirm('Do you want to generate a README file?', true)) {
             $this->configureReadme();
         }
 
@@ -129,8 +129,8 @@ class InitCommand extends Command implements Isolatable
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Renovate);
         }
 
-        if ($shouldGenerateReadme) {
-            $this->readmeGenerator?->save();
+        if (!empty($this->readmeGenerator)) {
+            $this->readmeGenerator->save();
 
             $this->info('README generated successfully!');
         }
@@ -373,9 +373,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureReadme(): void
     {
-        $this->readmeGenerator = app(ReadmeGenerator::class);
-
-        $this->readmeGenerator?->setAppInfo(
+        $this->readmeGenerator = app(ReadmeGenerator::class)->setAppInfo(
             appName: $this->appName,
             appType: $this->appType->value,
             appUrl: $this->appUrl,
@@ -384,7 +382,7 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
             $this->configureResources();
-            $this->configureContacts();
+            $this->configureManagerEmail();
         }
 
         if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
@@ -443,16 +441,12 @@ class InitCommand extends Command implements Isolatable
         }
     }
 
-    protected function configureContacts(): void
+    protected function configureManagerEmail(): void
     {
-        foreach ($this->readmeGenerator->getConfigurableContacts() as $contact) {
-            if ($link = $this->ask("Please enter a {$contact->title}'s email", '')) {
-                $contact->setEmail($link);
-            } else {
-                $this->emptyResourcesList[] = "{$contact->title}'s email";
-            }
-
-            $this->readmeGenerator?->addContact($contact);
+        if ($link = $this->ask("Please enter a Manager's email", '')) {
+            $this->readmeGenerator?->setManagerEmail($link);
+        } else {
+            $this->emptyResourcesList[] = "Manager's email";
         }
     }
 
