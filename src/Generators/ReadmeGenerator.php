@@ -82,7 +82,7 @@ class ReadmeGenerator
     {
         $this->fillProjectInfo();
 
-        if (!empty($this->resources) || !empty($this->contacts)) {
+        if (!empty($this->resources)) {
             $this->addBlock(ReadmeBlockEnum::ResourcesAndContacts);
         }
 
