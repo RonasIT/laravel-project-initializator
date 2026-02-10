@@ -7,9 +7,6 @@ use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 
 class ReadmeGenerator
 {
-    protected const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
-    protected const string LATER_TEXT = '(will be added later)';
-
     protected string $readmeContent = '';
 
     protected string $appName;
@@ -20,7 +17,6 @@ class ReadmeGenerator
     protected string $gitProjectPath;
 
     protected array $resources = [];
-    protected array $contacts = [];
     protected array $enabledBlocks = [];
 
     protected array $blocksMethodsMap = [
