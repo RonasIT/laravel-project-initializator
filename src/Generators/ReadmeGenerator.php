@@ -2,7 +2,6 @@
 
 namespace RonasIT\ProjectInitializator\Generators;
 
-use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 
@@ -17,6 +16,7 @@ class ReadmeGenerator
     protected string $appType;
     protected string $appUrl;
     protected string $codeOwnerEmail;
+    protected string $managerEmail = ':manager_link';
     protected string $gitProjectPath;
 
     protected array $resources = [];
@@ -33,12 +33,19 @@ class ReadmeGenerator
         ReadmeBlockEnum::Renovate->value => 'fillRenovate',
     ];
 
-    public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
+    public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): self
     {
         $this->appName = $appName;
         $this->appType = $appType;
         $this->appUrl = $appUrl;
         $this->codeOwnerEmail = $codeOwnerEmail;
+
+        return $this;
+    }
+
+    public function setManagerEmail(string $email): void
+    {
+        $this->managerEmail = $email;
     }
 
     public function setGitProjectPath(string $path): void
@@ -60,18 +67,6 @@ class ReadmeGenerator
     public function addResource(ResourceDTO $resource): void
     {
         $this->resources[] = $resource;
-    }
-
-    public function getConfigurableContacts(): array
-    {
-        return [
-            new ContactDTO('manager', 'Manager'),
-        ];
-    }
-
-    public function addContact(ContactDTO $contact): void
-    {
-        $this->contacts[] = $contact;
     }
 
     public function getAccessRequiredResources(): array
@@ -106,136 +101,70 @@ class ReadmeGenerator
 
     protected function fillProjectInfo(): void
     {
-        $this->readmeContent = $this->renderBlade('readme', [
+        $this->readmeContent = view('initializator::readme.readme_head', [
             'projectName' => $this->appName,
             'appType' => $this->appType,
-        ]);
+        ])->render();
     }
 
     protected function fillResourcesAndContacts(): void
     {
-        $filePart = $this->renderBlade('resources_and_contacts');
+        $this->addContent('resources_and_contacts');
 
-        $this->updateReadmeFile($filePart);
-
-        $this->fillResources();
-
-        $this->fillContacts();
-    }
-
-    protected function fillResources(): void
-    {
-        $resources = [];
-
-        foreach ($this->resources as $resource) {
-            $resources[$resource->key] = [
-                'isActive' => $resource->isActive,
-                'title' => $resource->title,
-                'link' => $resource->link ?: null,
-                'description' => $resource->description ?: null,
-                'laterText' => empty($resource->link) && $resource->isActive ? ' ' . self::LATER_TEXT : null,
-            ];
-        }
-
-        $filePart = $this->renderBlade('resources', [
-            'resources' => $resources,
+        $this->addContent('resources', [
+            'resources' => $this->resources,
             'apiLink' => $this->appUrl,
         ]);
 
-        $this->updateReadmeFile($filePart);
-    }
-
-    protected function fillContacts(): void
-    {
-        $contacts = [];
-
-        foreach ($this->contacts as $contact) {
-            if (!empty($contact->email)) {
-                $contacts[$contact->key] = [
-                    'email' => $contact->email,
-                ];
-            }
-        }
-
-        $filePart = $this->renderBlade('contacts', [
-            'contacts' => $contacts,
+        $this->addContent('contacts', [
+            'manager' => $this->managerEmail,
             'teamLead' => $this->codeOwnerEmail,
         ]);
-
-        $this->updateReadmeFile($filePart);
     }
 
     protected function fillPrerequisites(): void
     {
-        $filePart = $this->renderBlade('prerequisites');
-
-        $this->updateReadmeFile($filePart);
+        $this->addContent('prerequisites');
     }
 
     protected function fillGettingStarted(): void
     {
         $projectDirectory = basename($this->gitProjectPath, '.git');
 
-        $filePart = $this->renderBlade('getting_started', [
+        $this->addContent('getting_started', [
             'gitProjectPath' => $this->gitProjectPath,
             'projectDirectory' => $projectDirectory,
         ]);
-
-        $this->updateReadmeFile($filePart);
     }
 
     protected function fillEnvironments(): void
     {
-        $filePart = $this->renderBlade('environments', [
+        $this->addContent('environments', [
             'apiLink' => $this->appUrl,
         ]);
-
-        $this->updateReadmeFile($filePart);
     }
 
     protected function fillCredentialsAndAccess(): void
     {
-        $credentials = [];
-
-        foreach ($this->resources as $resource) {
-            if (!empty($resource->email)) {
-                $credentials[$resource->key] = [
-                    'email' => $resource->email,
-                    'password' => $resource->password,
-                ];
-            }
-        }
-
-        $filePart = $this->renderBlade('credentials_and_access', [
-            'admin' => $credentials['admin'] ?? null,
-            'telescope' => $credentials['telescope'] ?? null,
-            'nova' => $credentials['nova'] ?? null,
+        $this->addContent('credentials_and_access', [
+            'credentials' => $this->resources,
         ]);
-
-        $this->updateReadmeFile($filePart);
     }
 
     protected function fillClerk(): void
     {
-        $filePart = $this->renderBlade('clerk');
-
-        $this->updateReadmeFile($filePart);
+        $this->addContent('clerk');
     }
 
     protected function fillRenovate(): void
     {
-        $filePart = $this->renderBlade('renovate');
-
-        $this->updateReadmeFile($filePart);
+        $this->addContent('renovate');
     }
 
-    protected function renderBlade(string $view, array $data = []): string
+    protected function addContent(string $view, array $data = []): void
     {
-        return view("initializator::readme.$view", $data)->render();
-    }
+        $content = view("initializator::readme.{$view}", $data)->render();
 
-    protected function updateReadmeFile(string $filePart): void
-    {
-        $this->readmeContent .= "\n" . $filePart;
+        $this->readmeContent .= "\n{$content}";
     }
 }

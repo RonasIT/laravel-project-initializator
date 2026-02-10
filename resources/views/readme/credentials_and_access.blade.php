@@ -1,37 +1,15 @@
 ## Credentials and Access
+@foreach($credentials as $resource)
+@if(!empty($resource->email))
 
-@if(!empty($admin))
-Default admin access:
-
-```
-{{ $admin['email'] }}
-```
+{{ $resource->title }} access:
 
 ```
-{{ $admin['password'] }}
-```
-
-@endif
-@if(!empty($telescope))
-Laravel Telescope access:
-
-```
-{{ $telescope['email'] }}
+{{ $resource->email }}
 ```
 
 ```
-{{ $telescope['password'] }}
-```
-
-@endif
-@if(!empty($nova))
-Laravel Nova access:
-
-```
-{{ $nova['email'] }}
-```
-
-```
-{{ $nova['password'] }}
+{{ $resource->password }}
 ```
 @endif
+@endforeach

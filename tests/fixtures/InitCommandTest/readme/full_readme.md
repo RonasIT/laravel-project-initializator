@@ -68,16 +68,6 @@ and `testing`. Each environment is represented by an appropriate environment fil
 
 ## Credentials and Access
 
-Default admin access:
-
-```
-mail@mail.com
-```
-
-```
-123456
-```
-
 Laravel Telescope access:
 
 ```
@@ -96,6 +86,16 @@ nova_mail@mail.com
 
 ```
 654321
+```
+
+Default admin access:
+
+```
+mail@mail.com
+```
+
+```
+123456
 ```
 
 ### Renovate
