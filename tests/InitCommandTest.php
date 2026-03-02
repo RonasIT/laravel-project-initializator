@@ -60,7 +60,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
+            $this->callShellExec('DB_CONNECTION=pgsql DB_HOST=pgsql DB_PORT=5432 DB_DATABASE=postgres DB_USERNAME=postgres php artisan migrate --ansi --force'),
         );
 
         $this
@@ -125,7 +125,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
+            $this->callShellExec('DB_CONNECTION=pgsql DB_HOST=pgsql DB_PORT=5432 DB_DATABASE=postgres DB_USERNAME=postgres php artisan migrate --ansi --force'),
         );
 
         $this
@@ -191,7 +191,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
+            $this->callShellExec('DB_CONNECTION=pgsql DB_HOST=pgsql DB_PORT=5432 DB_DATABASE=postgres DB_USERNAME=postgres php artisan migrate --ansi --force'),
         );
 
         $this
@@ -271,7 +271,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
+            $this->callShellExec('DB_CONNECTION=pgsql DB_HOST=pgsql DB_PORT=5432 DB_DATABASE=postgres DB_USERNAME=postgres php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -408,7 +408,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
+            $this->callShellExec('DB_CONNECTION=pgsql DB_HOST=pgsql DB_PORT=5432 DB_DATABASE=postgres DB_USERNAME=postgres php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -534,7 +534,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
+            $this->callShellExec('DB_CONNECTION=pgsql DB_HOST=pgsql DB_PORT=5432 DB_DATABASE=postgres DB_USERNAME=postgres php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -669,7 +669,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
+            $this->callShellExec('DB_CONNECTION=pgsql DB_HOST=pgsql DB_PORT=5432 DB_DATABASE=postgres DB_USERNAME=postgres php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -806,7 +806,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
+            $this->callShellExec('DB_CONNECTION=pgsql DB_HOST=pgsql DB_PORT=5432 DB_DATABASE=postgres DB_USERNAME=postgres php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -951,7 +951,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
+            $this->callShellExec('DB_CONNECTION=pgsql DB_HOST=pgsql DB_PORT=5432 DB_DATABASE=postgres DB_USERNAME=postgres php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -1078,7 +1078,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
+            $this->callShellExec('DB_CONNECTION=pgsql DB_HOST=pgsql DB_PORT=5432 DB_DATABASE=postgres DB_USERNAME=postgres php artisan migrate --ansi --force'),
         );
 
         $this
