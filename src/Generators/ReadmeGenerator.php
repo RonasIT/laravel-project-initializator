@@ -13,8 +13,16 @@ class ReadmeGenerator
     protected string $appType;
     protected string $appUrl;
     protected string $codeOwnerEmail;
-    protected string $managerEmail = ':manager_link';
-    protected string $gitProjectPath;
+    public string $managerEmail = ':manager_link' {
+        set {
+            $this->managerEmail = $value;
+        }
+    }
+    public string $gitProjectPath {
+        set {
+            $this->gitProjectPath = $value;
+        }
+    }
 
     protected array $resources = [];
     protected array $enabledBlocks = [];
@@ -37,16 +45,6 @@ class ReadmeGenerator
         $this->codeOwnerEmail = $codeOwnerEmail;
 
         return $this;
-    }
-
-    public function setManagerEmail(string $email): void
-    {
-        $this->managerEmail = $email;
-    }
-
-    public function setGitProjectPath(string $path): void
-    {
-        $this->gitProjectPath = $path;
     }
 
     public function getConfigurableResources(): array
@@ -143,7 +141,7 @@ class ReadmeGenerator
     protected function fillCredentialsAndAccess(): void
     {
         $this->addContent('credentials_and_access', [
-            'credentials' => $this->resources,
+            'credentials_and_access' => $this->resources,
         ]);
     }
 
