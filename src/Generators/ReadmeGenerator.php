@@ -2,25 +2,22 @@
 
 namespace RonasIT\ProjectInitializator\Generators;
 
-use RonasIT\ProjectInitializator\DTO\ContactDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 
 class ReadmeGenerator
 {
-    protected const string TEMPLATES_PATH = 'vendor/ronasit/laravel-project-initializator/resources/md/readme';
-    protected const string LATER_TEXT = '(will be added later)';
-
     protected string $readmeContent = '';
 
     protected string $appName;
     protected string $appType;
     protected string $appUrl;
     protected string $codeOwnerEmail;
+    protected string $managerEmail = ':manager_link';
     protected string $gitProjectPath;
 
     protected array $resources = [];
-    protected array $contacts = [];
+    protected array $enabledBlocks = [];
 
     protected array $blocksMethodsMap = [
         ReadmeBlockEnum::ResourcesAndContacts->value => 'fillResourcesAndContacts',
@@ -28,23 +25,23 @@ class ReadmeGenerator
         ReadmeBlockEnum::GettingStarted->value => 'fillGettingStarted',
         ReadmeBlockEnum::Environments->value => 'fillEnvironments',
         ReadmeBlockEnum::CredentialsAndAccess->value => 'fillCredentialsAndAccess',
-        ReadmeBlockEnum::Clerk->value => 'fillClerkAuthType',
+        ReadmeBlockEnum::Clerk->value => 'fillClerk',
         ReadmeBlockEnum::Renovate->value => 'fillRenovate',
     ];
 
-    protected array $enabledBlocks = [];
-
-    public function __construct()
-    {
-        $this->readmeContent = $this->loadReadmePart('README.md');
-    }
-
-    public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): void
+    public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): self
     {
         $this->appName = $appName;
         $this->appType = $appType;
         $this->appUrl = $appUrl;
         $this->codeOwnerEmail = $codeOwnerEmail;
+
+        return $this;
+    }
+
+    public function setManagerEmail(string $email): void
+    {
+        $this->managerEmail = $email;
     }
 
     public function setGitProjectPath(string $path): void
@@ -55,31 +52,17 @@ class ReadmeGenerator
     public function getConfigurableResources(): array
     {
         return [
-            new ResourceDTO('issue_tracker', 'Issue Tracker'),
-            new ResourceDTO('figma', 'Figma'),
-            new ResourceDTO('sentry', 'Sentry'),
-            new ResourceDTO('datadog', 'DataDog'),
-            new ResourceDTO('argocd', 'ArgoCD'),
-            new ResourceDTO('telescope', 'Laravel Telescope', 'telescope'),
-            new ResourceDTO('nova', 'Laravel Nova', 'nova'),
+            new ResourceDTO('issue_tracker', 'Issue Tracker', 'Here, you can report any issues or bugs related to the project.'),
+            new ResourceDTO('figma', 'Figma', 'This is where we maintain all our design assets and mock-ups.'),
+            new ResourceDTO('sentry', 'Sentry', 'To monitor application performance and error tracking.'),
+            new ResourceDTO('telescope', 'Laravel Telescope', 'This is debug assistant for the Laravel framework.', 'telescope'),
+            new ResourceDTO('nova', 'Laravel Nova', 'This is admin panel for the Laravel framework.', 'nova'),
         ];
     }
 
     public function addResource(ResourceDTO $resource): void
     {
         $this->resources[] = $resource;
-    }
-
-    public function getConfigurableContacts(): array
-    {
-        return [
-            new ContactDTO('manager', 'Manager'),
-        ];
-    }
-
-    public function addContact(ContactDTO $contact): void
-    {
-        $this->contacts[] = $contact;
     }
 
     public function getAccessRequiredResources(): array
@@ -99,7 +82,7 @@ class ReadmeGenerator
     {
         $this->fillProjectInfo();
 
-        if (!empty($this->resources) || !empty($this->contacts)) {
+        if (!empty($this->resources)) {
             $this->addBlock(ReadmeBlockEnum::ResourcesAndContacts);
         }
 
@@ -114,150 +97,70 @@ class ReadmeGenerator
 
     protected function fillProjectInfo(): void
     {
-        $this->setReadmeValue($this->readmeContent, 'project_name', $this->appName);
-        $this->setReadmeValue($this->readmeContent, 'type', $this->appType);
+        $this->readmeContent = view('initializator::readme.readme_head', [
+            'projectName' => $this->appName,
+            'appType' => $this->appType,
+        ])->render();
     }
 
     protected function fillResourcesAndContacts(): void
     {
-        $filePart = $this->loadReadmePart('RESOURCES_AND_CONTACTS.md');
+        $this->addContent('resources_and_contacts');
 
-        $this->updateReadmeFile($filePart);
+        $this->addContent('resources', [
+            'resources' => $this->resources,
+            'apiLink' => $this->appUrl,
+        ]);
 
-        $this->fillResources();
-
-        $this->fillContacts();
-    }
-
-    protected function fillResources(): void
-    {
-        $filePart = $this->loadReadmePart('RESOURCES.md');
-
-        foreach ($this->resources as $resource) {
-            if (empty($resource->link) && $resource->isActive) {
-                $this->setReadmeValue($filePart, "{$resource->key}_link");
-                $this->setReadmeValue($filePart, "{$resource->key}_later", self::LATER_TEXT);
-            } elseif (!empty($resource->link)) {
-                $this->setReadmeValue($filePart, "{$resource->key}_link", $resource->link);
-                $this->setReadmeValue($filePart, "{$resource->key}_later");
-            }
-
-            $this->removeTag($filePart, $resource->key, !$resource->isActive);
-        }
-
-        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
-        $this->updateReadmeFile($filePart);
-    }
-
-    protected function fillContacts(): void
-    {
-        $filePart = $this->loadReadmePart('CONTACTS.md');
-
-        foreach ($this->contacts as $contact) {
-            $email = $contact->email;
-
-            if (!empty($email)) {
-                $this->setReadmeValue($filePart, "{$contact->key}_link", $email);
-            }
-
-            $this->removeTag($filePart, $contact->key);
-        }
-
-        $this->setReadmeValue($filePart, 'team_lead_link', $this->codeOwnerEmail);
-
-        $this->updateReadmeFile($filePart);
+        $this->addContent('contacts', [
+            'manager' => $this->managerEmail,
+            'teamLead' => $this->codeOwnerEmail,
+        ]);
     }
 
     protected function fillPrerequisites(): void
     {
-        $filePart = $this->loadReadmePart('PREREQUISITES.md');
-
-        $this->updateReadmeFile($filePart);
+        $this->addContent('prerequisites');
     }
 
     protected function fillGettingStarted(): void
     {
         $projectDirectory = basename($this->gitProjectPath, '.git');
-        $filePart = $this->loadReadmePart('GETTING_STARTED.md');
 
-        $this->setReadmeValue($filePart, 'git_project_path', $this->gitProjectPath);
-        $this->setReadmeValue($filePart, 'project_directory', $projectDirectory);
-
-        $this->updateReadmeFile($filePart);
+        $this->addContent('getting_started', [
+            'gitProjectPath' => $this->gitProjectPath,
+            'projectDirectory' => $projectDirectory,
+        ]);
     }
 
     protected function fillEnvironments(): void
     {
-        $filePart = $this->loadReadmePart('ENVIRONMENTS.md');
-
-        $this->setReadmeValue($filePart, 'api_link', $this->appUrl);
-        $this->updateReadmeFile($filePart);
+        $this->addContent('environments', [
+            'apiLink' => $this->appUrl,
+        ]);
     }
 
     protected function fillCredentialsAndAccess(): void
     {
-        $filePart = $this->loadReadmePart('CREDENTIALS_AND_ACCESS.md');
-
-        foreach ($this->resources as $resource) {
-            if (!empty($resource->email)) {
-                $this->setReadmeValue($filePart, "{$resource->key}_email", $resource->email);
-                $this->setReadmeValue($filePart, "{$resource->key}_password", $resource->password);
-            }
-
-            $this->removeTag($filePart, "{$resource->key}_credentials", empty($resource->email));
-        }
-
-        if (!$this->getResource('admin')) {
-            $this->removeTag($filePart, 'admin_credentials', true);
-        }
-
-        $this->updateReadmeFile($filePart);
+        $this->addContent('credentials_and_access', [
+            'credentials' => $this->resources,
+        ]);
     }
 
-    protected function fillClerkAuthType(): void
+    protected function fillClerk(): void
     {
-        $filePart = $this->loadReadmePart('CLERK.md');
-
-        $this->updateReadmeFile($filePart);
+        $this->addContent('clerk');
     }
 
     protected function fillRenovate(): void
     {
-        $filePart = $this->loadReadmePart('RENOVATE.md');
-
-        $this->updateReadmeFile($filePart);
+        $this->addContent('renovate');
     }
 
-    protected function getResource(string $key): ?ResourceDTO
+    protected function addContent(string $view, array $data = []): void
     {
-        return array_find($this->resources, fn (ResourceDTO $resource) => $resource->key === $key);
-    }
+        $content = view("initializator::readme.{$view}", $data)->render();
 
-    protected function loadReadmePart(string $fileName): string
-    {
-        $file = base_path(self::TEMPLATES_PATH . DIRECTORY_SEPARATOR . $fileName);
-
-        return file_get_contents($file);
-    }
-
-    protected function setReadmeValue(string &$file, string $key, string $value = ''): void
-    {
-        $file = str_replace(":{$key}", $value, $file);
-    }
-
-    protected function updateReadmeFile(string $filePart): void
-    {
-        $filePart = preg_replace('#(\n){3,}#', "\n", $filePart);
-
-        $this->readmeContent .= "\n" . $filePart;
-    }
-
-    protected function removeTag(string &$text, string $tag, bool $removeWholeString = false): void
-    {
-        $regex = ($removeWholeString)
-            ? "#({{$tag}})(.|\s)*?({/{$tag}})#"
-            : "# {0,1}{(/*){$tag}}#";
-
-        $text = preg_replace($regex, '', $text);
+        $this->readmeContent .= "\n{$content}";
     }
 }

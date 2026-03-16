@@ -12,6 +12,8 @@ process, so you can efficiently find what you need or reach out to who you need.
 
 Below are links to tools and services used in this project:
 - [Issue Tracker](): Here, you can report any issues or bugs related to the project. (will be added later)
+- [Laravel Telescope](): This is debug assistant for the Laravel framework. (will be added later)
+- [Laravel Nova](): This is admin panel for the Laravel framework. (will be added later)
 - [API Documentation](https://mysite.com)
 
 ### Contacts
@@ -27,11 +29,30 @@ Please be mindful of each individual's preferred contact method and office hours
 This repository by default supports three environments: `local`, `development`,
 and `testing`. Each environment is represented by an appropriate environment file:
 
-| Environment | File | URL                                  |
-| --- | --- |--------------------------------------|
-| local | .env | [http://localhost](http://localhost) |
-| testing | .env.testing | -                                    |
-| development | .env.development | [https://mysite.com](https://mysite.com)               |
+| Environment  | File             | URL
+| ------------ | ---------------- | --------------------------------------
+| local        | .env             | [http://localhost](http://localhost)
+| testing      | .env.testing     | -
+| development  | .env.development | [https://mysite.com](https://mysite.com)
 
 ## Credentials and Access
 
+Laravel Telescope access:
+
+```
+telescope_mail@mail.com
+```
+
+```
+654321
+```
+
+Laravel Nova access:
+
+```
+nova_mail@mail.com
+```
+
+```
+654321
+```
