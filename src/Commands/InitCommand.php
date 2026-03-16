@@ -45,6 +45,7 @@ class InitCommand extends Command implements Isolatable
         'composer require --dev brainmaestro/composer-git-hooks',
         './vendor/bin/cghooks update',
         'php artisan lang:publish',
+        'php artisan key:generate',
     ];
 
     protected bool $shouldUninstallPackage = false;
@@ -116,7 +117,7 @@ class InitCommand extends Command implements Isolatable
             $this->createAdminUser();
         }
 
-        if ($shouldGenerateReadme = $this->confirm('Do you want to generate a README file?', true)) {
+        if ($this->confirm('Do you want to generate a README file?', true)) {
             $this->configureReadme();
         }
 
@@ -130,7 +131,7 @@ class InitCommand extends Command implements Isolatable
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Renovate);
         }
 
-        if ($shouldGenerateReadme) {
+        if (!empty($this->readmeGenerator)) {
             $this->readmeGenerator->save();
 
             $this->info('README generated successfully!');
@@ -374,24 +375,43 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureReadme(): void
     {
-        $this->readmeGenerator = app(ReadmeGenerator::class);
-
-        $this->readmeGenerator->setAppInfo(
+        $this->readmeGenerator = app(ReadmeGenerator::class)->setAppInfo(
             appName: $this->appName,
             appType: $this->appType->value,
             appUrl: $this->appUrl,
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
+        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
+            $this->configureResources();
+            $this->configureManagerEmail();
+        }
 
-        $this
-            ->getReadmeBlocks()
-            ->each(function (ReadmeBlock $block) use ($shouldGenerateAllParts) {
-                if ($shouldGenerateAllParts || $this->confirm($block->question, true)) {
-                    ($block->action)();
-                }
-            });
+        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Prerequisites);
+        }
+
+        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
+            $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
+
+            $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
+
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::GettingStarted);
+        }
+
+        if ($this->confirm('Do you need an `Environments` part?', true)) {
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Environments);
+        }
+
+        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
+            $this->configureCredentialsAndAccess();
+
+            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
+
+            if ($this->authType === AuthTypeEnum::Clerk) {
+                $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Clerk);
+            }
+        }
     }
 
     protected function configureResources(): void
@@ -419,20 +439,16 @@ class InitCommand extends Command implements Isolatable
 
             $resource->setActive($answer !== UserAnswerEnum::No);
 
-            $this->readmeGenerator->addResource($resource);
+            $this->readmeGenerator?->addResource($resource);
         }
     }
 
-    protected function configureContacts(): void
+    protected function configureManagerEmail(): void
     {
-        foreach ($this->readmeGenerator->getConfigurableContacts() as $contact) {
-            if ($link = $this->ask("Please enter a {$contact->title}'s email", '')) {
-                $contact->setEmail($link);
-            } else {
-                $this->emptyResourcesList[] = "{$contact->title}'s email";
-            }
-
-            $this->readmeGenerator->addContact($contact);
+        if ($link = $this->ask("Please enter a Manager's email", '')) {
+            $this->readmeGenerator?->setManagerEmail($link);
+        } else {
+            $this->emptyResourcesList[] = "Manager's email";
         }
     }
 

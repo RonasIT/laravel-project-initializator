@@ -58,6 +58,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
@@ -120,6 +121,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
@@ -185,6 +187,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
@@ -262,6 +265,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
             $this->callShellExec('php artisan laravel-clerk:install --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
@@ -270,21 +274,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme.md')),
-        );
+        $this->mockReadmeFileWrite('default_readme.md');
 
         $this
             ->artisan('init "My App"')
@@ -315,16 +305,6 @@ class InitCommandTest extends TestCase
                 'later',
             )
             ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later',
-            )
-            ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'later',
@@ -347,8 +327,6 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- Issue Tracker link')
             ->expectsOutput('- Figma link')
             ->expectsOutput('- Sentry link')
-            ->expectsOutput('- DataDog link')
-            ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -396,22 +374,14 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFilePutContent('README.md', $this->getFixture('partial_readme.md')),
-        );
+        $this->mockReadmeFileWrite('partial_readme.md');
 
         $this
             ->artisan('init "My App"')
@@ -437,16 +407,6 @@ class InitCommandTest extends TestCase
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'no',
             )
@@ -520,6 +480,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
@@ -528,19 +489,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-            $this->callFilePutContent('README.md', $this->getFixture('full_readme.md')),
-        );
+        $this->mockReadmeFileWrite('full_readme.md');
 
         $this
             ->artisan('init "My App"')
@@ -572,16 +521,6 @@ class InitCommandTest extends TestCase
                 'Are you going to use Sentry? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'https://sentry.com/my-project',
-            )
-            ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://datadoghq.com/my-project',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'https://argocd.com/my-project',
             )
             ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
@@ -657,22 +596,14 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_with_telescope.md')),
-        );
+        $this->mockReadmeFileWrite('partial_readme_with_telescope.md');
 
         $this
             ->artisan('init "My App"')
@@ -698,16 +629,6 @@ class InitCommandTest extends TestCase
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'no',
             )
@@ -792,6 +713,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
             $this->callShellExec('php artisan laravel-clerk:install --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
@@ -800,21 +722,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/PREREQUISITES.md'), $this->getReadmeTemplateContent('PREREQUISITES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/GETTING_STARTED.md'), $this->getReadmeTemplateContent('GETTING_STARTED.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/ENVIRONMENTS.md'), $this->getReadmeTemplateContent('ENVIRONMENTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RENOVATE.md'), $this->getReadmeTemplateContent('RENOVATE.md')),
-
-            $this->callFilePutContent('README.md', $this->getFixture('default_readme_with_mobile_app.md')),
-        );
+        $this->mockReadmeFileWrite('default_readme_with_mobile_app.md');
 
         $this
             ->artisan('init "My App"')
@@ -846,16 +754,6 @@ class InitCommandTest extends TestCase
                 'later',
             )
             ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'later',
-            )
-            ->expectsQuestion(
                 'Are you going to use Laravel Telescope? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'later',
@@ -880,8 +778,6 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- Issue Tracker link')
             ->expectsOutput('- Figma link')
             ->expectsOutput('- Sentry link')
-            ->expectsOutput('- DataDog link')
-            ->expectsOutput('- ArgoCD link')
             ->expectsOutput('- Manager\'s email')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
@@ -937,6 +833,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
             $this->callShellExec('php artisan laravel-clerk:install --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
@@ -945,16 +842,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFileGetContent($this->generateResourcePath('md/readme/README.md'), $this->getReadmeTemplateContent('README.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES_AND_CONTACTS.md'), $this->getReadmeTemplateContent('RESOURCES_AND_CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/RESOURCES.md'), $this->getReadmeTemplateContent('RESOURCES.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CONTACTS.md'), $this->getReadmeTemplateContent('CONTACTS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CREDENTIALS_AND_ACCESS.md'), $this->getReadmeTemplateContent('CREDENTIALS_AND_ACCESS.md')),
-            $this->callFileGetContent($this->generateResourcePath('md/readme/CLERK.md'), $this->getReadmeTemplateContent('CLERK.md')),
-            $this->callFilePutContent('README.md', $this->getFixture('partial_readme_clerk_with_credentials.md')),
-        );
+        $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md');
 
         $this
             ->artisan('init "My App"')
@@ -980,16 +868,6 @@ class InitCommandTest extends TestCase
             )
             ->expectsQuestion(
                 'Are you going to use Sentry? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use DataDog? '
-                . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
-                'no',
-            )
-            ->expectsQuestion(
-                'Are you going to use ArgoCD? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
                 'no',
             )
@@ -1066,6 +944,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require --dev brainmaestro/composer-git-hooks --ansi'),
             $this->callShellExec('./vendor/bin/cghooks update --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),

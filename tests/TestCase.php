@@ -29,14 +29,4 @@ class TestCase extends BaseTestCase
             ProjectInitializatorServiceProvider::class,
         ];
     }
-
-    protected function getReadmeTemplateContent(string $templateName): string
-    {
-        return file_get_contents(base_path("/resources/md/readme/{$templateName}"));
-    }
-
-    protected function generateResourcePath(string $path): string
-    {
-        return base_path("/vendor/ronasit/laravel-project-initializator/resources/{$path}");
-    }
 }
