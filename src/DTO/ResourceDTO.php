@@ -7,8 +7,9 @@ class ResourceDTO
     public function __construct(
         public readonly string $key,
         public readonly string $title,
+        public readonly ?string $description = null,
         public readonly ?string $localPath = null,
-        public private(set) ?string $link = null,
+        public private(set) string $link = '',
         public private(set) bool $isActive = false,
         public private(set) ?string $email = null,
         public private(set) ?string $password = null,

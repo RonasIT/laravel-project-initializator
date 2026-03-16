@@ -14,8 +14,6 @@ Below are links to tools and services used in this project:
 - [Issue Tracker](https://gitlab.com/my-project): Here, you can report any issues or bugs related to the project.
 - [Figma](https://figma.com/my-project): This is where we maintain all our design assets and mock-ups.
 - [Sentry](https://sentry.com/my-project): To monitor application performance and error tracking.
-- [DataDog](https://datadoghq.com/my-project): This is where we monitor our logs, and server performance, and receive alerts.
-- [ArgoCD](https://argocd.com/my-project): Is a kubernetes controller which continuously monitors running applications.
 - [Laravel Telescope](https://mypsite.com/telescope-link): This is debug assistant for the Laravel framework.
 - [Laravel Nova](https://mypsite.com/nova-link): This is admin panel for the Laravel framework.
 - [API Documentation](https://mysite.com)
@@ -62,23 +60,13 @@ docker compose up -d
 This repository by default supports three environments: `local`, `development`,
 and `testing`. Each environment is represented by an appropriate environment file:
 
-| Environment | File | URL                                  |
-| --- | --- |--------------------------------------|
-| local | .env | [http://localhost](http://localhost) |
-| testing | .env.testing | -                                    |
-| development | .env.development | [https://mysite.com](https://mysite.com)               |
+| Environment  | File             | URL
+| ------------ | ---------------- | --------------------------------------
+| local        | .env             | [http://localhost](http://localhost)
+| testing      | .env.testing     | -
+| development  | .env.development | [https://mysite.com](https://mysite.com)
 
 ## Credentials and Access
-
-Default admin access:
-
-```
-mail@mail.com
-```
-
-```
-123456
-```
 
 Laravel Telescope access:
 
@@ -98,6 +86,16 @@ nova_mail@mail.com
 
 ```
 654321
+```
+
+Default admin access:
+
+```
+mail@mail.com
+```
+
+```
+123456
 ```
 
 ### Renovate
