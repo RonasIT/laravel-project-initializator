@@ -60,8 +60,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -125,8 +126,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "MyApp"')
@@ -191,8 +193,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -271,8 +274,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockReadmeFileWrite('default_readme.md');
 
@@ -382,8 +386,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockReadmeFileWrite('partial_readme.md');
 
@@ -489,8 +494,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockReadmeFileWrite('full_readme.md');
 
@@ -602,8 +608,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockReadmeFileWrite('partial_readme_with_telescope.md');
 
@@ -720,8 +727,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockReadmeFileWrite('default_readme_with_mobile_app.md');
 
@@ -839,8 +847,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md');
 
@@ -947,8 +956,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
