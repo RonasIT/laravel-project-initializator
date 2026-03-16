@@ -7,6 +7,8 @@ use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
@@ -617,17 +619,22 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
-        $envParams = [
-            "DB_CONNECTION={$this->defaultDBConnectionConfig['driver']}",
-            "DB_HOST={$this->defaultDBConnectionConfig['host']}",
-            "DB_PORT={$this->defaultDBConnectionConfig['port']}",
-            "DB_DATABASE={$this->defaultDBConnectionConfig['database']}",
-            "DB_USERNAME={$this->defaultDBConnectionConfig['username']}",
-        ];
+        $driver = $this->defaultDBConnectionConfig['driver'];
 
-        $command = implode(' ', $envParams) . ' php artisan migrate --ansi --force';
+        config([
+            'database.default' => $driver,
+            "database.connections.{$driver}.host" => $this->defaultDBConnectionConfig['host'],
+            "database.connections.{$driver}.port" => $this->defaultDBConnectionConfig['port'],
+            "database.connections.{$driver}.database" => $this->defaultDBConnectionConfig['database'],
+            "database.connections.{$driver}.username" => $this->defaultDBConnectionConfig['username'],
+        ]);
 
-        shell_exec($command);
+        DB::purge($driver);
+
+        Artisan::call('migrate', [
+            '--force' => true,
+            '--ansi' => true,
+        ]);
     }
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
