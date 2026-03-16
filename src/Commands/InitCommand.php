@@ -382,36 +382,15 @@ class InitCommand extends Command implements Isolatable
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
-            $this->configureResources();
-            $this->configureManagerEmail();
-        }
+        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
 
-        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Prerequisites);
-        }
-
-        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
-            $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
-
-            $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
-
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::GettingStarted);
-        }
-
-        if ($this->confirm('Do you need an `Environments` part?', true)) {
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Environments);
-        }
-
-        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
-            $this->configureCredentialsAndAccess();
-
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
-
-            if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Clerk);
-            }
-        }
+        $this
+            ->getReadmeBlocks()
+            ->each(function (ReadmeBlock $block) use ($shouldGenerateAllParts) {
+                if ($shouldGenerateAllParts || $this->confirm($block->question, true)) {
+                    ($block->action)();
+                }
+            });
     }
 
     protected function configureResources(): void
@@ -687,7 +666,7 @@ class InitCommand extends Command implements Isolatable
     protected function configureResourcesAndContactsStep(): void
     {
         $this->configureResources();
-        $this->configureContacts();
+        $this->configureManagerEmail();
     }
 
     protected function configureCredentialsAndAccessStep(): void
