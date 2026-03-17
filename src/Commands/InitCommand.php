@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Laravel\Telescope\TelescopeServiceProvider;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
@@ -143,7 +144,7 @@ class InitCommand extends Command implements Isolatable
             }
         }
 
-        if (!class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+        if (!class_exists(TelescopeServiceProvider::class)) {
             array_push(
                 $this->shellCommands,
                 'composer require ronasit/laravel-telescope-extension',
