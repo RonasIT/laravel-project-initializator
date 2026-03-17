@@ -261,6 +261,7 @@ class InitCommand extends Command implements Isolatable
             'AUTH_GUARD' => 'clerk',
             'CLERK_ALLOWED_ISSUER' => '',
             'CLERK_SECRET_KEY' => '',
+            'CLERK_SIGNER_KEY_PATH' => '',
         ];
 
         if ($this->appType !== AppTypeEnum::Mobile) {
@@ -268,13 +269,8 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->updateEnvFile('.env', $data);
-
-        $this->updateEnvFile('.env.example', [
-            ...$data,
-            'CLERK_SIGNER_KEY_PATH' => '',
-        ]);
-
-        $this->updateEnvFile('.env.development', $data);
+        $this->updateEnvFile('.env.example', $data);
+        $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
