@@ -2,6 +2,8 @@
 
 namespace RonasIT\ProjectInitializator\Tests\Support\Traits;
 
+use Illuminate\Support\Carbon;
+use RonasIT\ProjectInitializator\Tests\Support\MigrationPublishMock;
 use RonasIT\Support\Traits\MockTrait;
 
 trait InitCommandMockTrait
@@ -31,6 +33,15 @@ trait InitCommandMockTrait
     protected function callFilePutContent(string $fileName, string $result, int $flags = 0): array
     {
         return $this->functionCall('file_put_contents', [$fileName, $result, $flags]);
+    }
+
+    protected function callPublishMigrations(): MigrationPublishMock
+    {
+        return new MigrationPublishMock(
+            timestamp: Carbon::create(2018, 11, 11, 11, 11, 11),
+            callFilePutContent: fn (string $path, string $content) => $this->callFilePutContent($path, $content),
+            getFixture: fn (string $fixture) => $this->getFixture($fixture),
+        );
     }
 
     protected function callShellExec(string $command, string $result = 'success'): array
