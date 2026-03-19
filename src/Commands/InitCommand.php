@@ -87,6 +87,8 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
+        $this->publishDropJobsTableMigration();
+
         $this->appType = AppTypeEnum::from($this->choice(
             question: 'What type of application will your API serve?',
             choices: AppTypeEnum::values(),
@@ -628,6 +630,14 @@ class InitCommand extends Command implements Isolatable
         $this->fileSaver->publishMigration(
             view: view('initializator::admins_create_table'),
             migrationName: 'admins_create_table',
+        );
+    }
+
+    protected function publishDropJobsTableMigration(): void
+    {
+        $this->fileSaver->publishMigration(
+            view: view('initializator::drop_jobs_table'),
+            migrationName: 'drop_jobs_table',
         );
     }
 }
