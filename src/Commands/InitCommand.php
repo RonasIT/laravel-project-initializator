@@ -500,6 +500,10 @@ class InitCommand extends Command implements Isolatable
             $this->emptyResourcesList[] = 'GOOGLE_CLOUD_PROJECT_ID';
 
             $this->addGcsDiskToConfig();
+        } else {
+            $this->updateEnvFile('.env.development', [
+                'FILESYSTEM_DISK' => $storage->value,
+            ]);
         }
     }
 
