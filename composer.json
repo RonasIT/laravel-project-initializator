@@ -28,7 +28,7 @@
     "minimum-stability": "alpha",
     "require": {
         "php": ">=8.4",
-        "laravel/framework": "^12.28",
+        "laravel/framework": ">=12.28",
         "php-mock/php-mock-phpunit": "^2.10",
         "ext-json": "*",
         "ronasit/laravel-helpers": ">=3.5.7",
