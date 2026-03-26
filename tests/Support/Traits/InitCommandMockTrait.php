@@ -52,6 +52,14 @@ trait InitCommandMockTrait
         ];
     }
 
+    protected function changeBootstrapAppCall(string $sourceFixture, string $resultFixture): array
+    {
+        return [
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture("bootstrap/{$sourceFixture}")),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture("bootstrap/{$resultFixture}")),
+        ];
+    }
+
     protected function changeConfigFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
     {
         return [
