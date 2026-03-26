@@ -60,6 +60,14 @@ trait InitCommandMockTrait
         ];
     }
 
+    protected function changeAppFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
+    {
+        return [
+            $this->callFileGetContent(app_path($fileName), $this->getFixture("{$sourceFixture}")),
+            $this->callFilePutContent(app_path($fileName), $this->getFixture("{$resultFixture}")),
+        ];
+    }
+
     protected function changeConfigFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
     {
         return [
