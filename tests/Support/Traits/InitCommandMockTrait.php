@@ -43,6 +43,14 @@ trait InitCommandMockTrait
         return $this->functionCall('glob', [$pattern], $result);
     }
 
+    protected function copyEnvFileCall(string $envFile, string $sourceEnvFile = '.env.example'): array
+    {
+        return [
+            $this->callFileExists($envFile, false),
+            $this->callCopy($sourceEnvFile, $envFile),
+        ];
+    }
+
     protected function changeEnvFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
     {
         return [
