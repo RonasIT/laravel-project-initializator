@@ -28,6 +28,8 @@ class InitCommand extends Command implements Isolatable
 
     protected $description = 'Initialize required project parameters to run DEV environment';
 
+    protected string $appKey = 'base64:RMlWJrRHIuHLYRplJvWaLNwWvRoVkQdDTZe6U1Z4xRY=';
+
     protected array $adminCredentials = [];
 
     protected array $emptyResourcesList = [];
@@ -246,6 +248,27 @@ class InitCommand extends Command implements Isolatable
             'DB_DATABASE' => '',
             'DB_USERNAME' => '',
             'DB_PASSWORD' => '',
+        ]);
+
+        if (!file_exists('.env.ci-testing')) {
+            copy('.env.example', '.env.ci-testing');
+        }
+
+        $this->updateEnvFile('.env.ci-testing', [
+            ...$envConfig,
+            'APP_ENV' => 'testing',
+            'APP_KEY' => $this->appKey,
+        ]);
+
+        if (!file_exists('.env.testing')) {
+            copy('.env.example', '.env.testing');
+        }
+
+        $this->updateEnvFile('.env.testing', [
+            ...$envConfig,
+            'APP_ENV' => 'testing',
+            'APP_KEY' => $this->appKey,
+            'FAIL_EXPORT_JSON' => false,
         ]);
     }
 
