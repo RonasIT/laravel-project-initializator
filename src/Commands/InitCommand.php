@@ -229,10 +229,7 @@ class InitCommand extends Command implements Isolatable
             $this->updateEnvFile('.env', $envConfig);
         }
 
-        if (!file_exists('.env.development')) {
-            copy('.env.example', '.env.development');
-        }
-
+        $this->createEnvFileIfNotExists('.env.development', '.env.example');
         $this->updateEnvFile('.env.development', [
             'APP_NAME' => $this->appName,
             'APP_ENV' => 'development',
@@ -250,24 +247,24 @@ class InitCommand extends Command implements Isolatable
             'DB_PASSWORD' => '',
         ]);
 
-        if (!file_exists('.env.ci-testing')) {
-            copy('.env.example', '.env.ci-testing');
-        }
-
-        $this->updateEnvFile('.env.ci-testing', [
+        $testingEnvConfig = [
             ...$envConfig,
             'APP_ENV' => 'testing',
             'APP_KEY' => $this->appKey,
+            'LOG_CHANNEL' => 'stderr',
+        ];
+
+        $this->createEnvFileIfNotExists('.env.ci-testing', '.env.example');
+        $this->updateEnvFile('.env.ci-testing', [
+            ...$testingEnvConfig,
+            'DB_DATABASE' => 'forge',
+            'DB_USERNAME' => 'forge',
         ]);
 
-        if (!file_exists('.env.testing')) {
-            copy('.env.example', '.env.testing');
-        }
-
+        $this->createEnvFileIfNotExists('.env.testing', '.env.example');
         $this->updateEnvFile('.env.testing', [
-            ...$envConfig,
-            'APP_ENV' => 'testing',
-            'APP_KEY' => $this->appKey,
+            ...$testingEnvConfig,
+            'DB_HOST' => 'pgsql_test',
             'FAIL_EXPORT_JSON' => false,
         ]);
     }
@@ -294,6 +291,13 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env', $data);
         $this->updateEnvFile('.env.example', $data);
         $this->updateEnvFile('.env.development', $data);
+    }
+
+    protected function createEnvFileIfNotExists(string $filePath, string $source): void
+    {
+        if (!file_exists($filePath)) {
+            copy($source, $filePath);
+        }
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
