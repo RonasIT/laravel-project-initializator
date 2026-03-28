@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c9041c589dfbbc9bb763865fb1d6459c",
+    "content-hash": "bb384c29b4e4910aa50b868d1e4ad6af",
     "packages": [
         {
             "name": "brick/math",
@@ -4844,20 +4844,20 @@
         },
         {
             "name": "ronasit/larabuilder",
-            "version": "0.0.5",
+            "version": "dev-update-composer-laravel-constraint",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RonasIT/larabuilder.git",
-                "reference": "55094017edae2ac6c91ed742eb34e140315ac453"
+                "reference": "37b67cf49f636a7d09701c41e4409944de5dc87a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RonasIT/larabuilder/zipball/55094017edae2ac6c91ed742eb34e140315ac453",
-                "reference": "55094017edae2ac6c91ed742eb34e140315ac453",
+                "url": "https://api.github.com/repos/RonasIT/larabuilder/zipball/37b67cf49f636a7d09701c41e4409944de5dc87a",
+                "reference": "37b67cf49f636a7d09701c41e4409944de5dc87a",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "^12.28",
+                "laravel/framework": "^12.28|^13",
                 "nikic/php-parser": "^5.6",
                 "php": "^8.4"
             },
@@ -4889,9 +4889,9 @@
             "description": "A great tool for creating and modifying PHP classes in Laravel, providing utilities to generate boilerplate code, add methods, properties, and annotations with ease.",
             "support": {
                 "issues": "https://github.com/RonasIT/larabuilder/issues",
-                "source": "https://github.com/RonasIT/larabuilder/tree/0.0.5"
+                "source": "https://github.com/RonasIT/larabuilder/tree/update-composer-laravel-constraint"
             },
-            "time": "2026-01-29T05:50:04+00:00"
+            "time": "2026-03-27T06:43:32+00:00"
         },
         {
             "name": "ronasit/laravel-helpers",
@@ -11375,7 +11375,9 @@
     ],
     "aliases": [],
     "minimum-stability": "alpha",
-    "stability-flags": {},
+    "stability-flags": {
+        "ronasit/larabuilder": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
