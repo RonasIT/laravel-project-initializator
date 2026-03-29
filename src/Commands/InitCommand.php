@@ -255,6 +255,14 @@ class InitCommand extends Command implements Isolatable
             ->addArrayPropertyItem('fillable', 'clerk_id')
             ->save();
 
+        $this->fileSaver->publishClass(
+            template: view('initializator::models.admin'),
+            fileName: 'Admin',
+            filePath: 'app/Models',
+        );
+
+        $this->configureAuthForClerk();
+
         $data = [
             'AUTH_GUARD' => 'clerk',
             'CLERK_ALLOWED_ISSUER' => '',
@@ -269,6 +277,17 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env', $data);
         $this->updateEnvFile('.env.example', $data);
         $this->updateEnvFile('.env.development', $data);
+    }
+
+    protected function configureAuthForClerk(): void
+    {
+        $config = ArrayFile::open(base_path('config/auth.php'));
+
+        $config->set('guards.web.provider', 'admins');
+        $config->set('providers.admins.driver', 'eloquent');
+        $config->set('providers.admins.model', $config->constant('App\Models\Admin::class'));
+
+        $config->write();
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
