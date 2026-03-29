@@ -4,9 +4,7 @@ namespace RonasIT\ProjectInitializator\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
@@ -19,6 +17,7 @@ use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
+use RonasIT\ProjectInitializator\Support\FileSaver;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
@@ -56,6 +55,7 @@ class InitCommand extends Command implements Isolatable
     protected string $codeOwnerEmail;
 
     protected ?ReadmeGenerator $readmeGenerator = null;
+    protected FileSaver $fileSaver;
 
     protected array $defaultDBConnectionConfig = [
         'driver' => 'pgsql',
@@ -65,13 +65,11 @@ class InitCommand extends Command implements Isolatable
         'username' => 'postgres',
     ];
 
-    protected ?Carbon $lastMigrationTimestamp = null;
-
     public function __construct()
     {
-        $this->lastMigrationTimestamp = Carbon::now();
-
         parent::__construct();
+
+        $this->fileSaver = new FileSaver();
     }
 
     public function handle(): void
@@ -108,10 +106,6 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
-            if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->publishAdminsTableMigration();
-            }
-
             $this->createAdminUser();
         }
 
@@ -257,6 +251,19 @@ class InitCommand extends Command implements Isolatable
             ->addArrayPropertyItem('fillable', 'clerk_id')
             ->save();
 
+        $this->fileSaver->publishClass(
+            template: view('initializator::models.admin'),
+            fileName: 'Admin',
+            filePath: 'app/Models',
+        );
+
+        $this->fileSaver->publishMigration(
+            view: view('initializator::admins_create_table'),
+            migrationName: 'admins_create_table',
+        );
+
+        $this->configureAuthForClerk();
+
         $data = [
             'AUTH_GUARD' => 'clerk',
             'CLERK_ALLOWED_ISSUER' => '',
@@ -271,6 +278,17 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env', $data);
         $this->updateEnvFile('.env.example', $data);
         $this->updateEnvFile('.env.development', $data);
+    }
+
+    protected function configureAuthForClerk(): void
+    {
+        $config = ArrayFile::open(base_path('config/auth.php'));
+
+        $config->set('guards.web.provider', 'admins');
+        $config->set('providers.admins.driver', 'eloquent');
+        $config->set('providers.admins.model', $config->constant('App\Models\Admin::class'));
+
+        $config->write();
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
@@ -292,12 +310,12 @@ class InitCommand extends Command implements Isolatable
             'php artisan laravel-clerk:install',
         );
 
-        $this->publishMigration(
+        $this->fileSaver->publishMigration(
             view: view('initializator::users_format_to_clerk'),
             migrationName: 'users_format_to_clerk',
         );
 
-        $this->publishClass(
+        $this->fileSaver->publishClass(
             template: view('initializator::clerk_user_repository'),
             fileName: 'ClerkUserRepository',
             filePath: 'app/Support/Clerk',
@@ -337,38 +355,16 @@ class InitCommand extends Command implements Isolatable
     protected function publishRoleMigrations(): void
     {
         if (!$this->isMigrationExists('roles_create_table') && !$this->isMigrationExists('create_roles_table')) {
-            $this->publishMigration(
+            $this->fileSaver->publishMigration(
                 view: view('initializator::roles_create_table'),
                 migrationName: 'roles_create_table',
             );
 
-            $this->publishMigration(
+            $this->fileSaver->publishMigration(
                 view: view('initializator::users_add_role_id'),
                 migrationName: 'users_add_role_id',
             );
         }
-    }
-
-    protected function publishMigration(View $view, string $migrationName): void
-    {
-        $time = $this->lastMigrationTimestamp->addSecond();
-
-        $migrationName = "{$time->format('Y_m_d_His')}_{$migrationName}";
-
-        $this->publishClass($view, $migrationName, 'database/migrations');
-    }
-
-    protected function publishClass(View $template, string $fileName, string $filePath): void
-    {
-        $fileName = "{$fileName}.php";
-
-        if (!is_dir($filePath)) {
-            mkdir($filePath, 0777, true);
-        }
-
-        $data = $template->render();
-
-        file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
     }
 
     protected function configureReadme(): void
@@ -458,10 +454,6 @@ class InitCommand extends Command implements Isolatable
             if (!empty($this->adminCredentials) && $this->confirm("Is {$resource->title}'s admin the same as default one?", true)) {
                 $adminCredentials = $this->adminCredentials;
             } else {
-                if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
-                    $this->publishAdminsTableMigration();
-                }
-
                 $adminCredentials = $this->createAdminUser($resource->key, $resource->title);
             }
 
@@ -541,7 +533,7 @@ class InitCommand extends Command implements Isolatable
             'assignees' => [$reviewer],
         ];
 
-        file_put_contents('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
+        $this->fileSaver->saveFile('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
     }
 
     protected function setupComposerHooks(): void
@@ -559,7 +551,7 @@ class InitCommand extends Command implements Isolatable
 
         $resultData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
 
-        file_put_contents($path, $resultData);
+        $this->fileSaver->saveFile($path, $resultData);
     }
 
     protected function addArrayItemIfMissing(array &$data, string $path, string $value): void
@@ -599,7 +591,7 @@ class InitCommand extends Command implements Isolatable
     {
         shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
 
-        file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
+        $this->fileSaver->saveFile(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
     }
 
     protected function addDefaultHttpExceptionRender(): void
@@ -638,7 +630,7 @@ class InitCommand extends Command implements Isolatable
             ? 'initializator::admins_add_additional_admin'
             : 'initializator::add_default_user';
 
-        $this->publishMigration(
+        $this->fileSaver->publishMigration(
             view: view($viewName)->with($adminCredentials),
             migrationName: $migrationName,
         );
@@ -647,13 +639,5 @@ class InitCommand extends Command implements Isolatable
     protected function isMigrationExists(string $migrationName): bool
     {
         return !empty(glob(base_path("database/migrations/*_{$migrationName}.php")));
-    }
-
-    protected function publishAdminsTableMigration(): void
-    {
-        $this->publishMigration(
-            view: view('initializator::admins_create_table'),
-            migrationName: 'admins_create_table',
-        );
     }
 }
