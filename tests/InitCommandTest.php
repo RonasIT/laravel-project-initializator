@@ -257,8 +257,6 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
-
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -848,9 +846,6 @@ class InitCommandTest extends TestCase
             $this->callCopy('.env.example', '.env'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
 
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
