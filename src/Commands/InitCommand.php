@@ -270,7 +270,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateEnvFile('.env', $data);
         $this->updateEnvFile('.env.example', $data);
-        $this->updateEnvFile('.env.development', $data);
+        $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
