@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Laravel\Telescope\TelescopeServiceProvider;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
@@ -145,7 +146,7 @@ class InitCommand extends Command implements Isolatable
             }
         }
 
-        if (!class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+        if (!class_exists(TelescopeServiceProvider::class)) {
             array_push(
                 $this->shellCommands,
                 'composer require ronasit/laravel-telescope-extension',
@@ -621,22 +622,21 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
-        // $driver = $this->defaultDBConnectionConfig['driver'];
+        $driver = $this->defaultDBConnectionConfig['driver'];
 
-        // config([
-        //     'database.default' => $driver,
-        //     "database.connections.{$driver}.host" => $this->defaultDBConnectionConfig['host'],
-        //     "database.connections.{$driver}.port" => $this->defaultDBConnectionConfig['port'],
-        //     "database.connections.{$driver}.database" => $this->defaultDBConnectionConfig['database'],
-        //     "database.connections.{$driver}.username" => $this->defaultDBConnectionConfig['username'],
-        // ]);
+        config([
+            'database.default' => $driver,
+            "database.connections.{$driver}.host" => $this->defaultDBConnectionConfig['host'],
+            "database.connections.{$driver}.port" => $this->defaultDBConnectionConfig['port'],
+            "database.connections.{$driver}.database" => $this->defaultDBConnectionConfig['database'],
+            "database.connections.{$driver}.username" => $this->defaultDBConnectionConfig['username'],
+        ]);
 
-        // DB::purge($driver);
+        DB::purge($driver);
 
         Artisan::call('migrate', [
             '--force' => true,
             '--ansi' => true,
-            '--database' => 'pgsql',
         ]);
     }
 
