@@ -3,17 +3,9 @@
 namespace RonasIT\ProjectInitializator\Support;
 
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Carbon;
 
 class FileSaver
 {
-    protected ?Carbon $lastMigrationTimestamp = null;
-
-    public function __construct()
-    {
-        $this->lastMigrationTimestamp = Carbon::now();
-    }
-
     public function publishClass(View $template, string $fileName, string $filePath): void
     {
         $fileName = "{$fileName}.php";
@@ -27,13 +19,11 @@ class FileSaver
         $this->saveFile("{$filePath}/{$fileName}", "<?php\n\n{$data}");
     }
 
-    public function publishMigration(View $view, string $migrationName): void
+    public function publishJSON(string $fileName, mixed $data, int $jsonFlags): void
     {
-        $time = $this->lastMigrationTimestamp->addSecond();
+        $json = json_encode($data, $jsonFlags) . "\n";
 
-        $migrationName = "{$time->format('Y_m_d_His')}_{$migrationName}";
-
-        $this->publishClass($view, $migrationName, 'database/migrations');
+        $this->saveFile($fileName, $json);
     }
 
     public function saveFile(string $filename, mixed $data, int $flags = 0): void

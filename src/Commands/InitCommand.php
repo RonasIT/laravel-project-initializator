@@ -18,6 +18,7 @@ use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 use RonasIT\ProjectInitializator\Support\FileSaver;
+use RonasIT\ProjectInitializator\Support\MigrationPublisher;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
@@ -55,7 +56,6 @@ class InitCommand extends Command implements Isolatable
     protected string $codeOwnerEmail;
 
     protected ?ReadmeGenerator $readmeGenerator = null;
-    protected FileSaver $fileSaver;
 
     protected array $defaultDBConnectionConfig = [
         'driver' => 'pgsql',
@@ -65,11 +65,11 @@ class InitCommand extends Command implements Isolatable
         'username' => 'postgres',
     ];
 
-    public function __construct()
-    {
+    public function __construct(
+        protected FileSaver $fileSaver,
+        protected MigrationPublisher $migrationPublisher,
+    ) {
         parent::__construct();
-
-        $this->fileSaver = new FileSaver();
     }
 
     public function handle(): void
@@ -290,8 +290,8 @@ class InitCommand extends Command implements Isolatable
             'php artisan laravel-clerk:install',
         );
 
-        $this->fileSaver->publishMigration(
-            view: view('initializator::users_format_to_clerk'),
+        $this->migrationPublisher->publish(
+            templateName: 'users_format_to_clerk',
             migrationName: 'users_format_to_clerk',
         );
 
@@ -334,14 +334,16 @@ class InitCommand extends Command implements Isolatable
 
     protected function publishRoleMigrations(): void
     {
-        if (!$this->isMigrationExists('roles_create_table') && !$this->isMigrationExists('create_roles_table')) {
-            $this->fileSaver->publishMigration(
-                view: view('initializator::roles_create_table'),
+        if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
+            && !$this->migrationPublisher->isMigrationExists('create_roles_table')
+        ) {
+            $this->migrationPublisher->publish(
+                templateName: 'roles_create_table',
                 migrationName: 'roles_create_table',
             );
 
-            $this->fileSaver->publishMigration(
-                view: view('initializator::users_add_role_id'),
+            $this->migrationPublisher->publish(
+                templateName: 'users_add_role_id',
                 migrationName: 'users_add_role_id',
             );
         }
@@ -432,7 +434,7 @@ class InitCommand extends Command implements Isolatable
             if (!empty($this->adminCredentials) && $this->confirm("Is {$resource->title}'s admin the same as default one?", true)) {
                 $adminCredentials = $this->adminCredentials;
             } else {
-                if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
+                if ($this->authType === AuthTypeEnum::Clerk && !$this->migrationPublisher->isMigrationExists('admins_create_table')) {
                     $this->publishAdminsTableMigration();
                 }
 
@@ -515,7 +517,7 @@ class InitCommand extends Command implements Isolatable
             'assignees' => [$reviewer],
         ];
 
-        $this->fileSaver->saveFile('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
+        $this->fileSaver->publishJSON('renovate.json', $data, JSON_PRETTY_PRINT);
     }
 
     protected function setupComposerHooks(): void
@@ -531,9 +533,7 @@ class InitCommand extends Command implements Isolatable
         $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
         $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', 'cghooks update');
 
-        $resultData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
-
-        $this->fileSaver->saveFile($path, $resultData);
+        $this->fileSaver->publishJSON($path, $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     protected function addArrayItemIfMissing(array &$data, string $path, string $value): void
@@ -608,25 +608,17 @@ class InitCommand extends Command implements Isolatable
     {
         $migrationName = (empty($serviceKey)) ? 'add_default_admin' : "add_{$serviceKey}_admin";
 
-        $viewName = ($this->authType === AuthTypeEnum::Clerk)
-            ? 'initializator::admins_add_additional_admin'
-            : 'initializator::add_default_user';
+        $templateName = ($this->authType === AuthTypeEnum::Clerk)
+            ? 'admins_add_additional_admin'
+            : 'add_default_user';
 
-        $this->fileSaver->publishMigration(
-            view: view($viewName)->with($adminCredentials),
-            migrationName: $migrationName,
-        );
-    }
-
-    protected function isMigrationExists(string $migrationName): bool
-    {
-        return !empty(glob(base_path("database/migrations/*_{$migrationName}.php")));
+        $this->migrationPublisher->publish($templateName, $migrationName, $adminCredentials);
     }
 
     protected function publishAdminsTableMigration(): void
     {
-        $this->fileSaver->publishMigration(
-            view: view('initializator::admins_create_table'),
+        $this->migrationPublisher->publish(
+            templateName: 'admins_create_table',
             migrationName: 'admins_create_table',
         );
     }
