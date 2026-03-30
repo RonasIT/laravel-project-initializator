@@ -605,7 +605,7 @@ class InitCommand extends Command implements Isolatable
             ? 'admins_add_additional_admin'
             : 'add_default_user';
 
-        $this->migrationPublisher->publish($migrationName, $adminCredentials, $templateName);
+        $this->migrationPublisher->publish($templateName, $adminCredentials, $migrationName);
     }
 
     protected function publishAdminsTableMigration(): void
