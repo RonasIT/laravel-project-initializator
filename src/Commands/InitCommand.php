@@ -290,15 +290,12 @@ class InitCommand extends Command implements Isolatable
             'php artisan laravel-clerk:install',
         );
 
-        $this->migrationPublisher->publish(
-            templateName: 'users_format_to_clerk',
-            migrationName: 'users_format_to_clerk',
-        );
+        $this->migrationPublisher->publish('users_format_to_clerk');
 
         $this->fileSaver->publishClass(
             template: view('initializator::clerk_user_repository'),
             fileName: 'ClerkUserRepository',
-            filePath: 'app/Support/Clerk',
+            fileDirectory: 'app/Support/Clerk',
         );
     }
 
@@ -337,15 +334,9 @@ class InitCommand extends Command implements Isolatable
         if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
             && !$this->migrationPublisher->isMigrationExists('create_roles_table')
         ) {
-            $this->migrationPublisher->publish(
-                templateName: 'roles_create_table',
-                migrationName: 'roles_create_table',
-            );
+            $this->migrationPublisher->publish('roles_create_table');
 
-            $this->migrationPublisher->publish(
-                templateName: 'users_add_role_id',
-                migrationName: 'users_add_role_id',
-            );
+            $this->migrationPublisher->publish('users_add_role_id');
         }
     }
 
@@ -519,7 +510,7 @@ class InitCommand extends Command implements Isolatable
             'assignees' => [$reviewer],
         ];
 
-        $this->fileSaver->publishJSON('renovate.json', $data, JSON_PRETTY_PRINT);
+        $this->fileSaver->publishJSON('renovate.json', $data);
     }
 
     protected function setupComposerHooks(): void
@@ -575,7 +566,7 @@ class InitCommand extends Command implements Isolatable
     {
         shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
 
-        $this->fileSaver->saveFile(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
+        $this->fileSaver->appendOrCreateFile(base_path('routes/web.php'), "\nAuth::routes();\n");
     }
 
     protected function addDefaultHttpExceptionRender(): void
@@ -614,14 +605,11 @@ class InitCommand extends Command implements Isolatable
             ? 'admins_add_additional_admin'
             : 'add_default_user';
 
-        $this->migrationPublisher->publish($templateName, $migrationName, $adminCredentials);
+        $this->migrationPublisher->publish($migrationName, $adminCredentials, $templateName);
     }
 
     protected function publishAdminsTableMigration(): void
     {
-        $this->migrationPublisher->publish(
-            templateName: 'admins_create_table',
-            migrationName: 'admins_create_table',
-        );
+        $this->migrationPublisher->publish('admins_create_table');
     }
 }

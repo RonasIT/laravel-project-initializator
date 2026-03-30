@@ -14,13 +14,15 @@ class MigrationPublisher
         $this->lastMigrationTimestamp = Carbon::now();
     }
 
-    public function publish(string $templateName, string $migrationName, mixed $data = []): void
+    public function publish(string $migrationName, array $data = [], $templateName = ''): void
     {
         $time = $this->lastMigrationTimestamp->addSecond();
 
-        $migrationName = "{$time->format('Y_m_d_His')}_{$migrationName}";
+        $templateName = (!empty($templateName)) ? $templateName : $migrationName;
 
-        $view = view("initializator::migrations/{$templateName}")->with($data);
+        $view = view("initializator::migrations.{$templateName}")->with($data);
+
+        $migrationName = "{$time->format('Y_m_d_His')}_{$migrationName}";
 
         $this->fileSaver->publishClass($view, $migrationName, 'database/migrations');
     }

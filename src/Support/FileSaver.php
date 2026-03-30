@@ -6,28 +6,35 @@ use Illuminate\Contracts\View\View;
 
 class FileSaver
 {
-    public function publishClass(View $template, string $fileName, string $filePath): void
+    public function publishClass(View $template, string $fileName, string $fileDirectory): void
     {
-        $fileName = "{$fileName}.php";
-
-        if (!is_dir($filePath)) {
-            mkdir($filePath, 0777, true);
-        }
-
         $data = $template->render();
 
-        $this->saveFile("{$filePath}/{$fileName}", "<?php\n\n{$data}");
+        $this->saveFile("$fileName.php", "<?php\n\n{$data}", $fileDirectory);
     }
 
-    public function publishJSON(string $fileName, mixed $data, int $jsonFlags): void
+    public function publishJSON(string $filePath, mixed $data, int $jsonFlags = JSON_PRETTY_PRINT): void
     {
         $json = json_encode($data, $jsonFlags) . "\n";
 
-        $this->saveFile($fileName, $json);
+        $this->saveFile($filePath, $json);
     }
 
-    public function saveFile(string $filename, mixed $data, int $flags = 0): void
+    public function saveFile(string $fileName, mixed $data, string $fileDirectory = ''): void
     {
-        file_put_contents($filename, $data, $flags);
+        if (!empty($fileDirectory)) {
+            if (!is_dir($fileDirectory)) {
+                mkdir($fileDirectory, 0777, true);
+            }
+
+            $fileName = "{$fileDirectory}/{$fileName}";
+        }
+
+        file_put_contents($fileName, $data);
+    }
+
+    public function appendOrCreateFile(string $filePath, mixed $data): void
+    {
+        file_put_contents($filePath, $data, FILE_APPEND);
     }
 }
