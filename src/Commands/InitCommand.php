@@ -636,7 +636,7 @@ class InitCommand extends Command implements Isolatable
         Artisan::call('migrate', [
             '--force' => true,
             '--ansi' => true,
-            '--database' => 'custom_connection',
+            '--database' => 'pgsql',
         ]);
     }
 
