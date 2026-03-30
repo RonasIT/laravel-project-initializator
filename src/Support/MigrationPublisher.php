@@ -14,7 +14,7 @@ class MigrationPublisher
         $this->lastMigrationTimestamp = Carbon::now();
     }
 
-    public function publish(string $templateName, array $data = [], $migrationName = ''): void
+    public function publish(string $templateName, array $data = [], $migrationName = null): void
     {
         $time = $this->lastMigrationTimestamp->addSecond();
 
