@@ -1,5 +1,5 @@
 ## Credentials and Access
-@foreach($credentials_and_access as $resource)
+@foreach($resources as $resource)
 @if(!empty($resource->email))
 
 {{ $resource->title }} access:

@@ -393,7 +393,9 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateAllParts || $this->confirm('Do you need a `Getting Started` part?', true)) {
-            $this->readmeGenerator->gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
+            $gitProjectPath = shell_exec('git ls-remote --get-url origin');
+
+            $this->readmeGenerator->setGitProjectPath($gitProjectPath);
 
             $this->readmeGenerator->addBlock(ReadmeBlockEnum::GettingStarted);
         }
@@ -441,7 +443,7 @@ class InitCommand extends Command implements Isolatable
     protected function configureManagerEmail(): void
     {
         if ($link = $this->ask("Please enter a Manager's email", '')) {
-            $this->readmeGenerator->managerEmail = $link;
+            $this->readmeGenerator->setManagerEmail($link);
         } else {
             $this->emptyResourcesList[] = "Manager's email";
         }

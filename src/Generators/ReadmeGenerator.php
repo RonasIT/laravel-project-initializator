@@ -13,16 +13,8 @@ class ReadmeGenerator
     protected string $appType;
     protected string $appUrl;
     protected string $codeOwnerEmail;
-    public string $managerEmail = ':manager_link' {
-        set {
-            $this->managerEmail = $value;
-        }
-    }
-    public string $gitProjectPath {
-        set {
-            $this->gitProjectPath = $value;
-        }
-    }
+    protected string $managerEmail = ':manager_link';
+    protected string $gitProjectPath;
 
     protected array $resources = [];
     protected array $enabledBlocks = [];
@@ -93,6 +85,16 @@ class ReadmeGenerator
         file_put_contents('README.md', $this->readmeContent);
     }
 
+    public function setManagerEmail(string $email): void
+    {
+        $this->managerEmail = $email;
+    }
+
+    public function setGitProjectPath(string $path): void
+    {
+        $this->gitProjectPath = $path;
+    }
+
     protected function fillProjectInfo(): void
     {
         $this->readmeContent = view('initializator::readme.readme_head', [
@@ -141,7 +143,7 @@ class ReadmeGenerator
     protected function fillCredentialsAndAccess(): void
     {
         $this->addContent('credentials_and_access', [
-            'credentials_and_access' => $this->resources,
+            'resources' => $this->resources,
         ]);
     }
 
