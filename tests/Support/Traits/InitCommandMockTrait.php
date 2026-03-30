@@ -75,6 +75,7 @@ trait InitCommandMockTrait
             ->once()
             ->andReturn(0);
 
+        // As Kernel is final, the Artisan facade can not be mocked, so we need to create a partial mock from the resolved instance and swap the 'migrate' call via the Artisan facade.
         $mock->shouldReceive('call')
             ->withAnyArgs()
             ->andReturnUsing(fn (...$args) => $kernel->call(...$args));
