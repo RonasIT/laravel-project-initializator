@@ -380,16 +380,18 @@ class InitCommand extends Command implements Isolatable
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
+        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
+
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Resources & Contacts` part?', true)) {
             $this->configureResources();
             $this->configureManagerEmail();
         }
 
-        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Prerequisites` part?', true)) {
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Prerequisites);
         }
 
-        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Getting Started` part?', true)) {
             $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
 
             $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
@@ -397,11 +399,11 @@ class InitCommand extends Command implements Isolatable
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::GettingStarted);
         }
 
-        if ($this->confirm('Do you need an `Environments` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need an `Environments` part?', true)) {
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Environments);
         }
 
-        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Credentials and Access` part?', true)) {
             $this->configureCredentialsAndAccess();
 
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
