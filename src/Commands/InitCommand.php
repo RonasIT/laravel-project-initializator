@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Laravel\Telescope\TelescopeServiceProvider;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
@@ -143,7 +144,7 @@ class InitCommand extends Command implements Isolatable
             }
         }
 
-        if (!class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+        if (!class_exists(TelescopeServiceProvider::class)) {
             array_push(
                 $this->shellCommands,
                 'composer require ronasit/laravel-telescope-extension',
@@ -380,26 +381,28 @@ class InitCommand extends Command implements Isolatable
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
+        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
+
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Resources & Contacts` part?', true)) {
             $this->configureResources();
             $this->configureManagerEmail();
         }
 
-        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Prerequisites` part?', true)) {
             $this->readmeGenerator->addBlock(ReadmeBlockEnum::Prerequisites);
         }
 
-        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Getting Started` part?', true)) {
             $this->readmeGenerator->gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
 
             $this->readmeGenerator->addBlock(ReadmeBlockEnum::GettingStarted);
         }
 
-        if ($this->confirm('Do you need an `Environments` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need an `Environments` part?', true)) {
             $this->readmeGenerator->addBlock(ReadmeBlockEnum::Environments);
         }
 
-        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Credentials and Access` part?', true)) {
             $this->configureCredentialsAndAccess();
 
             $this->readmeGenerator->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
