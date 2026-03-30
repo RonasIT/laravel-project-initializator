@@ -621,21 +621,22 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
-        $driver = $this->defaultDBConnectionConfig['driver'];
+        // $driver = $this->defaultDBConnectionConfig['driver'];
 
-        config([
-            'database.default' => $driver,
-            "database.connections.{$driver}.host" => $this->defaultDBConnectionConfig['host'],
-            "database.connections.{$driver}.port" => $this->defaultDBConnectionConfig['port'],
-            "database.connections.{$driver}.database" => $this->defaultDBConnectionConfig['database'],
-            "database.connections.{$driver}.username" => $this->defaultDBConnectionConfig['username'],
-        ]);
+        // config([
+        //     'database.default' => $driver,
+        //     "database.connections.{$driver}.host" => $this->defaultDBConnectionConfig['host'],
+        //     "database.connections.{$driver}.port" => $this->defaultDBConnectionConfig['port'],
+        //     "database.connections.{$driver}.database" => $this->defaultDBConnectionConfig['database'],
+        //     "database.connections.{$driver}.username" => $this->defaultDBConnectionConfig['username'],
+        // ]);
 
-        DB::purge($driver);
+        // DB::purge($driver);
 
         Artisan::call('migrate', [
             '--force' => true,
             '--ansi' => true,
+            '--database' => 'custom_connection',
         ]);
     }
 
