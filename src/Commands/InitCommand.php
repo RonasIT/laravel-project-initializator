@@ -22,6 +22,8 @@ use RonasIT\ProjectInitializator\Support\MigrationPublisher;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
+use function Laravel\Prompts\select;
+
 class InitCommand extends Command implements Isolatable
 {
     protected $signature = 'init {application-name : The application name }';
@@ -87,15 +89,15 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
-        $this->appType = AppTypeEnum::from($this->choice(
-            question: 'What type of application will your API serve?',
-            choices: AppTypeEnum::values(),
+        $this->appType = AppTypeEnum::from(select(
+            label: 'What type of application will your API serve?',
+            options: AppTypeEnum::values(),
             default: AppTypeEnum::Multiplatform->value,
         ));
 
-        $this->authType = AuthTypeEnum::from($this->choice(
-            question: 'Please choose the authentication type',
-            choices: AuthTypeEnum::values(),
+        $this->authType = AuthTypeEnum::from(select(
+            label: 'Please choose the authentication type',
+            options: AuthTypeEnum::values(),
             default: AuthTypeEnum::None->value,
         ));
 
@@ -451,9 +453,9 @@ class InitCommand extends Command implements Isolatable
     {
         $this->shellCommands[] = 'composer require ronasit/laravel-media';
 
-        $storage = StorageEnum::from($this->choice(
-            question: 'Which storage will be used for media files?',
-            choices: StorageEnum::values(),
+        $storage = StorageEnum::from(select(
+            label: 'Which storage will be used for media files?',
+            options: StorageEnum::values(),
             default: StorageEnum::GCS->value,
         ));
 
