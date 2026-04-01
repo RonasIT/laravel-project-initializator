@@ -4,6 +4,7 @@ namespace RonasIT\ProjectInitializator\Generators;
 
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
+use RonasIT\ProjectInitializator\Support\FileSaver;
 
 class ReadmeGenerator
 {
@@ -28,6 +29,11 @@ class ReadmeGenerator
         ReadmeBlockEnum::Clerk->value => 'fillClerk',
         ReadmeBlockEnum::Renovate->value => 'fillRenovate',
     ];
+
+    public function __construct(
+        protected FileSaver $fileSaver,
+    ) {
+    }
 
     public function setAppInfo(string $appName, string $appType, string $appUrl, string $codeOwnerEmail): self
     {
@@ -92,7 +98,7 @@ class ReadmeGenerator
             }
         }
 
-        file_put_contents('README.md', $this->readmeContent);
+        $this->fileSaver->saveFile('README.md', $this->readmeContent);
     }
 
     protected function fillProjectInfo(): void
