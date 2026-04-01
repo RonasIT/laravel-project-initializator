@@ -58,7 +58,7 @@
             "@add-pre-commit-hook"
         ],
         "add-pre-commit-hook": [
-            "@php -r \"file_put_contents('.git/hooks/pre-commit', '#!/bin/sh\\ndocker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair\\n'); chmod('.git/hooks/pre-commit', 0755);\""
+            "@php -r \"file_put_contents('.git/hooks/pre-commit', \\\"#!/bin/sh\\n\\\" . \\\"docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair\\n\\\"); chmod('.git/hooks/pre-commit', 0755);\""
         ]
     },
     "extra": {

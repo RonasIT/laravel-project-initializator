@@ -520,7 +520,7 @@ class InitCommand extends Command implements Isolatable
 
         $data = json_decode($content, true);
 
-        $this->addArrayItemIfMissing($data, 'scripts.add-pre-commit-hook', '@php -r "file_put_contents(\'.git/hooks/pre-commit\', \'#!/bin/sh\ndocker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair\n\'); chmod(\'.git/hooks/pre-commit\', 0755);"');
+        $this->addArrayItemIfMissing($data, 'scripts.add-pre-commit-hook', '@php -r "file_put_contents(\'.git/hooks/pre-commit\', \"#!/bin/sh\n\" . \"docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair\n\"); chmod(\'.git/hooks/pre-commit\', 0755);"');
         $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '@add-pre-commit-hook');
         $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', '@add-pre-commit-hook');
 
