@@ -29,10 +29,11 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support', $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
@@ -99,10 +100,10 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -165,11 +166,12 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support', $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
@@ -241,15 +243,16 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support', $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
-            $this->callFilePutContent('README.md', $this->getFixture('readme/default_readme.md')),
+            $this->mockReadmeFileWrite('default_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
@@ -356,12 +359,12 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
-            $this->callFilePutContent('README.md', $this->getFixture('readme/partial_readme.md')),
+            $this->mockReadmeFileWrite('partial_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
@@ -459,15 +462,16 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support', $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'nova_users_table_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
-            $this->callFilePutContent('README.md', $this->getFixture('readme/full_readme.md')),
+            $this->mockReadmeFileWrite('full_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
@@ -586,7 +590,7 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
-            $this->callFilePutContent('README.md', $this->getFixture('readme/partial_readme_with_telescope.md')),
+            $this->mockReadmeFileWrite('partial_readme_with_telescope.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
@@ -703,7 +707,7 @@ class InitCommandTest extends TestCase
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
-            $this->callFilePutContent('README.md', $this->getFixture('readme/default_readme_with_mobile_app.md')),
+            $this->mockReadmeFileWrite('default_readme_with_mobile_app.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
@@ -819,13 +823,13 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'admins_add_telescope_admin_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
 
-            $this->callFilePutContent('README.md', $this->getFixture('readme/partial_readme_clerk_with_credentials.md')),
+            $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
