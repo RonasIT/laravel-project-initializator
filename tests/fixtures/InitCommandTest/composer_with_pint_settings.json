@@ -36,7 +36,7 @@
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "cghooks update"
+            "@add-pre-commit-hook"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
@@ -55,22 +55,15 @@
             "@php artisan test"
         ],
         "post-install-cmd": [
-            "[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock"
+            "@add-pre-commit-hook"
+        ],
+        "add-pre-commit-hook": [
+            "@php -r \"file_put_contents('.git/hooks/pre-commit', '#!/bin/sh\\ndocker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair\\n'); chmod('.git/hooks/pre-commit', 0755);\""
         ]
     },
     "extra": {
         "laravel": {
             "dont-discover": []
-        },
-        "hooks": {
-            "config": {
-                "stop-on-failure": [
-                    "pre-commit"
-                ]
-            },
-            "pre-commit": [
-                "docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair"
-            ]
         }
     },
     "config": {

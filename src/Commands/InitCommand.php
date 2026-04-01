@@ -41,8 +41,6 @@ class InitCommand extends Command implements Isolatable
         'composer require --dev ronasit/laravel-entity-generator',
         'composer require --dev laravel/pint',
         'php artisan vendor:publish --tag=pint-config',
-        'composer require --dev brainmaestro/composer-git-hooks',
-        './vendor/bin/cghooks update',
         'php artisan lang:publish',
         'php artisan key:generate',
     ];
@@ -522,10 +520,9 @@ class InitCommand extends Command implements Isolatable
 
         $data = json_decode($content, true);
 
-        $this->addArrayItemIfMissing($data, 'extra.hooks.config.stop-on-failure', 'pre-commit');
-        $this->addArrayItemIfMissing($data, 'extra.hooks.pre-commit', 'docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair');
-        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
-        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', 'cghooks update');
+        $this->addArrayItemIfMissing($data, 'scripts.add-pre-commit-hook', '@php -r "file_put_contents(\'.git/hooks/pre-commit\', \'#!/bin/sh\ndocker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair\n\'); chmod(\'.git/hooks/pre-commit\', 0755);"');
+        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '@add-pre-commit-hook');
+        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', '@add-pre-commit-hook');
 
         $this->fileSaver->publishJSON($path, $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
