@@ -147,6 +147,7 @@ class InitCommand extends Command implements Isolatable
                 $this->shellCommands,
                 'composer require ronasit/laravel-telescope-extension',
                 'php artisan telescope:install',
+                'php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force',
             );
         }
 

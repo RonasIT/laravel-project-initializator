@@ -2,6 +2,8 @@
 
 use Laravel\Telescope\Http\Middleware\Authorize;
 use Laravel\Telescope\Watchers;
+use MuhammadHuzaifa\TelescopeGuzzleWatcher\Watchers\TelescopeGuzzleWatcher;
+use RonasIT\TelescopeExtension\Watchers\RequestWatcher;
 
 return [
 
@@ -46,6 +48,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Allowed IPs
+    |--------------------------------------------------------------------------
+    |
+    | In a production environment, you may wish to restrict access to Telescope
+    | to a specific list of IP addresses. You can list them here. The
+    | middleware will only be applied if this array is not empty.
+    |
+    */
+
+    'allowed_ips' => [],
+
+    /*
+    |--------------------------------------------------------------------------
     | Telescope Storage Driver
     |--------------------------------------------------------------------------
     |
@@ -75,8 +90,8 @@ return [
     */
 
     'queue' => [
-        'connection' => env('TELESCOPE_QUEUE_CONNECTION'),
-        'queue' => env('TELESCOPE_QUEUE'),
+        'connection' => env('TELESCOPE_QUEUE_CONNECTION', null),
+        'queue' => env('TELESCOPE_QUEUE', null),
         'delay' => env('TELESCOPE_QUEUE_DELAY', 10),
     ],
 
@@ -135,7 +150,6 @@ return [
         Watchers\CacheWatcher::class => [
             'enabled' => env('TELESCOPE_CACHE_WATCHER', true),
             'hidden' => [],
-            'ignore' => [],
         ],
         Watchers\ClientRequestWatcher::class => env('TELESCOPE_CLIENT_REQUEST_WATCHER', true),
         Watchers\CommandWatcher::class => [
@@ -175,16 +189,83 @@ return [
             'enabled' => env('TELESCOPE_QUERY_WATCHER', true),
             'ignore_packages' => true,
             'ignore_paths' => [],
-            'slow' => 100,
+            'slow' => env('TELESCOPE_QUERY_WATCHER_SLOW', 150),
         ],
         Watchers\RedisWatcher::class => env('TELESCOPE_REDIS_WATCHER', true),
-        Watchers\RequestWatcher::class => [
+        RequestWatcher::class => [
             'enabled' => env('TELESCOPE_REQUEST_WATCHER', true),
             'size_limit' => env('TELESCOPE_RESPONSE_SIZE_LIMIT', 64),
             'ignore_http_methods' => [],
             'ignore_status_codes' => [],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Ignorable response messages, array<string>
+            |--------------------------------------------------------------------------
+            | Requests that have one of the values in the `message` field of the response
+            | will not be recorded.
+            */
+            'ignore_error_messages' => [],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Ignorable paths, array<string>
+            |--------------------------------------------------------------------------
+            | Requests that match one of these paths will not be recorded.
+            */
+            'ignore_paths' => [],
         ],
         Watchers\ScheduleWatcher::class => env('TELESCOPE_SCHEDULE_WATCHER', true),
         Watchers\ViewWatcher::class => env('TELESCOPE_VIEW_WATCHER', true),
+        TelescopeGuzzleWatcher::class => env('TELESCOPE_GUZZLE_WATCHER', true),
+    ],
+    'notifications' => [
+        'report' => [
+            'enabled' => env('IS_TELESCOPE_REPORT_ENABLED', false),
+
+            /*
+            |----------------------------------------------------------------------
+            | Frequency, days
+            |----------------------------------------------------------------------
+            */
+            'frequency' => env('TELESCOPE_REPORT_FREQUENCY', 7),
+
+            /*
+            |--------------------------------------------------------------------------
+            | Time to send, hour
+            |--------------------------------------------------------------------------
+            */
+            'time' => env('TELESCOPE_REPORT_TIME_HOUR', 12),
+            'driver' => env('TELESCOPE_REPORT_DRIVER', 'mail'),
+            'drivers' => [
+                'mail' => [
+                    'to' => explode(',', env('TELESCOPE_REPORT_MAIL_TO', '')),
+                ],
+            ],
+            'entry_emoji_map' => [
+                'cache' => '📦',
+                'client-requests' => '📡',
+                'requests' => '🌐',
+                'commands' => '⌨️',
+                'queries' => '📊',
+                'mail' => '✉️',
+                'views' => '🖥',
+                'redis' => '⚡️',
+                'exceptions' => '⚠️',
+                'notifications' => '🔔',
+                'jobs' => '💥',
+                'schedule' => '🕒',
+                'batches' => '🗂',
+                'logs' => '📑',
+                'gates' => '🚪',
+                'events' => '🎫',
+                'models' => '🤖',
+                'dumps' => '📝',
+            ],
+            'entry_display_name_map' => [
+                'exceptions' => 'Unresolved exceptions',
+                'jobs' => 'Failed jobs',
+            ],
+        ],
     ],
 ];
