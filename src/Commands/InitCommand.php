@@ -25,6 +25,8 @@ use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
 {
+    protected const EXECUTE_PERMISSIONS = 0755;
+
     protected $signature = 'init {application-name : The application name }';
 
     protected $description = 'Initialize required project parameters to run DEV environment';
@@ -41,8 +43,6 @@ class InitCommand extends Command implements Isolatable
         'composer require --dev ronasit/laravel-entity-generator',
         'composer require --dev laravel/pint',
         'php artisan vendor:publish --tag=pint-config',
-        'composer require --dev brainmaestro/composer-git-hooks',
-        './vendor/bin/cghooks update',
         'php artisan lang:publish',
         'php artisan key:generate',
     ];
@@ -523,10 +523,12 @@ class InitCommand extends Command implements Isolatable
 
         $data = json_decode($content, true);
 
-        $this->addArrayItemIfMissing($data, 'extra.hooks.config.stop-on-failure', 'pre-commit');
-        $this->addArrayItemIfMissing($data, 'extra.hooks.pre-commit', 'docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair');
-        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
-        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', 'cghooks update');
+        $hookName = 'add-pre-commit-hook';
+        $preCommitHookFile = '.git/hooks/pre-commit';
+
+        $this->addArrayItemIfMissing($data, "scripts.{$hookName}", "@php -r \"file_put_contents('{$preCommitHookFile}', \\\"#!/bin/sh\\n\\\" . \\\"docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair\\n\\\"); chmod('{$preCommitHookFile}', " . self::EXECUTE_PERMISSIONS . ');"');
+        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', "@{$hookName}");
+        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', "@{$hookName}");
 
         $this->fileSaver->publishJSON($path, $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
