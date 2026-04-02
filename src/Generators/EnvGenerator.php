@@ -9,10 +9,7 @@ use Winter\LaravelConfigWriter\EnvFile;
 
 class EnvGenerator
 {
-    protected string $appName;
-    protected string $appUrl;
-
-    protected array $defaultDBConnectionConfig = [
+    public const array DEFAULT_DB_CONNECTION_CONFIG = [
         'driver' => 'pgsql',
         'host' => 'pgsql',
         'port' => '5432',
@@ -20,17 +17,15 @@ class EnvGenerator
         'username' => 'postgres',
     ];
 
+    protected string $appName;
+    protected string $appUrl;
+
     public function setAppInfo(string $appName, string $appUrl): self
     {
         $this->appName = $appName;
         $this->appUrl = $appUrl;
 
         return $this;
-    }
-
-    public function getDefaultDBConnectionConfig(): array
-    {
-        return $this->defaultDBConnectionConfig;
     }
 
     public function generate(): void
@@ -70,11 +65,11 @@ class EnvGenerator
     {
         $envConfig = [
             'APP_NAME' => $this->appName,
-            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
-            'DB_HOST' => $this->defaultDBConnectionConfig['host'],
-            'DB_PORT' => $this->defaultDBConnectionConfig['port'],
-            'DB_DATABASE' => $this->defaultDBConnectionConfig['database'],
-            'DB_USERNAME' => $this->defaultDBConnectionConfig['username'],
+            'DB_CONNECTION' => self::DEFAULT_DB_CONNECTION_CONFIG['driver'],
+            'DB_HOST' => self::DEFAULT_DB_CONNECTION_CONFIG['host'],
+            'DB_PORT' => self::DEFAULT_DB_CONNECTION_CONFIG['port'],
+            'DB_DATABASE' => self::DEFAULT_DB_CONNECTION_CONFIG['database'],
+            'DB_USERNAME' => self::DEFAULT_DB_CONNECTION_CONFIG['username'],
             'DB_PASSWORD' => '',
         ];
 
@@ -96,7 +91,7 @@ class EnvGenerator
             'CACHE_STORE' => 'redis',
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
-            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
+            'DB_CONNECTION' => self::DEFAULT_DB_CONNECTION_CONFIG['driver'],
             'DB_HOST' => '',
             'DB_PORT' => '',
             'DB_DATABASE' => '',

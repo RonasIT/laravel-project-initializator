@@ -511,13 +511,11 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
-        $dbConfig = $this->envGenerator->getDefaultDBConnectionConfig();
-
         config([
-            'database.default' => $dbConfig['driver'],
-            "database.connections.{$dbConfig['driver']}" => [
+            'database.default' => EnvGenerator::DEFAULT_DB_CONNECTION_CONFIG['driver'],
+            'database.connections.' . EnvGenerator::DEFAULT_DB_CONNECTION_CONFIG['driver'] => [
                 'password' => '',
-                ...$dbConfig,
+                ...EnvGenerator::DEFAULT_DB_CONNECTION_CONFIG,
             ],
         ]);
 
