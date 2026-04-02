@@ -51,6 +51,11 @@ trait InitCommandMockTrait
         ];
     }
 
+    protected function callRandomBytes(): array
+    {
+        return $this->functionCall('random_bytes', [32], base64_decode('RMlWJrRHIuHLYRplJvWaLNwWvRoVkQdDTZe6U1Z4xRY='));
+    }
+
     protected function changeEnvFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
     {
         return [

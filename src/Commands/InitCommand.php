@@ -17,11 +17,11 @@ use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
+use RonasIT\ProjectInitializator\Generators\EnvGenerator;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 use RonasIT\ProjectInitializator\Support\FileSaver;
 use RonasIT\ProjectInitializator\Support\MigrationPublisher;
 use Winter\LaravelConfigWriter\ArrayFile;
-use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -30,8 +30,6 @@ class InitCommand extends Command implements Isolatable
     protected $signature = 'init {application-name : The application name }';
 
     protected $description = 'Initialize required project parameters to run DEV environment';
-
-    protected string $appKey = 'base64:RMlWJrRHIuHLYRplJvWaLNwWvRoVkQdDTZe6U1Z4xRY=';
 
     protected array $adminCredentials = [];
 
@@ -60,17 +58,10 @@ class InitCommand extends Command implements Isolatable
 
     protected ?ReadmeGenerator $readmeGenerator = null;
 
-    protected array $defaultDBConnectionConfig = [
-        'driver' => 'pgsql',
-        'host' => 'pgsql',
-        'port' => '5432',
-        'database' => 'postgres',
-        'username' => 'postgres',
-    ];
-
     public function __construct(
         protected FileSaver $fileSaver,
         protected MigrationPublisher $migrationPublisher,
+        protected EnvGenerator $envGenerator,
     ) {
         parent::__construct();
     }
@@ -86,7 +77,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabAppName}.com");
 
-        $this->setupEnvFiles();
+        $this->envGenerator->setAppInfo($this->appName, $this->appUrl)->generate();
 
         $this->info('Project initialized successfully!');
 
@@ -208,66 +199,6 @@ class InitCommand extends Command implements Isolatable
         $this->kebabAppName = Str::kebab($appName);
     }
 
-    protected function setupEnvFiles(): void
-    {
-        $envConfig = [
-            'APP_NAME' => $this->appName,
-            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
-            'DB_HOST' => $this->defaultDBConnectionConfig['host'],
-            'DB_PORT' => $this->defaultDBConnectionConfig['port'],
-            'DB_DATABASE' => $this->defaultDBConnectionConfig['database'],
-            'DB_USERNAME' => $this->defaultDBConnectionConfig['username'],
-            'DB_PASSWORD' => '',
-        ];
-
-        $this->updateEnvFile('.env.example', $envConfig);
-
-        if (!file_exists('.env')) {
-            copy('.env.example', '.env');
-        } else {
-            $this->updateEnvFile('.env', $envConfig);
-        }
-
-        $this->createEnvFileIfNotExists('.env.development', '.env.example');
-        $this->updateEnvFile('.env.development', [
-            'APP_NAME' => $this->appName,
-            'APP_ENV' => 'development',
-            'APP_URL' => $this->appUrl,
-            'APP_MAINTENANCE_DRIVER' => 'cache',
-            'APP_MAINTENANCE_STORE' => 'redis',
-            'CACHE_STORE' => 'redis',
-            'QUEUE_CONNECTION' => 'redis',
-            'SESSION_DRIVER' => 'redis',
-            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
-            'DB_HOST' => '',
-            'DB_PORT' => '',
-            'DB_DATABASE' => '',
-            'DB_USERNAME' => '',
-            'DB_PASSWORD' => '',
-        ]);
-
-        $testingEnvConfig = [
-            ...$envConfig,
-            'APP_ENV' => 'testing',
-            'APP_KEY' => $this->appKey,
-            'LOG_CHANNEL' => 'stderr',
-        ];
-
-        $this->createEnvFileIfNotExists('.env.ci-testing', '.env.example');
-        $this->updateEnvFile('.env.ci-testing', [
-            ...$testingEnvConfig,
-            'DB_DATABASE' => 'forge',
-            'DB_USERNAME' => 'forge',
-        ]);
-
-        $this->createEnvFileIfNotExists('.env.testing', '.env.example');
-        $this->updateEnvFile('.env.testing', [
-            ...$testingEnvConfig,
-            'DB_HOST' => 'pgsql_test',
-            'FAIL_EXPORT_JSON' => false,
-        ]);
-    }
-
     protected function configureClerk(): void
     {
         $this->enableClerk();
@@ -276,38 +207,7 @@ class InitCommand extends Command implements Isolatable
             ->addArrayPropertyItem('fillable', 'clerk_id')
             ->save();
 
-        $data = [
-            'AUTH_GUARD' => 'clerk',
-            'CLERK_ALLOWED_ISSUER' => '',
-            'CLERK_SECRET_KEY' => '',
-            'CLERK_SIGNER_KEY_PATH' => '',
-        ];
-
-        if ($this->appType !== AppTypeEnum::Mobile) {
-            $data['CLERK_ALLOWED_ORIGINS'] = '';
-        }
-
-        $this->updateEnvFile('.env', $data);
-        $this->updateEnvFile('.env.example', $data);
-        $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
-    }
-
-    protected function createEnvFileIfNotExists(string $filePath, string $source): void
-    {
-        if (!file_exists($filePath)) {
-            copy($source, $filePath);
-        }
-    }
-
-    protected function updateEnvFile(string $fileName, array $data): void
-    {
-        $env = EnvFile::open($fileName);
-
-        $env->addEmptyLine();
-
-        $env->set($data);
-
-        $env->write();
+        $this->envGenerator->configureClerk($this->appType);
     }
 
     protected function enableClerk(): void
@@ -488,12 +388,7 @@ class InitCommand extends Command implements Isolatable
         if ($storage === StorageEnum::GCS) {
             $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage';
 
-            $this->updateEnvFile('.env.development', [
-                'FILESYSTEM_DISK' => StorageEnum::GCS->value,
-                'GOOGLE_CLOUD_STORAGE_PATH_PREFIX' => 'api',
-                'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
-                'GOOGLE_CLOUD_PROJECT_ID' => '',
-            ]);
+            $this->envGenerator->configureGcsStorage();
 
             $this->emptyResourcesList[] = 'GOOGLE_CLOUD_STORAGE_BUCKET';
             $this->emptyResourcesList[] = 'GOOGLE_CLOUD_PROJECT_ID';
@@ -616,11 +511,13 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
+        $dbConfig = $this->envGenerator->getDefaultDBConnectionConfig();
+
         config([
-            'database.default' => $this->defaultDBConnectionConfig['driver'],
-            "database.connections.{$this->defaultDBConnectionConfig['driver']}" => [
+            'database.default' => $dbConfig['driver'],
+            "database.connections.{$dbConfig['driver']}" => [
                 'password' => '',
-                ...$this->defaultDBConnectionConfig,
+                ...$dbConfig,
             ],
         ]);
 

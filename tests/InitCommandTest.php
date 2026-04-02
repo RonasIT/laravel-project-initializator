@@ -32,12 +32,17 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->copyEnvFileCall('.env'),
             $this->copyEnvFileCall('.env.development'),
             $this->copyEnvFileCall('.env.ci-testing'),
             $this->copyEnvFileCall('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -102,12 +107,17 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->callFileExists('.env'),
             $this->callFileExists('.env.development'),
             $this->callFileExists('.env.ci-testing'),
             $this->callFileExists('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('composer require laravel/ui --ansi'),
@@ -172,13 +182,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->copyEnvFileCall('.env'),
 
             $this->callFileExists('.env.development'),
             $this->callFileExists('.env.ci-testing'),
             $this->callFileExists('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('composer require laravel/ui --ansi'),
@@ -252,13 +267,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->copyEnvFileCall('.env'),
 
             $this->callFileExists('.env.development'),
             $this->callFileExists('.env.ci-testing'),
             $this->callFileExists('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
@@ -369,13 +389,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->copyEnvFileCall('.env'),
 
             $this->callFileExists('.env.development'),
             $this->callFileExists('.env.ci-testing'),
             $this->callFileExists('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('composer require laravel/ui --ansi'),
@@ -475,13 +500,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->copyEnvFileCall('.env'),
 
             $this->callFileExists('.env.development'),
             $this->callFileExists('.env.ci-testing'),
             $this->callFileExists('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
@@ -597,13 +627,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->copyEnvFileCall('.env'),
 
             $this->callFileExists('.env.development'),
             $this->callFileExists('.env.ci-testing'),
             $this->callFileExists('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('composer require laravel/ui --ansi'),
@@ -718,13 +753,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->copyEnvFileCall('.env'),
 
             $this->callFileExists('.env.development'),
             $this->callFileExists('.env.ci-testing'),
             $this->callFileExists('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
@@ -841,13 +881,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->copyEnvFileCall('.env'),
 
             $this->callFileExists('.env.development'),
             $this->callFileExists('.env.ci-testing'),
             $this->callFileExists('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('composer require laravel/ui --ansi'),
@@ -956,13 +1001,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->copyEnvFileCall('.env'),
             $this->copyEnvFileCall('.env.development'),
 
             $this->callFileExists('.env.ci-testing'),
             $this->callFileExists('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
