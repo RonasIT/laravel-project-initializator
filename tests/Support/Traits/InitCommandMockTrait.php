@@ -47,8 +47,24 @@ trait InitCommandMockTrait
     {
         return [
             $this->functionCall('is_file', [$fileName]),
-            $this->callFileGetContent($fileName, $this->getFixture($sourceFixture)),
-            $this->callFilePutContent($fileName, $this->getFixture($resultFixture)),
+            $this->callFileGetContent($fileName, $this->getFixture("env/{$sourceFixture}")),
+            $this->callFilePutContent($fileName, $this->getFixture("env/{$resultFixture}")),
+        ];
+    }
+
+    protected function changeBootstrapAppCall(string $sourceFixture, string $resultFixture): array
+    {
+        return [
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture("bootstrap/{$sourceFixture}")),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture("bootstrap/{$resultFixture}")),
+        ];
+    }
+
+    protected function changeAppFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
+    {
+        return [
+            $this->callFileGetContent(app_path($fileName), $this->getFixture("{$sourceFixture}")),
+            $this->callFilePutContent(app_path($fileName), $this->getFixture("{$resultFixture}")),
         ];
     }
 
@@ -56,8 +72,18 @@ trait InitCommandMockTrait
     {
         return [
             $this->callFileExists(base_path($fileName)),
-            $this->callFileGetContent(base_path($fileName), $this->getFixture($sourceFixture)),
-            $this->callFilePutContent(base_path($fileName), $this->getFixture($resultFixture)),
+            $this->callFileGetContent(base_path($fileName), $this->getFixture("configs/{$sourceFixture}")),
+            $this->callFilePutContent(base_path($fileName), $this->getFixture("configs/{$resultFixture}")),
         ];
+    }
+
+    protected function mockMigrationFileWrite(string $fileName, string $fixture): array
+    {
+        return $this->callFilePutContent("database/migrations/{$fileName}", $this->getFixture("migrations/{$fixture}"));
+    }
+
+    protected function mockReadmeFileWrite(string $fixture): array
+    {
+        return $this->callFilePutContent('README.md', $this->getFixture("readme/{$fixture}"));
     }
 }
