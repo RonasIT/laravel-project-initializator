@@ -2,6 +2,9 @@
 
 namespace RonasIT\ProjectInitializator\Tests\Support\Traits;
 
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Facades\Artisan;
+use Mockery;
 use RonasIT\Support\Traits\MockTrait;
 
 trait InitCommandMockTrait
@@ -59,5 +62,34 @@ trait InitCommandMockTrait
             $this->callFileGetContent(base_path($fileName), $this->getFixture($sourceFixture)),
             $this->callFilePutContent(base_path($fileName), $this->getFixture($resultFixture)),
         ];
+    }
+
+    protected function mockArtisanMigrateCall(): void
+    {
+        $kernel = app(Kernel::class);
+
+        $mock = Mockery::mock($kernel)->makePartial();
+
+        $mock
+            ->shouldReceive('call')
+            ->with('migrate', ['--force' => true, '--ansi' => true])
+            ->once()
+            ->andReturn(0);
+
+        // As Kernel is final, the Artisan facade can not be mocked, so we need to create a partial mock from the resolved instance and swap the 'migrate' call via the Artisan facade.
+        $mock
+            ->shouldReceive('call')
+            ->withAnyArgs()
+            ->andReturnUsing(fn (...$args) => $kernel->call(...$args));
+
+        Artisan::swap($mock);
+    }
+
+    protected function mockReadmeFileWrite(string $fixture)
+    {
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->callFilePutContent('README.md', $this->getFixture("readme/{$fixture}")),
+        );
     }
 }

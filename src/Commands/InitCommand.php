@@ -5,6 +5,8 @@ namespace RonasIT\ProjectInitializator\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Telescope\TelescopeServiceProvider;
@@ -589,15 +591,22 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
+        $driver = $this->defaultDBConnectionConfig['driver'];
+
         config([
-            'database.default' => $this->defaultDBConnectionConfig['driver'],
-            "database.connections.{$this->defaultDBConnectionConfig['driver']}" => [
-                'password' => '',
-                ...$this->defaultDBConnectionConfig,
-            ],
+            'database.default' => $driver,
+            "database.connections.{$driver}.host" => $this->defaultDBConnectionConfig['host'],
+            "database.connections.{$driver}.port" => $this->defaultDBConnectionConfig['port'],
+            "database.connections.{$driver}.database" => $this->defaultDBConnectionConfig['database'],
+            "database.connections.{$driver}.username" => $this->defaultDBConnectionConfig['username'],
         ]);
 
-        shell_exec('php artisan migrate --ansi --force');
+        DB::purge($driver);
+
+        Artisan::call('migrate', [
+            '--force' => true,
+            '--ansi' => true,
+        ]);
     }
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
