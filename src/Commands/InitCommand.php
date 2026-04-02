@@ -25,6 +25,8 @@ use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
 {
+    protected const EXECUTE_PERMISSIONS = 0755;
+
     protected $signature = 'init {application-name : The application name }';
 
     protected $description = 'Initialize required project parameters to run DEV environment';
@@ -520,9 +522,12 @@ class InitCommand extends Command implements Isolatable
 
         $data = json_decode($content, true);
 
-        $this->addArrayItemIfMissing($data, 'scripts.add-pre-commit-hook', '@php -r "file_put_contents(\'.git/hooks/pre-commit\', \"#!/bin/sh\n\" . \"docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair\n\"); chmod(\'.git/hooks/pre-commit\', 0755);"');
-        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '@add-pre-commit-hook');
-        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', '@add-pre-commit-hook');
+        $hookName = 'add-pre-commit-hook';
+        $preCommitHookFile = '.git/hooks/pre-commit';
+
+        $this->addArrayItemIfMissing($data, "scripts.{$hookName}", "@php -r \"file_put_contents('{$preCommitHookFile}', \\\"#!/bin/sh\\n\\\" . \\\"docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair\\n\\\"); chmod('{$preCommitHookFile}', " . self::EXECUTE_PERMISSIONS . ');"');
+        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', "@{$hookName}");
+        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', "@{$hookName}");
 
         $this->fileSaver->publishJSON($path, $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
