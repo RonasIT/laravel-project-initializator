@@ -2,6 +2,7 @@
 
 namespace RonasIT\ProjectInitializator\Tests\Support\Traits;
 
+use RonasIT\ProjectInitializator\Tests\Support\MigrationPublishMock;
 use RonasIT\Support\Traits\MockTrait;
 
 trait InitCommandMockTrait
@@ -31,6 +32,15 @@ trait InitCommandMockTrait
     protected function callFilePutContent(string $fileName, string $result, int $flags = 0): array
     {
         return $this->functionCall('file_put_contents', [$fileName, $result, $flags]);
+    }
+
+    protected function mockMigrationPublish(): MigrationPublishMock
+    {
+        return new MigrationPublishMock(
+            timestamp: now(),
+            callFilePutContent: $this->callFilePutContent(...),
+            getFixture: $this->getFixture(...),
+        );
     }
 
     protected function callShellExec(string $command, string $result = 'success'): array
