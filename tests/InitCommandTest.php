@@ -53,10 +53,13 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
         );
 
+        $migration = $this->mockMigrationPublish();
+
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
+            $migration->publish('drop_jobs_table', 'drop_jobs_table_migration.php'),
+            $migration->publish('roles_create_table', 'roles_create_table_migration.php'),
+            $migration->publish('users_add_role_id', 'users_add_role_id_migration.php'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
@@ -120,10 +123,13 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
         );
 
+        $migration = $this->mockMigrationPublish();
+
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
+            $migration->publish('drop_jobs_table', 'drop_jobs_table_migration.php'),
+            $migration->publish('roles_create_table', 'roles_create_table_migration.php'),
+            $migration->publish('users_add_role_id', 'users_add_role_id_migration.php'),
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
@@ -189,11 +195,14 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
         );
 
+        $migration = $this->mockMigrationPublish();
+
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_default_admin.php', $this->getFixture('migration.php')),
+            $migration->publish('drop_jobs_table', 'drop_jobs_table_migration.php'),
+            $migration->publish('roles_create_table', 'roles_create_table_migration.php'),
+            $migration->publish('users_add_role_id', 'users_add_role_id_migration.php'),
+            $migration->publish('add_default_admin', 'migration.php'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
@@ -244,6 +253,8 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
 
+        $migration = $this->mockMigrationPublish();
+
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
@@ -274,12 +285,13 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_users_format_to_clerk.php', $this->getFixture('users_format_to_clerk_migration.php')),
+            $migration->publish('drop_jobs_table', 'drop_jobs_table_migration.php'),
+            $migration->publish('users_format_to_clerk', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_default_admin.php', $this->getFixture('admins_add_default_admin.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111115_add_nova_admin.php', $this->getFixture('admins_add_nova_admin_migration.php')),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
+            $migration->publish('admins_create_table', 'admins_table_migration.php'),
+            $migration->publish('add_default_admin', 'admins_add_default_admin.php'),
+            $migration->publish('add_nova_admin', 'admins_add_nova_admin_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path($migration->getPath('admins_create_table'))]),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent('README.md', $this->getFixture('readme/default_readme.md')),
@@ -384,10 +396,13 @@ class InitCommandTest extends TestCase
 
         $this->mockArtisanMigrateCall();
 
+        $migration = $this->mockMigrationPublish();
+
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
+            $migration->publish('drop_jobs_table', 'drop_jobs_table_migration.php'),
+            $migration->publish('roles_create_table', 'roles_create_table_migration.php'),
+            $migration->publish('users_add_role_id', 'users_add_role_id_migration.php'),
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
@@ -492,14 +507,15 @@ class InitCommandTest extends TestCase
 
         $this->mockArtisanMigrateCall();
 
+        $migration = $this->mockMigrationPublish();
+
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_default_admin.php', $this->getFixture('migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111115_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $migration->publish('drop_jobs_table', 'drop_jobs_table_migration.php'),
+            $migration->publish('roles_create_table', 'roles_create_table_migration.php'),
+            $migration->publish('users_add_role_id', 'users_add_role_id_migration.php'),
+            $migration->publish('add_default_admin', 'migration.php'),
+            $migration->publish('add_nova_admin', 'nova_users_table_migration.php'),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent('README.md', $this->getFixture('readme/full_readme.md')),
@@ -609,12 +625,15 @@ class InitCommandTest extends TestCase
 
         $this->mockArtisanMigrateCall();
 
+        $migration = $this->mockMigrationPublish();
+
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_telescope_admin.php', $this->getFixture('telescope_users_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111115_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
+            $migration->publish('drop_jobs_table', 'drop_jobs_table_migration.php'),
+            $migration->publish('roles_create_table', 'roles_create_table_migration.php'),
+            $migration->publish('users_add_role_id', 'users_add_role_id_migration.php'),
+            $migration->publish('add_telescope_admin', 'telescope_users_table_migration.php'),
+            $migration->publish('add_nova_admin', 'nova_users_table_migration.php'),
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
@@ -731,12 +750,15 @@ class InitCommandTest extends TestCase
 
         $this->mockArtisanMigrateCall();
 
+        $migration = $this->mockMigrationPublish();
+
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_users_format_to_clerk.php', $this->getFixture('users_format_to_clerk_migration.php')),
+            $migration->publish('drop_jobs_table', 'drop_jobs_table_migration.php'),
+            $migration->publish('users_format_to_clerk', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_default_admin.php', $this->getFixture('admins_add_default_admin.php')),
+            $migration->publish('admins_create_table', 'admins_table_migration.php'),
+            $migration->publish('add_default_admin', 'admins_add_default_admin.php'),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent('README.md', $this->getFixture('readme/default_readme_with_mobile_app.md')),
@@ -824,6 +846,8 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
 
+        $migration = $this->mockMigrationPublish();
+
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
@@ -853,13 +877,14 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_users_format_to_clerk.php', $this->getFixture('users_format_to_clerk_migration.php')),
+            $migration->publish('drop_jobs_table', 'drop_jobs_table_migration.php'),
+            $migration->publish('users_format_to_clerk', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_admins_create_table.php', $this->getFixture('admins_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_telescope_admin.php', $this->getFixture('admins_add_telescope_admin_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111115_add_nova_admin.php', $this->getFixture('admins_add_nova_admin_migration.php')),
+            $migration->publish('admins_create_table', 'admins_table_migration.php'),
+            $migration->publish('add_telescope_admin', 'admins_add_telescope_admin_migration.php'),
+            $migration->publish('add_nova_admin', 'admins_add_nova_admin_migration.php'),
             $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path($migration->getPath('admins_create_table'))]),
 
             $this->callFilePutContent('README.md', $this->getFixture('readme/partial_readme_clerk_with_credentials.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -919,7 +944,7 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function testRunWithoutAdminAndWithoutReadmeAndWithMediaStorageGcs()
+    public function testRunWithoutAdminAndWithoutReadmeAndWithMediaStorageGcs(): void
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
@@ -964,10 +989,13 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
         );
 
+        $migration = $this->mockMigrationPublish();
+
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
+            $migration->publish('drop_jobs_table', 'drop_jobs_table_migration.php'),
+            $migration->publish('roles_create_table', 'roles_create_table_migration.php'),
+            $migration->publish('users_add_role_id', 'users_add_role_id_migration.php'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
 
