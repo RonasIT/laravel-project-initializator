@@ -13,6 +13,7 @@ use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
+use RonasIT\ProjectInitializator\Enums\ConfirmEnum;
 use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
@@ -108,7 +109,7 @@ class InitCommand extends Command implements Isolatable
             $this->publishRoleMigrations();
         }
 
-        if ($this->confirm('Do you want to generate an admin user?', true)) {
+        if ($this->isConfirmed('Do you want to generate an admin user?')) {
             if ($this->authType === AuthTypeEnum::Clerk) {
                 $this->publishAdminsTableMigration();
             }
@@ -116,15 +117,15 @@ class InitCommand extends Command implements Isolatable
             $this->createAdminUser();
         }
 
-        if ($this->confirm('Do you want to generate a README file?', true)) {
+        if ($this->isConfirmed('Do you want to generate a README file?')) {
             $this->configureReadme();
         }
 
-        if ($this->confirm('Will project work with media files? (upload, store and return content)')) {
+        if ($this->isConfirmed('Will project work with media files? (upload, store and return content)', false)) {
             $this->setupMediaStorage();
         }
 
-        if ($this->confirm('Would you use Renovate dependabot?', true)) {
+        if ($this->isConfirmed('Would you use Renovate dependabot?')) {
             $this->saveRenovateJSON();
 
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Renovate);
@@ -152,9 +153,7 @@ class InitCommand extends Command implements Isolatable
             );
         }
 
-        if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
-            $this->shouldUninstallPackage = true;
-        }
+        $this->shouldUninstallPackage = $this->isConfirmed('Do you want to uninstall project-initializator package?');
 
         $this->setupComposerHooks();
 
@@ -200,7 +199,7 @@ class InitCommand extends Command implements Isolatable
 
         $pascalCaseAppName = ucfirst(Str::camel($appName));
 
-        if ($appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
+        if ($appName !== $pascalCaseAppName && $this->isConfirmed("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}")) {
             $appName = $pascalCaseAppName;
         }
 
@@ -352,18 +351,18 @@ class InitCommand extends Command implements Isolatable
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
+        $shouldGenerateAllParts = $this->isConfirmed('Do you want to generate all README parts?');
 
-        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Resources & Contacts` part?', true)) {
+        if ($shouldGenerateAllParts || $this->isConfirmed('Do you need a `Resources & Contacts` part?')) {
             $this->configureResources();
             $this->configureManagerEmail();
         }
 
-        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Prerequisites` part?', true)) {
+        if ($shouldGenerateAllParts || $this->isConfirmed('Do you need a `Prerequisites` part?')) {
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Prerequisites);
         }
 
-        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Getting Started` part?', true)) {
+        if ($shouldGenerateAllParts || $this->isConfirmed('Do you need a `Getting Started` part?')) {
             $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
 
             $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
@@ -371,11 +370,11 @@ class InitCommand extends Command implements Isolatable
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::GettingStarted);
         }
 
-        if ($shouldGenerateAllParts || $this->confirm('Do you need an `Environments` part?', true)) {
+        if ($shouldGenerateAllParts || $this->isConfirmed('Do you need an `Environments` part?')) {
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Environments);
         }
 
-        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Credentials and Access` part?', true)) {
+        if ($shouldGenerateAllParts || $this->isConfirmed('Do you need a `Credentials and Access` part?')) {
             $this->configureCredentialsAndAccess();
 
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
@@ -427,7 +426,7 @@ class InitCommand extends Command implements Isolatable
     protected function configureCredentialsAndAccess(): void
     {
         foreach ($this->readmeGenerator->getAccessRequiredResources() as $resource) {
-            if (!empty($this->adminCredentials) && $this->confirm("Is {$resource->title}'s admin the same as default one?", true)) {
+            if (!empty($this->adminCredentials) && $this->isConfirmed("Is {$resource->title}'s admin the same as default one?")) {
                 $adminCredentials = $this->adminCredentials;
             } else {
                 if ($this->authType === AuthTypeEnum::Clerk && !$this->migrationPublisher->isMigrationExists('admins_create_table')) {
@@ -616,5 +615,14 @@ class InitCommand extends Command implements Isolatable
     protected function publishAdminsTableMigration(): void
     {
         $this->migrationPublisher->publish('admins_create_table');
+    }
+
+    protected function isConfirmed(string $label, bool $default = true): bool
+    {
+        return ConfirmEnum::from(select(
+            label: $label,
+            options: ConfirmEnum::values(),
+            default: $default ? ConfirmEnum::Yes->value : ConfirmEnum::No->value,
+        )) === ConfirmEnum::Yes;
     }
 }

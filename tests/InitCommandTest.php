@@ -67,17 +67,17 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsChoice('The application name is not in PascalCase, would you like to use MyApp', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?')
-            ->expectsConfirmation('Do you want to generate a README file?')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsChoice('Do you want to generate an admin user?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate a README file?', 'no', ['yes', 'no'])
+            ->expectsChoice('Will project work with media files? (upload, store and return content)', 'no', ['yes', 'no'])
+            ->expectsChoice('Would you use Renovate dependabot?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
@@ -139,12 +139,12 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?')
-            ->expectsConfirmation('Do you want to generate a README file?')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsChoice('Do you want to generate an admin user?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate a README file?', 'no', ['yes', 'no'])
+            ->expectsChoice('Will project work with media files? (upload, store and return content)', 'no', ['yes', 'no'])
+            ->expectsChoice('Would you use Renovate dependabot?', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
@@ -202,21 +202,21 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsChoice('The application name is not in PascalCase, would you like to use MyApp', 'no', ['yes', 'no'])
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
+            ->expectsChoice('Do you want to generate an admin user?', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
             ->expectsQuestion('Please enter admin name', 'TestAdmin')
             ->expectsQuestion('Please enter admin role id', 1)
-            ->expectsConfirmation('Do you want to generate a README file?')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsChoice('Do you want to generate a README file?', 'no', ['yes', 'no'])
+            ->expectsChoice('Will project work with media files? (upload, store and return content)', 'no', ['yes', 'no'])
+            ->expectsChoice('Would you use Renovate dependabot?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
@@ -285,17 +285,17 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsChoice('The application name is not in PascalCase, would you like to use MyApp', 'no', ['yes', 'no'])
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
+            ->expectsChoice('Do you want to generate an admin user?', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
-            ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsConfirmation('Do you want to generate all README parts?', 'yes')
+            ->expectsChoice('Do you want to generate a README file?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate all README parts?', 'yes', ['yes', 'no'])
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
@@ -322,12 +322,12 @@ class InitCommandTest extends TestCase
                 'later',
             )
             ->expectsQuestion('Please enter a Manager\'s email', '')
-            ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
-            ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?')
+            ->expectsChoice('Is Laravel Telescope\'s admin the same as default one?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Is Laravel Nova\'s admin the same as default one?', 'no', ['yes', 'no'])
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsChoice('Will project work with media files? (upload, store and return content)', 'no', ['yes', 'no'])
+            ->expectsChoice('Would you use Renovate dependabot?', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
@@ -335,7 +335,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- Figma link')
             ->expectsOutput('- Sentry link')
             ->expectsOutput('- Manager\'s email')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
@@ -393,16 +393,16 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsChoice('The application name is not in PascalCase, would you like to use MyApp', 'no', ['yes', 'no'])
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Web', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?')
-            ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsConfirmation('Do you want to generate all README parts?')
-            ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
+            ->expectsChoice('Do you want to generate an admin user?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate a README file?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate all README parts?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Resources & Contacts` part?', 'yes', ['yes', 'no'])
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
@@ -429,16 +429,16 @@ class InitCommandTest extends TestCase
                 'no',
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
-            ->expectsConfirmation('Do you need a `Prerequisites` part?')
-            ->expectsConfirmation('Do you need a `Getting Started` part?')
-            ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
-            ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsChoice('Do you need a `Prerequisites` part?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Getting Started` part?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need an `Environments` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Credentials and Access` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Will project work with media files? (upload, store and return content)', 'no', ['yes', 'no'])
+            ->expectsChoice('Would you use Renovate dependabot?', 'no', ['yes', 'no'])
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
@@ -502,20 +502,20 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsChoice('The application name is not in PascalCase, would you like to use MyApp', 'no', ['yes', 'no'])
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Mobile', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
+            ->expectsChoice('Do you want to generate an admin user?', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
             ->expectsQuestion('Please enter admin name', 'TestAdmin')
             ->expectsQuestion('Please enter admin role id', 1)
-            ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsConfirmation('Do you want to generate all README parts?')
-            ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
+            ->expectsChoice('Do you want to generate a README file?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate all README parts?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Resources & Contacts` part?', 'yes', ['yes', 'no'])
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
@@ -542,22 +542,22 @@ class InitCommandTest extends TestCase
                 'https://mypsite.com/nova-link',
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
-            ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
-            ->expectsConfirmation('Do you need a `Getting Started` part?', 'yes')
-            ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
-            ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
-            ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
-            ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?')
+            ->expectsChoice('Do you need a `Prerequisites` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Getting Started` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you need an `Environments` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Credentials and Access` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Is Laravel Telescope\'s admin the same as default one?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Is Laravel Nova\'s admin the same as default one?', 'no', ['yes', 'no'])
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'nova_mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '654321')
             ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
             ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
             ->expectsOutput('README generated successfully!')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
+            ->expectsChoice('Will project work with media files? (upload, store and return content)', 'yes', ['yes', 'no'])
             ->expectsChoice('Which storage will be used for media files?', 's3', ['gcs', 'local', 's3'])
-            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsChoice('Would you use Renovate dependabot?', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'yes', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
@@ -617,16 +617,16 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsChoice('The application name is not in PascalCase, would you like to use MyApp', 'no', ['yes', 'no'])
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Web', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?')
-            ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsConfirmation('Do you want to generate all README parts?')
-            ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
+            ->expectsChoice('Do you want to generate an admin user?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate a README file?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate all README parts?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Resources & Contacts` part?', 'yes', ['yes', 'no'])
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
@@ -653,10 +653,10 @@ class InitCommandTest extends TestCase
                 'later',
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
-            ->expectsConfirmation('Do you need a `Prerequisites` part?')
-            ->expectsConfirmation('Do you need a `Getting Started` part?')
-            ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
-            ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
+            ->expectsChoice('Do you need a `Prerequisites` part?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Getting Started` part?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need an `Environments` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Credentials and Access` part?', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please enter admin email for Laravel Telescope', 'telescope_mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Telescope', '654321')
             ->expectsQuestion('Please enter admin name for Laravel Telescope', 'Telescope Admin')
@@ -665,12 +665,12 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin password for Laravel Nova', '654321')
             ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
             ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsChoice('Will project work with media files? (upload, store and return content)', 'no', ['yes', 'no'])
+            ->expectsChoice('Would you use Renovate dependabot?', 'no', ['yes', 'no'])
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
@@ -737,18 +737,18 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsChoice('The application name is not in PascalCase, would you like to use MyApp', 'no', ['yes', 'no'])
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Mobile', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
+            ->expectsChoice('Do you want to generate an admin user?', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
-            ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsConfirmation('Do you want to generate all README parts?')
-            ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
+            ->expectsChoice('Do you want to generate a README file?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate all README parts?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Resources & Contacts` part?', 'yes', ['yes', 'no'])
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
@@ -775,14 +775,14 @@ class InitCommandTest extends TestCase
                 'later',
             )
             ->expectsQuestion('Please enter a Manager\'s email', '')
-            ->expectsConfirmation('Do you need a `Prerequisites` part?', 'yes')
-            ->expectsConfirmation('Do you need a `Getting Started` part?', 'yes')
-            ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
-            ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
-            ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
-            ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?', 'yes')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
+            ->expectsChoice('Do you need a `Prerequisites` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Getting Started` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you need an `Environments` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Credentials and Access` part?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Is Laravel Telescope\'s admin the same as default one?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Is Laravel Nova\'s admin the same as default one?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Will project work with media files? (upload, store and return content)', 'no', ['yes', 'no'])
+            ->expectsChoice('Would you use Renovate dependabot?', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
@@ -790,7 +790,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('- Figma link')
             ->expectsOutput('- Sentry link')
             ->expectsOutput('- Manager\'s email')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
@@ -858,16 +858,16 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsChoice('The application name is not in PascalCase, would you like to use MyApp', 'no', ['yes', 'no'])
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Web', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?')
-            ->expectsConfirmation('Do you want to generate a README file?', 'yes')
-            ->expectsConfirmation('Do you want to generate all README parts?')
-            ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
+            ->expectsChoice('Do you want to generate an admin user?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate a README file?', 'yes', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate all README parts?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Resources & Contacts` part?', 'yes', ['yes', 'no'])
             ->expectsQuestion(
                 'Are you going to use Issue Tracker? '
                 . 'Please enter a link or select `later` to do it later, otherwise select `no`.',
@@ -894,18 +894,18 @@ class InitCommandTest extends TestCase
                 'later',
             )
             ->expectsQuestion('Please enter a Manager\'s email', 'manager@mail.com')
-            ->expectsConfirmation('Do you need a `Prerequisites` part?')
-            ->expectsConfirmation('Do you need a `Getting Started` part?')
-            ->expectsConfirmation('Do you need an `Environments` part?')
-            ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
+            ->expectsChoice('Do you need a `Prerequisites` part?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Getting Started` part?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need an `Environments` part?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you need a `Credentials and Access` part?', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please enter admin email for Laravel Telescope', 'telescope_mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Telescope', '654321')
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
             ->expectsOutput('README generated successfully!')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Would you use Renovate dependabot?')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsChoice('Will project work with media files? (upload, store and return content)', 'no', ['yes', 'no'])
+            ->expectsChoice('Would you use Renovate dependabot?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
@@ -967,21 +967,21 @@ class InitCommandTest extends TestCase
 
         $this
             ->artisan('init "My App"')
-            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsChoice('The application name is not in PascalCase, would you like to use MyApp', 'yes', ['yes', 'no'])
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
-            ->expectsConfirmation('Do you want to generate an admin user?')
-            ->expectsConfirmation('Do you want to generate a README file?')
-            ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
+            ->expectsChoice('Do you want to generate an admin user?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you want to generate a README file?', 'no', ['yes', 'no'])
+            ->expectsChoice('Will project work with media files? (upload, store and return content)', 'yes', ['yes', 'no'])
             ->expectsChoice('Which storage will be used for media files?', 'gcs', ['gcs', 'local', 's3'])
-            ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsChoice('Would you use Renovate dependabot?', 'no', ['yes', 'no'])
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- GOOGLE_CLOUD_STORAGE_BUCKET')
             ->expectsOutput('- GOOGLE_CLOUD_PROJECT_ID')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
