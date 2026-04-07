@@ -459,6 +459,7 @@ class InitCommand extends Command implements Isolatable
             choices: StorageEnum::values(),
             default: StorageEnum::GCS->value,
         ));
+
         if ($storage === StorageEnum::GCS) {
             $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage';
 
