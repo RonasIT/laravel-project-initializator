@@ -27,22 +27,21 @@
     },
     "minimum-stability": "alpha",
     "require": {
-        "php": ">=8.4.1",
+        "php": ">=8.4",
         "laravel/framework": ">=12.28",
-        "php-mock/php-mock-phpunit": "^2.15",
+        "php-mock/php-mock-phpunit": "^2.10",
         "ext-json": "*",
         "ronasit/laravel-helpers": ">=3.5.7",
         "winter/laravel-config-writer": ">=1.2.1",
-        "ronasit/larabuilder": ">=0.0.4"
+        "ronasit/larabuilder": ">=0.0.6"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23.1",
         "mockery/mockery": "^1.6.12",
-        "phpunit/phpunit": "^13.0.0",
+        "phpunit/phpunit": "^11.5.3",
         "php-coveralls/php-coveralls": "^2.7",
         "orchestra/testbench": "^10.8.0",
         "friendsofphp/php-cs-fixer": "^3.62",
-        "brainmaestro/composer-git-hooks": "^3.0",
         "laravel/pint": "^1.27"
     },
     "extra": {
