@@ -38,9 +38,8 @@
     "require-dev": {
         "fakerphp/faker": "^1.23.1",
         "mockery/mockery": "^1.6.12",
-        "phpunit/phpunit": "^11.5.3",
-        "php-coveralls/php-coveralls": "^2.7",
-        "orchestra/testbench": "^10.8.0",
+        "phpunit/phpunit": ">=11.5.5",
+        "orchestra/testbench": ">=9.5.1",
         "friendsofphp/php-cs-fixer": "^3.62",
         "laravel/pint": "^1.27"
     },
