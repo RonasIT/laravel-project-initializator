@@ -66,6 +66,7 @@ class InitCommand extends Command implements Isolatable
         'port' => '5432',
         'database' => 'postgres',
         'username' => 'postgres',
+        'password' => '',
     ];
 
     public function __construct(
@@ -217,7 +218,7 @@ class InitCommand extends Command implements Isolatable
             'DB_PORT' => $this->defaultDBConnectionConfig['port'],
             'DB_DATABASE' => $this->defaultDBConnectionConfig['database'],
             'DB_USERNAME' => $this->defaultDBConnectionConfig['username'],
-            'DB_PASSWORD' => '',
+            'DB_PASSWORD' => $this->defaultDBConnectionConfig['password'],
         ];
 
         $this->updateEnvFile('.env.example', $envConfig);
@@ -595,10 +596,10 @@ class InitCommand extends Command implements Isolatable
 
         config([
             'database.default' => $driver,
-            "database.connections.{$driver}.host" => $this->defaultDBConnectionConfig['host'],
-            "database.connections.{$driver}.port" => $this->defaultDBConnectionConfig['port'],
-            "database.connections.{$driver}.database" => $this->defaultDBConnectionConfig['database'],
-            "database.connections.{$driver}.username" => $this->defaultDBConnectionConfig['username'],
+            "database.connections.{$driver}" => array_merge(
+                config("database.connections.{$driver}", []),
+                Arr::except($this->defaultDBConnectionConfig, 'driver'),
+            ),
         ]);
 
         DB::purge($driver);

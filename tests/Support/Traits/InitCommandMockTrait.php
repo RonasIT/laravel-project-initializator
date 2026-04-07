@@ -84,12 +84,4 @@ trait InitCommandMockTrait
 
         Artisan::swap($mock);
     }
-
-    protected function mockReadmeFileWrite(string $fixture)
-    {
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Generators',
-            $this->callFilePutContent('README.md', $this->getFixture("readme/{$fixture}")),
-        );
-    }
 }
