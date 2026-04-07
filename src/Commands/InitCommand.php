@@ -596,10 +596,7 @@ class InitCommand extends Command implements Isolatable
 
         config([
             'database.default' => $driver,
-            "database.connections.{$driver}" => array_merge(
-                config("database.connections.{$driver}", []),
-                Arr::except($this->defaultDBConnectionConfig, 'driver'),
-            ),
+            "database.connections.{$driver}" => $this->defaultDBConnectionConfig,
         ]);
 
         DB::purge($driver);
