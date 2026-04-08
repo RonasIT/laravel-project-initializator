@@ -4,11 +4,12 @@ namespace RonasIT\ProjectInitializator\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Laravel\Telescope\TelescopeServiceProvider;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
@@ -19,11 +20,15 @@ use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
+use RonasIT\ProjectInitializator\Support\FileSaver;
+use RonasIT\ProjectInitializator\Support\MigrationPublisher;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
 class InitCommand extends Command implements Isolatable
 {
+    protected const EXECUTE_PERMISSIONS = 0755;
+
     protected $signature = 'init {application-name : The application name }';
 
     protected $description = 'Initialize required project parameters to run DEV environment';
@@ -40,8 +45,6 @@ class InitCommand extends Command implements Isolatable
         'composer require --dev ronasit/laravel-entity-generator',
         'composer require --dev laravel/pint',
         'php artisan vendor:publish --tag=pint-config',
-        'composer require --dev brainmaestro/composer-git-hooks',
-        './vendor/bin/cghooks update',
         'php artisan lang:publish',
         'php artisan key:generate',
     ];
@@ -63,14 +66,13 @@ class InitCommand extends Command implements Isolatable
         'port' => '5432',
         'database' => 'postgres',
         'username' => 'postgres',
+        'password' => '',
     ];
 
-    protected ?Carbon $lastMigrationTimestamp = null;
-
-    public function __construct()
-    {
-        $this->lastMigrationTimestamp = Carbon::now();
-
+    public function __construct(
+        protected FileSaver $fileSaver,
+        protected MigrationPublisher $migrationPublisher,
+    ) {
         parent::__construct();
     }
 
@@ -143,7 +145,7 @@ class InitCommand extends Command implements Isolatable
             }
         }
 
-        if (!class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+        if (!class_exists(TelescopeServiceProvider::class)) {
             array_push(
                 $this->shellCommands,
                 'composer require ronasit/laravel-telescope-extension',
@@ -167,11 +169,11 @@ class InitCommand extends Command implements Isolatable
 
         $this->publishWebLogin();
 
+        $this->addDefaultHttpExceptionRender();
+
         if ($this->shouldUninstallPackage) {
             shell_exec('composer remove --dev ronasit/laravel-project-initializator --ansi');
         }
-
-        $this->addDefaultHttpExceptionRender();
 
         $this->runMigrations();
     }
@@ -216,7 +218,7 @@ class InitCommand extends Command implements Isolatable
             'DB_PORT' => $this->defaultDBConnectionConfig['port'],
             'DB_DATABASE' => $this->defaultDBConnectionConfig['database'],
             'DB_USERNAME' => $this->defaultDBConnectionConfig['username'],
-            'DB_PASSWORD' => '',
+            'DB_PASSWORD' => $this->defaultDBConnectionConfig['password'],
         ];
 
         $this->updateEnvFile('.env.example', $envConfig);
@@ -270,7 +272,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateEnvFile('.env', $data);
         $this->updateEnvFile('.env.example', $data);
-        $this->updateEnvFile('.env.development', $data);
+        $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
@@ -292,15 +294,12 @@ class InitCommand extends Command implements Isolatable
             'php artisan laravel-clerk:install',
         );
 
-        $this->publishMigration(
-            view: view('initializator::users_format_to_clerk'),
-            migrationName: 'users_format_to_clerk',
-        );
+        $this->migrationPublisher->publish('users_format_to_clerk');
 
-        $this->publishClass(
+        $this->fileSaver->publishClass(
             template: view('initializator::clerk_user_repository'),
             fileName: 'ClerkUserRepository',
-            filePath: 'app/Support/Clerk',
+            fileDirectory: 'app/Support/Clerk',
         );
     }
 
@@ -336,39 +335,13 @@ class InitCommand extends Command implements Isolatable
 
     protected function publishRoleMigrations(): void
     {
-        if (!$this->isMigrationExists('roles_create_table') && !$this->isMigrationExists('create_roles_table')) {
-            $this->publishMigration(
-                view: view('initializator::roles_create_table'),
-                migrationName: 'roles_create_table',
-            );
+        if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
+            && !$this->migrationPublisher->isMigrationExists('create_roles_table')
+        ) {
+            $this->migrationPublisher->publish('roles_create_table');
 
-            $this->publishMigration(
-                view: view('initializator::users_add_role_id'),
-                migrationName: 'users_add_role_id',
-            );
+            $this->migrationPublisher->publish('users_add_role_id');
         }
-    }
-
-    protected function publishMigration(View $view, string $migrationName): void
-    {
-        $time = $this->lastMigrationTimestamp->addSecond();
-
-        $migrationName = "{$time->format('Y_m_d_His')}_{$migrationName}";
-
-        $this->publishClass($view, $migrationName, 'database/migrations');
-    }
-
-    protected function publishClass(View $template, string $fileName, string $filePath): void
-    {
-        $fileName = "{$fileName}.php";
-
-        if (!is_dir($filePath)) {
-            mkdir($filePath, 0777, true);
-        }
-
-        $data = $template->render();
-
-        file_put_contents("{$filePath}/{$fileName}", "<?php\n\n{$data}");
     }
 
     protected function configureReadme(): void
@@ -380,16 +353,18 @@ class InitCommand extends Command implements Isolatable
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        if ($this->confirm('Do you need a `Resources & Contacts` part?', true)) {
+        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
+
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Resources & Contacts` part?', true)) {
             $this->configureResources();
             $this->configureManagerEmail();
         }
 
-        if ($this->confirm('Do you need a `Prerequisites` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Prerequisites` part?', true)) {
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Prerequisites);
         }
 
-        if ($this->confirm('Do you need a `Getting Started` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Getting Started` part?', true)) {
             $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
 
             $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
@@ -397,11 +372,11 @@ class InitCommand extends Command implements Isolatable
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::GettingStarted);
         }
 
-        if ($this->confirm('Do you need an `Environments` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need an `Environments` part?', true)) {
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Environments);
         }
 
-        if ($this->confirm('Do you need a `Credentials and Access` part?', true)) {
+        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Credentials and Access` part?', true)) {
             $this->configureCredentialsAndAccess();
 
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
@@ -456,7 +431,7 @@ class InitCommand extends Command implements Isolatable
             if (!empty($this->adminCredentials) && $this->confirm("Is {$resource->title}'s admin the same as default one?", true)) {
                 $adminCredentials = $this->adminCredentials;
             } else {
-                if ($this->authType === AuthTypeEnum::Clerk && !$this->isMigrationExists('admins_create_table')) {
+                if ($this->authType === AuthTypeEnum::Clerk && !$this->migrationPublisher->isMigrationExists('admins_create_table')) {
                     $this->publishAdminsTableMigration();
                 }
 
@@ -542,7 +517,7 @@ class InitCommand extends Command implements Isolatable
             'assignees' => [$reviewer],
         ];
 
-        file_put_contents('renovate.json', json_encode($data, JSON_PRETTY_PRINT));
+        $this->fileSaver->publishJSON('renovate.json', $data);
     }
 
     protected function setupComposerHooks(): void
@@ -553,14 +528,14 @@ class InitCommand extends Command implements Isolatable
 
         $data = json_decode($content, true);
 
-        $this->addArrayItemIfMissing($data, 'extra.hooks.config.stop-on-failure', 'pre-commit');
-        $this->addArrayItemIfMissing($data, 'extra.hooks.pre-commit', 'docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair');
-        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', '[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock');
-        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', 'cghooks update');
+        $hookName = 'add-pre-commit-hook';
+        $preCommitHookFile = '.git/hooks/pre-commit';
 
-        $resultData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+        $this->addArrayItemIfMissing($data, "scripts.{$hookName}", "@php -r \"file_put_contents('{$preCommitHookFile}', \\\"#!/bin/sh\\n\\\" . \\\"docker compose up -d php && docker compose exec -T nginx vendor/bin/pint --repair\\n\\\"); chmod('{$preCommitHookFile}', " . self::EXECUTE_PERMISSIONS . ');"');
+        $this->addArrayItemIfMissing($data, 'scripts.post-install-cmd', "@{$hookName}");
+        $this->addArrayItemIfMissing($data, 'scripts.post-update-cmd', "@{$hookName}");
 
-        file_put_contents($path, $resultData);
+        $this->fileSaver->publishJSON($path, $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     protected function addArrayItemIfMissing(array &$data, string $path, string $value): void
@@ -600,7 +575,7 @@ class InitCommand extends Command implements Isolatable
     {
         shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
 
-        file_put_contents(base_path('routes/web.php'), "\nAuth::routes();\n", FILE_APPEND);
+        $this->fileSaver->appendOrCreateFile(base_path('routes/web.php'), "\nAuth::routes();\n");
     }
 
     protected function addDefaultHttpExceptionRender(): void
@@ -620,41 +595,34 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
+        $driver = $this->defaultDBConnectionConfig['driver'];
+
         config([
-            'database.default' => $this->defaultDBConnectionConfig['driver'],
-            "database.connections.{$this->defaultDBConnectionConfig['driver']}" => [
-                'password' => '',
-                ...$this->defaultDBConnectionConfig,
-            ],
+            'database.default' => $driver,
+            "database.connections.{$driver}" => $this->defaultDBConnectionConfig,
         ]);
 
-        shell_exec('php artisan migrate --ansi --force');
+        DB::purge($driver);
+
+        Artisan::call('migrate', [
+            '--force' => true,
+            '--ansi' => true,
+        ]);
     }
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
     {
         $migrationName = (empty($serviceKey)) ? 'add_default_admin' : "add_{$serviceKey}_admin";
 
-        $viewName = ($this->authType === AuthTypeEnum::Clerk)
-            ? 'initializator::admins_add_additional_admin'
-            : 'initializator::add_default_user';
+        $templateName = ($this->authType === AuthTypeEnum::Clerk)
+            ? 'admins_add_additional_admin'
+            : 'add_default_user';
 
-        $this->publishMigration(
-            view: view($viewName)->with($adminCredentials),
-            migrationName: $migrationName,
-        );
-    }
-
-    protected function isMigrationExists(string $migrationName): bool
-    {
-        return !empty(glob(base_path("database/migrations/*_{$migrationName}.php")));
+        $this->migrationPublisher->publish($templateName, $adminCredentials, $migrationName);
     }
 
     protected function publishAdminsTableMigration(): void
     {
-        $this->publishMigration(
-            view: view('initializator::admins_create_table'),
-            migrationName: 'admins_create_table',
-        );
+        $this->migrationPublisher->publish('admins_create_table');
     }
 }
