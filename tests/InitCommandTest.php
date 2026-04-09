@@ -29,17 +29,6 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
-
-            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
-        );
-
-        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development', false),
@@ -61,8 +50,20 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+        );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -97,18 +98,6 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
-
-            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
-            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
-        );
-
-        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env'),
             $this->callFileExists('.env.development'),
@@ -127,8 +116,21 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+        );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "MyApp"')
@@ -162,18 +164,6 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
-
-            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
-        );
-
-        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -194,8 +184,21 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+        );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -237,21 +240,6 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
-            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
-            $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
-
-            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
-            $this->mockReadmeFileWrite('default_readme.md'),
-            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
-        );
-
-        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -275,8 +263,24 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
+
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->mockReadmeFileWrite('default_readme.md'),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+        );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -350,18 +354,6 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
-
-            $this->mockReadmeFileWrite('partial_readme.md'),
-            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
-        );
-
-        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -382,8 +374,21 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+
+            $this->mockReadmeFileWrite('partial_readme.md'),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+        );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -442,6 +447,7 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_filesystem_disk_added.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
@@ -449,21 +455,6 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
             $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
-        );
-
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'nova_users_table_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
-
-            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
-            $this->mockReadmeFileWrite('full_readme.md'),
-            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockNativeFunction(
@@ -490,8 +481,24 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'nova_users_table_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->mockReadmeFileWrite('full_readme.md'),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+        );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -570,20 +577,6 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'telescope_users_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'nova_users_table_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
-
-            $this->mockReadmeFileWrite('partial_readme_with_telescope.md'),
-            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
-        );
-
-        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -604,8 +597,23 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'telescope_users_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'nova_users_table_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+
+            $this->mockReadmeFileWrite('partial_readme_with_telescope.md'),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+        );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -686,19 +694,6 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
-            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
-            $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
-
-            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
-            $this->mockReadmeFileWrite('default_readme_with_mobile_app.md'),
-            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
-        );
-
-        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -722,8 +717,22 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
+
+            $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
+            $this->mockReadmeFileWrite('default_readme_with_mobile_app.md'),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+        );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -804,21 +813,6 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
-            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
-            $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'admins_add_telescope_admin_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
-
-            $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md'),
-            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
-        );
-
-        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileExists('.env', false),
             $this->callFileExists('.env.development'),
@@ -841,8 +835,24 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
+            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'admins_add_telescope_admin_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
+
+            $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md'),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+        );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -905,6 +915,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_pascal_case.yml', 'env.development_storage_gcs.yml'),
             $this->changeConfigFileCall('config/filesystems.php', 'filesystems.php', 'filesystems_after_changes.php'),
+            $this->changeEnvFileCall('.env.development', 'env.development_storage_gcs.yml', 'env.development_storage_gcs.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
@@ -912,15 +923,6 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
             $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
-        );
-
-        $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-
-            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockNativeFunction(
@@ -947,8 +949,18 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+        );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
