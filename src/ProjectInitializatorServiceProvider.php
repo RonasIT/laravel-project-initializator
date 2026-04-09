@@ -15,7 +15,6 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/../stubs/controllers/LoginController.php' => app_path('Http/Controllers/Auth/LoginController.php'),
-            __DIR__ . '/../stubs/requests/Request.php' => app_path('Http/Requests/Request.php'),
             __DIR__ . '/../stubs/assets/css/app.css' => public_path('app.css'),
             __DIR__ . '/../stubs/assets/js/app.js' => public_path('app.js'),
             __DIR__ . '/../stubs/views/app.blade.php' => resource_path('views/layouts/app.blade.php'),
@@ -27,5 +26,9 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../resources/pint.json' => base_path('pint.json'),
         ], 'pint-config');
+
+        $this->publishes([
+            __DIR__ . '/../stubs/requests/Request.php' => app_path('Http/Requests/Request.php'),
+        ], 'base-request');
     }
 }
