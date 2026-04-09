@@ -15,6 +15,7 @@ class EnvGenerator
         'port' => '5432',
         'database' => 'postgres',
         'username' => 'postgres',
+        'password' => '',
     ];
 
     protected string $appName;
@@ -70,7 +71,7 @@ class EnvGenerator
             'DB_PORT' => self::DEFAULT_DB_CONNECTION_CONFIG['port'],
             'DB_DATABASE' => self::DEFAULT_DB_CONNECTION_CONFIG['database'],
             'DB_USERNAME' => self::DEFAULT_DB_CONNECTION_CONFIG['username'],
-            'DB_PASSWORD' => '',
+            'DB_PASSWORD' => self::DEFAULT_DB_CONNECTION_CONFIG['password'],
         ];
 
         $this->updateEnvFile('.env.example', $envConfig);
