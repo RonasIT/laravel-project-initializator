@@ -51,7 +51,6 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -64,6 +63,8 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -117,7 +118,6 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -131,6 +131,8 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "MyApp"')
@@ -185,7 +187,6 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -199,6 +200,8 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
@@ -265,8 +268,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
@@ -376,8 +380,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
@@ -448,6 +453,7 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_filesystem_disk_added.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
@@ -482,8 +488,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
@@ -598,8 +605,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
@@ -719,8 +727,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
@@ -838,8 +847,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
@@ -917,6 +927,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_pascal_case.yml', 'env.development_storage_gcs.yml'),
             $this->changeConfigFileCall('config/filesystems.php', 'filesystems.php', 'filesystems_after_changes.php'),
+            $this->changeEnvFileCall('.env.development', 'env.development_storage_gcs.yml', 'env.development_storage_gcs.yml'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope_config.php', 'telescope_config_after_initialization.php'),
         );
@@ -951,7 +962,6 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan migrate --ansi --force'),
         );
 
         $this->mockNativeFunction(
@@ -964,6 +974,8 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
         );
+
+        $this->mockArtisanMigrateCall();
 
         $this
             ->artisan('init "My App"')
