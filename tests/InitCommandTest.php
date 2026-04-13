@@ -41,6 +41,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -106,6 +107,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -175,6 +177,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -238,8 +241,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
-            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
             $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
             $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
@@ -253,6 +254,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -368,6 +370,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -473,6 +476,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -593,6 +597,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -697,8 +702,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
-            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
             $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
             $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
@@ -712,6 +715,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -818,8 +822,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
-            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
             $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
             $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
         );
@@ -833,6 +835,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -950,6 +953,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
