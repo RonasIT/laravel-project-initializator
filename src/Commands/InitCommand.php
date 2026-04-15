@@ -465,7 +465,6 @@ class InitCommand extends Command implements Isolatable
             $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage';
 
             $this->updateEnvFile('.env.development', [
-                'FILESYSTEM_DISK' => StorageEnum::GCS->value,
                 'GOOGLE_CLOUD_STORAGE_PATH_PREFIX' => 'api',
                 'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
                 'GOOGLE_CLOUD_PROJECT_ID' => '',
@@ -476,6 +475,10 @@ class InitCommand extends Command implements Isolatable
 
             $this->addGcsDiskToConfig();
         }
+
+        $this->updateEnvFile('.env.development', [
+            'FILESYSTEM_DISK' => $storage->value,
+        ]);
     }
 
     protected function addGcsDiskToConfig(): void
