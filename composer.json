@@ -38,8 +38,8 @@
     "require-dev": {
         "fakerphp/faker": "^1.23.1",
         "mockery/mockery": "^1.6.12",
-        "phpunit/phpunit": ">=11.5.5",
-        "orchestra/testbench": ">=9.5.1",
+        "phpunit/phpunit": ">=11",
+        "orchestra/testbench": ">=10",
         "friendsofphp/php-cs-fixer": "^3.62",
         "laravel/pint": "^1.27"
     },
