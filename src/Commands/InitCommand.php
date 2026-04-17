@@ -366,11 +366,11 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateAllParts || $this->isConfirmed('Do you need a `Getting Started` part?')) {
-            $gitProjectPath = trim((string) shell_exec('git ls-remote --get-url origin'));
+            $gitProjectPath = shell_exec('git ls-remote --get-url origin');
 
-            $this->readmeGenerator?->setGitProjectPath($gitProjectPath);
+            $this->readmeGenerator->setGitProjectPath($gitProjectPath);
 
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::GettingStarted);
+            $this->readmeGenerator->addBlock(ReadmeBlockEnum::GettingStarted);
         }
 
         if ($shouldGenerateAllParts || $this->isConfirmed('Do you need an `Environments` part?')) {
@@ -380,11 +380,7 @@ class InitCommand extends Command implements Isolatable
         if ($shouldGenerateAllParts || $this->isConfirmed('Do you need a `Credentials and Access` part?')) {
             $this->configureCredentialsAndAccess();
 
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
-
-            if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Clerk);
-            }
+            $this->readmeGenerator->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
         }
     }
 
@@ -413,14 +409,14 @@ class InitCommand extends Command implements Isolatable
 
             $resource->setActive($answer !== UserAnswerEnum::No);
 
-            $this->readmeGenerator?->addResource($resource);
+            $this->readmeGenerator->addResource($resource);
         }
     }
 
     protected function configureManagerEmail(): void
     {
         if ($link = $this->ask("Please enter a Manager's email", '')) {
-            $this->readmeGenerator?->setManagerEmail($link);
+            $this->readmeGenerator->setManagerEmail($link);
         } else {
             $this->emptyResourcesList[] = "Manager's email";
         }
@@ -428,6 +424,10 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureCredentialsAndAccess(): void
     {
+        if ($this->authType === AuthTypeEnum::Clerk) {
+            $this->readmeGenerator->addBlock(ReadmeBlockEnum::Clerk);
+        }
+
         foreach ($this->readmeGenerator->getAccessRequiredResources() as $resource) {
             if (!empty($this->adminCredentials) && $this->isConfirmed("Is {$resource->title}'s admin the same as default one?")) {
                 $adminCredentials = $this->adminCredentials;
@@ -443,7 +443,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if (!empty($this->adminCredentials)) {
-            $this->readmeGenerator?->addResource(new ResourceDTO(
+            $this->readmeGenerator->addResource(new ResourceDTO(
                 key: 'admin',
                 title: 'Default admin',
                 email: $this->adminCredentials['email'],
