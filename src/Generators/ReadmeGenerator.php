@@ -45,16 +45,6 @@ class ReadmeGenerator
         return $this;
     }
 
-    public function setManagerEmail(string $email): void
-    {
-        $this->managerEmail = $email;
-    }
-
-    public function setGitProjectPath(string $path): void
-    {
-        $this->gitProjectPath = $path;
-    }
-
     public function getConfigurableResources(): array
     {
         return [
@@ -99,6 +89,16 @@ class ReadmeGenerator
         }
 
         $this->fileSaver->saveFile('README.md', $this->readmeContent);
+    }
+
+    public function setManagerEmail(string $email): void
+    {
+        $this->managerEmail = $email;
+    }
+
+    public function setGitProjectPath(string $path): void
+    {
+        $this->gitProjectPath = $path;
     }
 
     protected function fillProjectInfo(): void
@@ -149,7 +149,7 @@ class ReadmeGenerator
     protected function fillCredentialsAndAccess(): void
     {
         $this->addContent('credentials_and_access', [
-            'credentials' => $this->resources,
+            'resources' => $this->resources,
         ]);
     }
 
