@@ -137,14 +137,6 @@ class InitCommand extends Command implements Isolatable
             $this->info('README generated successfully!');
         }
 
-        if ($this->emptyResourcesList) {
-            $this->warn('Don`t forget to fill the following empty values:');
-
-            foreach ($this->emptyResourcesList as $value) {
-                $this->warn("- {$value}");
-            }
-        }
-
         if (!class_exists(TelescopeServiceProvider::class)) {
             array_push(
                 $this->shellCommands,
@@ -176,6 +168,14 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->runMigrations();
+
+        if ($this->emptyResourcesList) {
+            $this->warn('Don`t forget to fill the following empty values:');
+
+            foreach ($this->emptyResourcesList as $value) {
+                $this->warn("- {$value}");
+            }
+        }
     }
 
     protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
