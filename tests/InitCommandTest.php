@@ -51,6 +51,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockNativeFunction(
@@ -118,6 +119,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockNativeFunction(
@@ -187,6 +189,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockNativeFunction(
@@ -268,6 +271,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -380,6 +384,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -487,6 +492,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
         );
 
@@ -605,6 +611,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -727,6 +734,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -847,6 +855,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -962,6 +971,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockNativeFunction(

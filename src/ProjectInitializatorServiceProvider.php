@@ -26,5 +26,9 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../resources/pint.json' => base_path('pint.json'),
         ], 'pint-config');
+
+        $this->publishes([
+            __DIR__ . '/../stubs/requests/Request.php' => app_path('Http/Requests/Request.php'),
+        ], 'base-request');
     }
 }
