@@ -91,6 +91,8 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
+        $this->migrationPublisher->publish('drop_jobs_table');
+
         $this->appType = AppTypeEnum::from($this->choice(
             question: 'What type of application will your API serve?',
             choices: AppTypeEnum::values(),

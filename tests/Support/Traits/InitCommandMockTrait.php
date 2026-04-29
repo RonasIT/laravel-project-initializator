@@ -5,6 +5,7 @@ namespace RonasIT\ProjectInitializator\Tests\Support\Traits;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
 use Mockery;
+use RonasIT\ProjectInitializator\Tests\Support\MigrationPublishMock;
 use RonasIT\Support\Traits\MockTrait;
 
 trait InitCommandMockTrait
@@ -83,5 +84,14 @@ trait InitCommandMockTrait
             ->andReturnUsing(fn (...$args) => $kernel->call(...$args));
 
         Artisan::swap($mock);
+    }
+
+    protected function mockMigrationPublish(): MigrationPublishMock
+    {
+        return new MigrationPublishMock(
+            timestamp: now(),
+            callFilePutContent: $this->callFilePutContent(...),
+            getFixture: $this->getFixture(...),
+        );
     }
 }
