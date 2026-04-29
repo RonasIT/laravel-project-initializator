@@ -97,15 +97,9 @@ class InitCommand extends Command implements Isolatable
             default: AppTypeEnum::Multiplatform->value,
         ));
 
-        $this->authType = AuthTypeEnum::from($this->choice(
-            question: 'Please choose the authentication type',
-            choices: AuthTypeEnum::values(),
-            default: AuthTypeEnum::None->value,
-        ));
+        $this->configureAuthType();
 
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->configureClerk();
-        } else {
+        if ($this->authType !== AuthTypeEnum::Clerk) {
             $this->publishRoleMigrations();
         }
 
@@ -275,6 +269,24 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
     }
 
+    protected function configureJwt(): void
+    {
+        $commands = [
+            'composer require tymon/jwt-auth',
+            'php artisan jwt:secret',
+        ];
+
+        array_push($this->shellCommands, ...$commands);
+
+        $envData = [
+            'JWT_SECRET' => '',
+        ];
+
+        $this->updateEnvFile('.env', $envData);
+        $this->updateEnvFile('.env.example', $envData);
+        $this->updateEnvFile('.env.development', $envData);
+    }
+
     protected function updateEnvFile(string $fileName, array $data): void
     {
         $env = EnvFile::open($fileName);
@@ -319,7 +331,7 @@ class InitCommand extends Command implements Isolatable
 
         $adminName = when($isServiceAdmin, "{$serviceName} Admin", 'Admin');
 
-        if ($this->authType === AuthTypeEnum::None) {
+        if (in_array($this->authType, [AuthTypeEnum::Jwt, AuthTypeEnum::None], true)) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
         }
@@ -624,5 +636,20 @@ class InitCommand extends Command implements Isolatable
     protected function publishAdminsTableMigration(): void
     {
         $this->migrationPublisher->publish('admins_create_table');
+    }
+
+    protected function configureAuthType(): void
+    {
+        $this->authType = AuthTypeEnum::from($this->choice(
+            question: 'Please choose the authentication type',
+            choices: AuthTypeEnum::values(),
+            default: AuthTypeEnum::None->value,
+        ));
+
+        match ($this->authType) {
+            AuthTypeEnum::Jwt => $this->configureJwt(),
+            AuthTypeEnum::Clerk => $this->configureClerk(),
+            default => null,
+        };
     }
 }
