@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup
-        uses: ./.github/actions/php-laravel-setup
+        uses: ronasit/github-actions/php-laravel-setup@d086499
         with:
           php-version: ${{ matrix.php-version }}
           laravel-version: ${{ matrix.laravel-version }}
