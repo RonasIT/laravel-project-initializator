@@ -89,8 +89,6 @@ class InitCommand extends Command implements Isolatable
 
         $this->setupEnvFiles();
 
-        $this->info('Project initialized successfully!');
-
         $this->appType = AppTypeEnum::from($this->choice(
             question: 'What type of application will your API serve?',
             choices: AppTypeEnum::values(),
@@ -168,6 +166,8 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->runMigrations();
+
+        $this->info('Project initialized successfully!');
 
         if ($this->emptyResourcesList) {
             $this->warn('Don`t forget to fill the following empty values:');
