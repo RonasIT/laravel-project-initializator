@@ -39,7 +39,7 @@ class InitCommandTest extends TestCase
 
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
-            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer.json')),
 
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -68,6 +68,8 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'not-an-email')
+            ->expectsOutput('The email of code owner/ team lead field must be a valid email address.')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
