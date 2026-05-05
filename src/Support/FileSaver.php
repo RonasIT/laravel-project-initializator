@@ -32,9 +32,4 @@ class FileSaver
 
         file_put_contents($fileName, $data);
     }
-
-    public function appendOrCreateFile(string $filePath, mixed $data): void
-    {
-        file_put_contents($filePath, $data, FILE_APPEND);
-    }
 }
