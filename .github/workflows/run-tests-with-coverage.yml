@@ -8,24 +8,31 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  PHP_LATEST: &php-latest "8.5"
-  LARAVEL_LATEST: &laravel-latest "13.*"
 
 jobs:
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.matrix }}
+      php-latest: ${{ steps.generate-matrix.outputs.php-latest }}
+      laravel-latest: ${{ steps.generate-matrix.outputs.laravel-latest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Generate matrix
+        id: generate-matrix
+        uses: ronasit/github-actions/generate-matrix@main
+
   tests:
+    needs: prepare-matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        php-version: [ "8.4", "8.5" ]
-        laravel-version: [ "12.*", "13.*" ]
-        exclude:
-          - php-version: *php-latest
-            laravel-version: *laravel-latest
+      matrix: ${{ fromJson(needs.prepare-matrix.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup
-        uses: ronasit/github-actions/php-laravel-setup@d086499bf9f7a688bab222ed90238b1ffba82e11
+        uses: ronasit/github-actions/php-laravel-setup@main
         with:
           php-version: ${{ matrix.php-version }}
           laravel-version: ${{ matrix.laravel-version }}
@@ -34,15 +41,16 @@ jobs:
         run: vendor/bin/phpunit
 
   tests-with-coverage:
+    needs: prepare-matrix
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup
-        uses: ronasit/github-actions/php-laravel-setup@d086499bf9f7a688bab222ed90238b1ffba82e11
+        uses: ronasit/github-actions/php-laravel-setup@main
         with:
-          php-version: *php-latest
-          laravel-version: *laravel-latest
+          php-version: ${{ needs.prepare-matrix.outputs.php-latest }}
+          laravel-version: ${{ needs.prepare-matrix.outputs.laravel-latest }}
           coverage: xdebug
       - name: Format code style via Pint
         run: vendor/bin/pint --test
@@ -55,7 +63,7 @@ jobs:
           path: build/logs
 
   upload-to-coveralls:
-    needs: tests-with-coverage
+    needs: [ tests, tests-with-coverage ]
     runs-on: ubuntu-latest
     steps:
       - name: Set up PHP
