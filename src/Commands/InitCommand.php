@@ -104,7 +104,7 @@ class InitCommand extends Command implements Isolatable
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->configureClerk();
         } else {
-            $this->publishRoleMigrations();
+            $this->configureRole();
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -321,7 +321,7 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::None) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
-            $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
+            $adminCredentials['role'] = $this->ask("Please enter admin role{$serviceLabel}", RoleEnum::Admin->value);
         }
 
         if (!$isServiceAdmin) {
@@ -333,14 +333,20 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
-    protected function publishRoleMigrations(): void
+    protected function configureRole(): void
     {
-        if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
-            && !$this->migrationPublisher->isMigrationExists('create_roles_table')
-        ) {
-            $this->migrationPublisher->publish('roles_create_table');
+        if (!$this->migrationPublisher->isMigrationExists('users_add_role')) {
+            $this->migrationPublisher->publish('users_add_role');
 
-            $this->migrationPublisher->publish('users_add_role_id');
+            $this->fileSaver->publishClass(
+                template: view('initializator::enums.role_enum'),
+                fileName: 'RoleEnum',
+                fileDirectory: 'app/Enums/User',
+            );
+
+            new PHPFileBuilder(app_path('Models/User.php'))
+                ->addArrayPropertyItem('fillable', 'role')
+                ->save();
         }
     }
 
