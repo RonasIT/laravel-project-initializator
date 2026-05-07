@@ -989,10 +989,11 @@ class InitCommandTest extends TestCase
             ->expectsChoice('Will project work with media files? (upload, store and return content)', 'yes', ['yes', 'no'])
             ->expectsChoice('Which storage will be used for media files?', 'gcs', ['gcs', 'local', 's3'])
             ->expectsChoice('Would you use Renovate dependabot?', 'no', ['yes', 'no'])
+            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
+            ->expectsOutput('Project initialized successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- GOOGLE_CLOUD_STORAGE_BUCKET')
             ->expectsOutput('- GOOGLE_CLOUD_PROJECT_ID')
-            ->expectsChoice('Do you want to uninstall project-initializator package?', 'no', ['yes', 'no'])
             ->assertExitCode(0);
     }
 
