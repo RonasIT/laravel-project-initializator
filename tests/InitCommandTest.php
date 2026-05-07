@@ -69,7 +69,6 @@ class InitCommandTest extends TestCase
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -78,6 +77,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutput('Project initialized successfully!')
             ->assertExitCode(0);
     }
 
@@ -135,7 +135,6 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "MyApp"')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -145,6 +144,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutput('Project initialized successfully!')
             ->assertExitCode(0);
     }
 
@@ -204,7 +204,6 @@ class InitCommandTest extends TestCase
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -217,6 +216,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutput('Project initialized successfully!')
             ->assertExitCode(0);
     }
 
@@ -286,7 +286,6 @@ class InitCommandTest extends TestCase
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
@@ -329,12 +328,13 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutput('Project initialized successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
             ->expectsOutput('- Figma link')
             ->expectsOutput('- Sentry link')
             ->expectsOutput('- Manager\'s email')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
 
@@ -394,7 +394,6 @@ class InitCommandTest extends TestCase
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -435,9 +434,10 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsOutput('README generated successfully!')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutput('Project initialized successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
 
@@ -504,7 +504,6 @@ class InitCommandTest extends TestCase
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -558,6 +557,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
+            ->expectsOutput('Project initialized successfully!')
             ->assertExitCode(0);
     }
 
@@ -619,7 +619,6 @@ class InitCommandTest extends TestCase
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -668,9 +667,10 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsOutput('README generated successfully!')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutput('Project initialized successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
 
@@ -738,7 +738,6 @@ class InitCommandTest extends TestCase
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Mobile')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
@@ -784,12 +783,13 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutput('Project initialized successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- Issue Tracker link')
             ->expectsOutput('- Figma link')
             ->expectsOutput('- Sentry link')
             ->expectsOutput('- Manager\'s email')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
 
@@ -858,7 +858,6 @@ class InitCommandTest extends TestCase
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Web')
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
@@ -904,6 +903,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutput('Project initialized successfully!')
             ->assertExitCode(0);
     }
 
@@ -966,7 +966,6 @@ class InitCommandTest extends TestCase
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsOutput('Project initialized successfully!')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
@@ -975,10 +974,11 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
             ->expectsChoice('Which storage will be used for media files?', 'gcs', ['gcs', 'local', 's3'])
             ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutput('Project initialized successfully!')
             ->expectsOutput('Don`t forget to fill the following empty values:')
             ->expectsOutput('- GOOGLE_CLOUD_STORAGE_BUCKET')
             ->expectsOutput('- GOOGLE_CLOUD_PROJECT_ID')
-            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->assertExitCode(0);
     }
 
