@@ -64,6 +64,22 @@ trait InitCommandMockTrait
         ];
     }
 
+    protected function changeUserModelCall(string $sourceFixture, string $resultFixture): array
+    {
+        return [
+            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture($sourceFixture)),
+            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture($resultFixture)),
+        ];
+    }
+
+    protected function changeAppBootstrapCall(string $sourceFixture, string $resultFixture): array
+    {
+        return [
+            $this->callFileGetContent('bootstrap/app.php', $this->getFixture($sourceFixture)),
+            $this->callFilePutContent('bootstrap/app.php', $this->getFixture($resultFixture)),
+        ];
+    }
+
     protected function mockArtisanMigrateCall(): void
     {
         $kernel = app(Kernel::class);

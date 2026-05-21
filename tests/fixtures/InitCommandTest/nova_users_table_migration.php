@@ -14,7 +14,7 @@ return new class extends Migration
                 'name' => 'Nova Admin',
                 'email' => 'nova_mail@mail.com',
                 'password' => Hash::make('654321'),
-                'role_id' => 1,
+                'role' => 'admin',
             ]);
         }
     }

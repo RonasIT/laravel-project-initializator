@@ -25,8 +25,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
-            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+            $this->changeUserModelCall('user_model.php', 'user_model_with_role.php'),
+            $this->changeAppBootstrapCall('app.php', 'app_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -55,12 +55,11 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111112_users_add_role.php', $this->getFixture('users_add_role_migration.php')),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
         );
 
         $this->mockArtisanMigrateCall();
@@ -96,8 +95,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
-            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+            $this->changeUserModelCall('user_model.php', 'user_model_with_role.php'),
+            $this->changeAppBootstrapCall('app.php', 'app_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -123,13 +122,12 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111112_users_add_role.php', $this->getFixture('users_add_role_migration.php')),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
         );
 
         $this->mockArtisanMigrateCall();
@@ -162,8 +160,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
-            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+            $this->changeUserModelCall('user_model.php', 'user_model_with_role.php'),
+            $this->changeAppBootstrapCall('app.php', 'app_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -191,13 +189,12 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_default_admin.php', $this->getFixture('migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111112_users_add_role.php', $this->getFixture('users_add_role_migration.php')),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111113_add_default_admin.php', $this->getFixture('migration.php')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
         );
 
         $this->mockArtisanMigrateCall();
@@ -213,7 +210,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
             ->expectsQuestion('Please enter admin name', 'TestAdmin')
-            ->expectsQuestion('Please enter admin role id', 1)
+            ->expectsQuestion('Please enter admin role', 'admin')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
@@ -237,10 +234,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
-            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
-            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
-            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+            $this->changeUserModelCall('user_model.php', 'user_model_with_clerk_id.php'),
+            $this->changeAppBootstrapCall('app.php', 'app_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -353,8 +348,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
-            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+            $this->changeUserModelCall('user_model.php', 'user_model_with_role.php'),
+            $this->changeAppBootstrapCall('app.php', 'app_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -384,10 +379,9 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('database/migrations/2018_11_11_111112_users_add_role.php', $this->getFixture('users_add_role_migration.php')),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->callFilePutContent('README.md', $this->getFixture('readme/partial_readme.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -457,8 +451,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
-            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+            $this->changeUserModelCall('user_model.php', 'user_model_with_role.php'),
+            $this->changeAppBootstrapCall('app.php', 'app_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -491,12 +485,11 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_default_admin.php', $this->getFixture('migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111115_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('database/migrations/2018_11_11_111112_users_add_role.php', $this->getFixture('users_add_role_migration.php')),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111113_add_default_admin.php', $this->getFixture('migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent('README.md', $this->getFixture('readme/full_readme.md')),
@@ -514,7 +507,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
             ->expectsQuestion('Please enter admin name', 'TestAdmin')
-            ->expectsQuestion('Please enter admin role id', 1)
+            ->expectsQuestion('Please enter admin role', 'admin')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsConfirmation('Do you want to generate all README parts?')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
@@ -553,7 +546,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'nova_mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '654321')
             ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
-            ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
+            ->expectsQuestion('Please enter admin role for Laravel Nova', 'admin')
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
             ->expectsChoice('Which storage will be used for media files?', 's3', ['gcs', 'local', 's3'])
@@ -576,8 +569,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
-            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+            $this->changeUserModelCall('user_model.php', 'user_model_with_role.php'),
+            $this->changeAppBootstrapCall('app.php', 'app_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -607,12 +600,11 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_telescope_admin.php', $this->getFixture('telescope_users_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111115_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('database/migrations/2018_11_11_111112_users_add_role.php', $this->getFixture('users_add_role_migration.php')),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111113_add_telescope_admin.php', $this->getFixture('telescope_users_table_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111114_add_nova_admin.php', $this->getFixture('nova_users_table_migration.php')),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->callFilePutContent('README.md', $this->getFixture('readme/partial_readme_with_telescope.md')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -662,11 +654,11 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email for Laravel Telescope', 'telescope_mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Telescope', '654321')
             ->expectsQuestion('Please enter admin name for Laravel Telescope', 'Telescope Admin')
-            ->expectsQuestion('Please enter admin role id for Laravel Telescope', 1)
+            ->expectsQuestion('Please enter admin role for Laravel Telescope', 'admin')
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'nova_mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '654321')
             ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
-            ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
+            ->expectsQuestion('Please enter admin role for Laravel Nova', 'admin')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsOutput('README generated successfully!')
@@ -692,10 +684,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
-            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
-            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
-            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+            $this->changeUserModelCall('user_model.php', 'user_model_with_clerk_id.php'),
+            $this->changeAppBootstrapCall('app.php', 'app_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -812,10 +802,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent(app_path('Models/User.php'), $this->getFixture('user_model.php')),
-            $this->callFilePutContent(app_path('Models/User.php'), $this->getFixture('user_model_fillable_updated.php')),
-            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
-            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+            $this->changeUserModelCall('user_model.php', 'user_model_with_clerk_id.php'),
+            $this->changeAppBootstrapCall('app.php', 'app_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -927,8 +915,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', $this->getFixture('app.php')),
-            $this->callFilePutContent('bootstrap/app.php', $this->getFixture('app_after_changes.php')),
+            $this->changeUserModelCall('user_model.php', 'user_model_with_role.php'),
+            $this->changeAppBootstrapCall('app.php', 'app_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -959,12 +947,11 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('database/migrations/2018_11_11_111112_roles_create_table.php', $this->getFixture('roles_create_table_migration.php')),
-            $this->callFilePutContent('database/migrations/2018_11_11_111113_users_add_role_id.php', $this->getFixture('users_add_role_id_migration.php')),
+            $this->callFilePutContent('database/migrations/2018_11_11_111112_users_add_role.php', $this->getFixture('users_add_role_migration.php')),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
         );
 
         $this->mockArtisanMigrateCall();
