@@ -574,8 +574,6 @@ class InitCommand extends Command implements Isolatable
     protected function publishWebLogin(): void
     {
         shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
-
-        $this->fileSaver->appendOrCreateFile(base_path('routes/web.php'), "\nAuth::routes();\n");
     }
 
     protected function addDefaultHttpExceptionRender(): void
