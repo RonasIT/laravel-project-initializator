@@ -38,7 +38,7 @@ class InitCommandTest extends TestCase
 
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
-            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer.json')),
 
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -60,7 +60,6 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockArtisanMigrateCall();
@@ -68,6 +67,8 @@ class InitCommandTest extends TestCase
         $this
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'not-an-email')
+            ->expectsOutput('The email of code owner/ team lead field must be a valid email address.')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
@@ -127,7 +128,6 @@ class InitCommandTest extends TestCase
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockArtisanMigrateCall();
@@ -195,7 +195,6 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockArtisanMigrateCall();
@@ -277,7 +276,6 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('default_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockArtisanMigrateCall();
@@ -385,7 +383,6 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockArtisanMigrateCall();
@@ -495,7 +492,6 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('full_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockArtisanMigrateCall();
@@ -610,7 +606,6 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme_with_telescope.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockArtisanMigrateCall();
@@ -729,7 +724,6 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('default_readme_with_mobile_app.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockArtisanMigrateCall();
@@ -849,7 +843,6 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
         );
 
         $this->mockArtisanMigrateCall();
@@ -957,7 +950,9 @@ class InitCommandTest extends TestCase
             $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
-            $this->callFilePutContent(base_path('/routes/web.php'), "\nAuth::routes();\n", FILE_APPEND),
+
+            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
         );
 
         $this->mockArtisanMigrateCall();
