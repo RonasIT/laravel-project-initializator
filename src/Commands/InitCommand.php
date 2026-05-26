@@ -135,13 +135,7 @@ class InitCommand extends Command implements Isolatable
             $this->info('README generated successfully!');
         }
 
-        if (!class_exists(TelescopeServiceProvider::class)) {
-            array_push(
-                $this->shellCommands,
-                'composer require ronasit/laravel-telescope-extension',
-                'php artisan telescope:install',
-            );
-        }
+        $this->installLaravelTelescope();
 
         if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
             $this->shouldUninstallPackage = true;
@@ -518,6 +512,18 @@ class InitCommand extends Command implements Isolatable
         ];
 
         $this->fileSaver->publishJSON('renovate.json', $data);
+    }
+
+    protected function installLaravelTelescope()
+    {
+        if (!class_exists(TelescopeServiceProvider::class)) {
+            array_push(
+                $this->shellCommands,
+                'composer require ronasit/laravel-telescope-extension',
+                'php artisan telescope:install',
+                'php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force',
+            );
+        }
     }
 
     protected function setupComposerHooks(): void
