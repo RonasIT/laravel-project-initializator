@@ -123,6 +123,13 @@ class InitCommand extends Command implements Isolatable
             $this->setupMediaStorage();
         }
 
+        if (in_array($this->appType, [AppTypeEnum::Multiplatform, AppTypeEnum::Mobile])) {
+            if ($this->confirm('Will the application use push notifications?')) {
+                $this->shellCommands[] = 'composer require ronasit/laravel-exponent-push-notifications';
+                $this->shellCommands[] = 'php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config"';
+            }
+        }
+
         if ($this->confirm('Would you use Renovate dependabot?', true)) {
             $this->saveRenovateJSON();
 
