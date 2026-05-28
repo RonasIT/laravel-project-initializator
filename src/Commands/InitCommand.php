@@ -125,8 +125,7 @@ class InitCommand extends Command implements Isolatable
 
         if (in_array($this->appType, [AppTypeEnum::Multiplatform, AppTypeEnum::Mobile])) {
             if ($this->confirm('Will the application use push notifications?')) {
-                $this->shellCommands[] = 'composer require ronasit/laravel-exponent-push-notifications';
-                $this->shellCommands[] = 'php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config"';
+               $this->setupPushNotifications();
             }
         }
 
@@ -645,5 +644,11 @@ class InitCommand extends Command implements Isolatable
     protected function publishAdminsTableMigration(): void
     {
         $this->migrationPublisher->publish('admins_create_table');
+    }
+
+    protected function setupPushNotifications(): void
+    {
+        $this->shellCommands[] = 'composer require ronasit/laravel-exponent-push-notifications';
+        $this->shellCommands[] = 'php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config"';
     }
 }
