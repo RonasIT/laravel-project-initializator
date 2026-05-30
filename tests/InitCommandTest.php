@@ -61,6 +61,7 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -131,6 +132,7 @@ class InitCommandTest extends TestCase
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -200,6 +202,7 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->mockMigrationFileWrite('2018_11_11_111115_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -283,6 +286,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('default_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -392,6 +396,7 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -503,6 +508,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('full_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -619,6 +625,7 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme_with_telescope.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -739,6 +746,7 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('default_readme_with_mobile_app.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->mockMigrationFileWrite('2018_11_11_111115_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -860,6 +868,7 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -968,6 +977,7 @@ class InitCommandTest extends TestCase
             $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
 
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
