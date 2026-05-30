@@ -354,7 +354,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateAllParts || $this->isConfirmed('Do you need a `Prerequisites` part?')) {
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Prerequisites);
+            $this->readmeGenerator->addBlock(ReadmeBlockEnum::Prerequisites);
         }
 
         if ($shouldGenerateAllParts || $this->isConfirmed('Do you need a `Getting Started` part?')) {
@@ -366,7 +366,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateAllParts || $this->isConfirmed('Do you need an `Environments` part?')) {
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Environments);
+            $this->readmeGenerator->addBlock(ReadmeBlockEnum::Environments);
         }
 
         if ($shouldGenerateAllParts || $this->isConfirmed('Do you need a `Credentials and Access` part?')) {
@@ -643,10 +643,12 @@ class InitCommand extends Command implements Isolatable
 
     protected function isConfirmed(string $label, bool $default = true): bool
     {
-        return ConfirmEnum::from(select(
+        $result = select(
             label: $label,
             options: ConfirmEnum::values(),
-            default: $default ? ConfirmEnum::Yes->value : ConfirmEnum::No->value,
-        )) === ConfirmEnum::Yes;
+            default: ($default) ? ConfirmEnum::Yes->value : ConfirmEnum::No->value,
+        );
+
+        return ConfirmEnum::from($result) === ConfirmEnum::Yes;
     }
 }
