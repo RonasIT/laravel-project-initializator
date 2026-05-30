@@ -101,9 +101,9 @@ class InitCommand extends Command implements Isolatable
         ));
 
         if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->configureClerk();
+            $this->configureClerkAuth();
         } else {
-            $this->publishRoleMigrations();
+            $this->configureDefaultAuth();
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -242,7 +242,7 @@ class InitCommand extends Command implements Isolatable
         ]);
     }
 
-    protected function configureClerk(): void
+    protected function configureClerkAuth(): void
     {
         $this->enableClerk();
 
@@ -322,7 +322,7 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
-    protected function publishRoleMigrations(): void
+    protected function configureDefaultAuth(): void
     {
         shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
 

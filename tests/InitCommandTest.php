@@ -1007,7 +1007,7 @@ class InitCommandTest extends TestCase
         $commandMock = Mockery::mock(InitCommand::class)->shouldAllowMockingProtectedMethods();
 
         $commandMock->shouldReceive('ask')->andReturnUsing(fn ($question, $default) => $default);
-        $commandMock->shouldReceive('publishRoleMigrations');
+        $commandMock->shouldReceive('configureDefaultAuth');
         $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
 
         $this->setReflectionProperty($commandMock, InitCommand::class, 'authType', AuthTypeEnum::None);
