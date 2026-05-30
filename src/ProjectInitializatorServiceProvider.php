@@ -19,6 +19,7 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
             __DIR__ . '/../stubs/assets/js/app.js' => public_path('app.js'),
             __DIR__ . '/../stubs/views/app.blade.php' => resource_path('views/layouts/app.blade.php'),
             __DIR__ . '/../stubs/views/login.blade.php' => resource_path('views/auth/login.blade.php'),
+            __DIR__ . '/../stubs/routes/web.php' => base_path('routes/web.php'),
         ], 'initializator-web-login');
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'initializator');
@@ -26,6 +27,10 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../resources/pint.json' => base_path('pint.json'),
         ], 'pint-config');
+
+        $this->publishes([
+            __DIR__ . '/../stubs/requests/Request.php' => app_path('Http/Requests/Request.php'),
+        ], 'base-request');
 
         $this->publishes([
             __DIR__ . '/../stubs/models/User_with_role.php' => app_path('Models/User.php'),
