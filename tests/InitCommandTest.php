@@ -232,6 +232,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_jwt_secret_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_jwt_secret_added.yml'),
+            $this->changeConfigFileCall('config/auth.php', 'auth.php', 'auth_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
         );
@@ -298,6 +299,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput('Please complete the following steps manually:')
+            ->expectsOutput('- Implement the `Tymon\JWTAuth\Contracts\JWTSubject` interface in the `App\Models\User` model (add the `getJWTIdentifier()` and `getJWTCustomClaims()` methods)')
             ->assertExitCode(0);
     }
 

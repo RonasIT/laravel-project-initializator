@@ -37,6 +37,8 @@ class InitCommand extends Command implements Isolatable
 
     protected array $emptyResourcesList = [];
 
+    protected array $manualActionsList = [];
+
     protected array $shellCommands = [
         'composer require laravel/ui',
         'composer require ronasit/laravel-helpers',
@@ -164,6 +166,14 @@ class InitCommand extends Command implements Isolatable
                 $this->warn("- {$value}");
             }
         }
+
+        if ($this->manualActionsList) {
+            $this->warn('Please complete the following steps manually:');
+
+            foreach ($this->manualActionsList as $value) {
+                $this->warn("- {$value}");
+            }
+        }
     }
 
     protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
@@ -284,6 +294,21 @@ class InitCommand extends Command implements Isolatable
 
         $this->updateEnvFile('.env.example', ['JWT_SECRET' => '']);
         $this->updateEnvFile('.env.development', ['JWT_SECRET' => '']);
+
+        $this->addJwtGuardToConfig();
+
+        $this->manualActionsList[] = 'Implement the `Tymon\JWTAuth\Contracts\JWTSubject` interface in the `App\Models\User` model (add the `getJWTIdentifier()` and `getJWTCustomClaims()` methods)';
+    }
+
+    protected function addJwtGuardToConfig(): void
+    {
+        $config = ArrayFile::open(base_path('config/auth.php'));
+
+        $config
+            ->set('guards.api.driver', 'jwt')
+            ->set('guards.api.provider', 'users');
+
+        $config->write();
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
