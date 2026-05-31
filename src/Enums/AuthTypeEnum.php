@@ -10,4 +10,5 @@ enum AuthTypeEnum: string
 
     case Clerk = 'clerk';
     case None = 'none';
+    case Jwt = 'jwt';
 }
