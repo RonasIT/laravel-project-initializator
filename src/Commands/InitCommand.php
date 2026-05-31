@@ -104,11 +104,7 @@ class InitCommand extends Command implements Isolatable
             default: AuthTypeEnum::None->value,
         ));
 
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->configureClerkAuth();
-        } else {
-            $this->configureDefaultAuth();
-        }
+        $this->configureAuthType();
 
         if (confirm('Do you want to generate an admin user?')) {
             if ($this->authType === AuthTypeEnum::Clerk) {
@@ -264,6 +260,31 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
     }
 
+    protected function configureAuthType(): void
+    {
+        match ($this->authType) {
+            AuthTypeEnum::Clerk => $this->configureClerkAuth(),
+            AuthTypeEnum::Jwt => $this->configureJwtAuth(),
+            AuthTypeEnum::None => $this->configureDefaultAuth(),
+        };
+    }
+
+    protected function configureJwtAuth(): void
+    {
+        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
+
+        $this->publishRolesTableMigration();
+
+        array_push(
+            $this->shellCommands,
+            'composer require tymon/jwt-auth',
+            'php artisan jwt:secret',
+        );
+
+        $this->updateEnvFile('.env.example', ['JWT_SECRET' => '']);
+        $this->updateEnvFile('.env.development', ['JWT_SECRET' => '']);
+    }
+
     protected function updateEnvFile(string $fileName, array $data): void
     {
         $env = EnvFile::open($fileName);
@@ -324,7 +345,7 @@ class InitCommand extends Command implements Isolatable
 
         $adminName = when($isServiceAdmin, "{$serviceName} Admin", 'Admin');
 
-        if ($this->authType === AuthTypeEnum::None) {
+        if (in_array($this->authType, [AuthTypeEnum::None, AuthTypeEnum::Jwt], true)) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
         }
@@ -342,13 +363,7 @@ class InitCommand extends Command implements Isolatable
     {
         shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
 
-        if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
-            && !$this->migrationPublisher->isMigrationExists('create_roles_table')
-        ) {
-            $this->migrationPublisher->publish('roles_create_table');
-
-            $this->migrationPublisher->publish('users_add_role_id');
-        }
+        $this->publishRolesTableMigration();
     }
 
     protected function configureReadme(): void
@@ -658,5 +673,16 @@ class InitCommand extends Command implements Isolatable
     protected function publishAdminsTableMigration(): void
     {
         $this->migrationPublisher->publish('admins_create_table');
+    }
+
+    protected function publishRolesTableMigration(): void
+    {
+        if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
+            && !$this->migrationPublisher->isMigrationExists('create_roles_table')
+        ) {
+            $this->migrationPublisher->publish('roles_create_table');
+
+            $this->migrationPublisher->publish('users_add_role_id');
+        }
     }
 }
