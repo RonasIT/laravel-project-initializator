@@ -242,6 +242,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.app_name_not_pascal_case.yml', 'env.clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeConfigFileCall('config/auth.php', 'auth.php', 'auth_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
@@ -285,6 +286,7 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
@@ -712,6 +714,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.app_name_not_pascal_case.yml', 'env.clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
+            $this->changeConfigFileCall('config/auth.php', 'auth.php', 'auth_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
@@ -755,6 +758,7 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
 
@@ -835,6 +839,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeConfigFileCall('config/auth.php', 'auth.php', 'auth_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
@@ -877,6 +882,7 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
+            $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'admins_add_telescope_admin_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
