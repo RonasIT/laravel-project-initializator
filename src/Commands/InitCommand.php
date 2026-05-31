@@ -101,11 +101,7 @@ class InitCommand extends Command implements Isolatable
             default: AuthTypeEnum::None->value,
         ));
 
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->configureClerk();
-        } else {
-            $this->publishRoleMigrations();
-        }
+        $this->configureAuthType();
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
             if ($this->authType === AuthTypeEnum::Clerk) {
@@ -267,6 +263,29 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
     }
 
+    protected function configureAuthType(): void
+    {
+        match ($this->authType) {
+            AuthTypeEnum::Clerk => $this->configureClerk(),
+            AuthTypeEnum::Jwt => $this->configureJwt(),
+            AuthTypeEnum::None => $this->publishRoleMigrations(),
+        };
+    }
+
+    protected function configureJwt(): void
+    {
+        $this->publishRoleMigrations();
+
+        array_push(
+            $this->shellCommands,
+            'composer require tymon/jwt-auth',
+            'php artisan jwt:secret',
+        );
+
+        $this->updateEnvFile('.env.example', ['JWT_SECRET' => '']);
+        $this->updateEnvFile('.env.development', ['JWT_SECRET' => '']);
+    }
+
     protected function updateEnvFile(string $fileName, array $data): void
     {
         $env = EnvFile::open($fileName);
@@ -311,7 +330,7 @@ class InitCommand extends Command implements Isolatable
 
         $adminName = when($isServiceAdmin, "{$serviceName} Admin", 'Admin');
 
-        if ($this->authType === AuthTypeEnum::None) {
+        if (in_array($this->authType, [AuthTypeEnum::None, AuthTypeEnum::Jwt], true)) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
         }
