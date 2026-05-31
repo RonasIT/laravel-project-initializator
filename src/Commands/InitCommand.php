@@ -265,6 +265,26 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env', $data);
         $this->updateEnvFile('.env.example', $data);
         $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
+
+        $this->configureAdminAuth();
+    }
+
+    protected function configureAdminAuth(): void
+    {
+        $this->fileSaver->publishClass(
+            template: view('initializator::models.admin'),
+            fileName: 'Admin',
+            fileDirectory: 'app/Models',
+        );
+
+        $config = ArrayFile::open(base_path('config/auth.php'));
+
+        $config
+            ->set('guards.web.provider', 'admins')
+            ->set('providers.admins.driver', 'eloquent')
+            ->set('providers.admins.model', $config->constant('App\Models\Admin::class'));
+
+        $config->write();
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
