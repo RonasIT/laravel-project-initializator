@@ -135,13 +135,7 @@ class InitCommand extends Command implements Isolatable
             $this->info('README generated successfully!');
         }
 
-        if (!class_exists(TelescopeServiceProvider::class)) {
-            array_push(
-                $this->shellCommands,
-                'composer require ronasit/laravel-telescope-extension',
-                'php artisan telescope:install',
-            );
-        }
+        $this->installLaravelTelescope();
 
         if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
             $this->shouldUninstallPackage = true;
@@ -157,9 +151,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->changeMiddlewareForTelescopeAuthorization();
 
-        $this->publishWebLogin();
-
-        $this->addDefaultHttpExceptionRender();
+        $this->patchApplication();
 
         if ($this->shouldUninstallPackage) {
             shell_exec('composer remove --dev ronasit/laravel-project-initializator --ansi');
@@ -520,6 +512,18 @@ class InitCommand extends Command implements Isolatable
         $this->fileSaver->publishJSON('renovate.json', $data);
     }
 
+    protected function installLaravelTelescope()
+    {
+        if (!class_exists(TelescopeServiceProvider::class)) {
+            array_push(
+                $this->shellCommands,
+                'composer require ronasit/laravel-telescope-extension',
+                'php artisan telescope:install',
+                'php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force',
+            );
+        }
+    }
+
     protected function setupComposerHooks(): void
     {
         $path = base_path('composer.json');
@@ -571,14 +575,19 @@ class InitCommand extends Command implements Isolatable
         $config->write();
     }
 
+    protected function patchApplication(): void
+    {
+        $this->publishWebLogin();
+        $this->configureBootstrap();
+        $this->publishBaseRequest();
+    }
+
     protected function publishWebLogin(): void
     {
         shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
-
-        $this->fileSaver->appendOrCreateFile(base_path('routes/web.php'), "\nAuth::routes();\n");
     }
 
-    protected function addDefaultHttpExceptionRender(): void
+    protected function configureBootstrap(): void
     {
         new AppBootstrapBuilder()
             ->addExceptionsRender(
@@ -591,6 +600,11 @@ class InitCommand extends Command implements Isolatable
                 includeRequestArg: true,
             )
             ->save();
+    }
+
+    protected function publishBaseRequest(): void
+    {
+        shell_exec('php artisan vendor:publish --tag=base-request');
     }
 
     protected function runMigrations(): void
