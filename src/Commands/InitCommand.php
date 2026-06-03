@@ -125,7 +125,7 @@ class InitCommand extends Command implements Isolatable
 
         if (in_array($this->appType, [AppTypeEnum::Multiplatform, AppTypeEnum::Mobile])) {
             if ($this->confirm('Will the application use push notifications?')) {
-               $this->setupPushNotifications();
+                $this->setupPushNotifications();
             }
         }
 
