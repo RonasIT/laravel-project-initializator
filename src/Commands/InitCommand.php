@@ -293,8 +293,14 @@ class InitCommand extends Command implements Isolatable
             'php artisan vendor:publish --provider="Tymon\\JWTAuth\\Providers\\LaravelServiceProvider"',
         );
 
-        $this->updateEnvFile('.env.example', ['JWT_SECRET' => '']);
-        $this->updateEnvFile('.env.development', ['JWT_SECRET' => '']);
+        $envData = [
+            'AUTH_GUARD' => 'api',
+            'JWT_SECRET' => '',
+        ];
+
+        $this->updateEnvFile('.env', Arr::except($envData, ['JWT_SECRET']));
+        $this->updateEnvFile('.env.example', $envData);
+        $this->updateEnvFile('.env.development', $envData);
 
         $this->addJwtGuardToConfig();
 
