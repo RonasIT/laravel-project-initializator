@@ -108,10 +108,6 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
-            if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->publishAdminsTableMigration();
-            }
-
             $this->createAdminUser();
         }
 
@@ -265,6 +261,28 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env', $data);
         $this->updateEnvFile('.env.example', $data);
         $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
+
+        $this->configureAdminAuth();
+    }
+
+    protected function configureAdminAuth(): void
+    {
+        $this->fileSaver->publishClass(
+            template: view('initializator::models.admin'),
+            fileName: 'Admin',
+            fileDirectory: 'app/Models',
+        );
+
+        $this->migrationPublisher->publish('admins_create_table');
+
+        $config = ArrayFile::open(base_path('config/auth.php'));
+
+        $config
+            ->set('guards.web.provider', 'admins')
+            ->set('providers.admins.driver', 'eloquent')
+            ->set('providers.admins.model', $config->constant('App\Models\Admin::class'));
+
+        $config->write();
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
@@ -423,10 +441,6 @@ class InitCommand extends Command implements Isolatable
             if (!empty($this->adminCredentials) && $this->confirm("Is {$resource->title}'s admin the same as default one?", true)) {
                 $adminCredentials = $this->adminCredentials;
             } else {
-                if ($this->authType === AuthTypeEnum::Clerk && !$this->migrationPublisher->isMigrationExists('admins_create_table')) {
-                    $this->publishAdminsTableMigration();
-                }
-
                 $adminCredentials = $this->createAdminUser($resource->key, $resource->title);
             }
 
@@ -633,10 +647,5 @@ class InitCommand extends Command implements Isolatable
             : 'add_default_user';
 
         $this->migrationPublisher->publish($templateName, $adminCredentials, $migrationName);
-    }
-
-    protected function publishAdminsTableMigration(): void
-    {
-        $this->migrationPublisher->publish('admins_create_table');
     }
 }
