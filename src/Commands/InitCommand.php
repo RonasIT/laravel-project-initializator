@@ -143,9 +143,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->changeMiddlewareForTelescopeAuthorization();
 
-        $this->publishWebLogin();
-
-        $this->addDefaultHttpExceptionRender();
+        $this->patchApplication();
 
         if ($this->shouldUninstallPackage) {
             shell_exec('composer remove --dev ronasit/laravel-project-initializator --ansi');
@@ -495,12 +493,19 @@ class InitCommand extends Command implements Isolatable
         $config->write();
     }
 
+    protected function patchApplication(): void
+    {
+        $this->publishWebLogin();
+        $this->configureBootstrap();
+        $this->publishBaseRequest();
+    }
+
     protected function publishWebLogin(): void
     {
         shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
     }
 
-    protected function addDefaultHttpExceptionRender(): void
+    protected function configureBootstrap(): void
     {
         new AppBootstrapBuilder()
             ->addExceptionsRender(
@@ -513,6 +518,11 @@ class InitCommand extends Command implements Isolatable
                 includeRequestArg: true,
             )
             ->save();
+    }
+
+    protected function publishBaseRequest(): void
+    {
+        shell_exec('php artisan vendor:publish --tag=base-request');
     }
 
     protected function runMigrations(): void
