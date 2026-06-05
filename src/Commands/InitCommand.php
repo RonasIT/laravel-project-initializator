@@ -290,6 +290,7 @@ class InitCommand extends Command implements Isolatable
             $this->shellCommands,
             'composer require tymon/jwt-auth',
             'php artisan jwt:secret',
+            'php artisan vendor:publish --provider="Tymon\\JWTAuth\\Providers\\LaravelServiceProvider"',
         );
 
         $this->updateEnvFile('.env.example', ['JWT_SECRET' => '']);
