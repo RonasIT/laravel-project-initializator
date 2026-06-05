@@ -1063,6 +1063,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require tymon/jwt-auth --ansi'),
             $this->callShellExec('php artisan jwt:secret --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider" --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
