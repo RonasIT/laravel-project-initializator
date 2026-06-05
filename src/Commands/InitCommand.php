@@ -288,11 +288,27 @@ class InitCommand extends Command implements Isolatable
 
         $this->migrationPublisher->publish('users_format_to_clerk');
 
+        $this->addClerkUserRepository();
+    }
+
+    protected function addClerkUserRepository(): void
+    {
         $this->fileSaver->publishClass(
             template: view('initializator::clerk_user_repository'),
             fileName: 'ClerkUserRepository',
             fileDirectory: 'app/Support/Clerk',
         );
+
+        new PHPFileBuilder(app_path('Providers/AppServiceProvider.php'))
+            ->addImports([
+                'RonasIT\Clerk\Contracts\UserRepositoryContract',
+                'App\Support\Clerk\ClerkUserRepository',
+            ])
+            ->insertCodeToMethod(
+                methodName: 'boot',
+                code: '$this->app->bind(UserRepositoryContract::class, ClerkUserRepository::class);',
+            )
+            ->save();
     }
 
     protected function createAdminUser(string $serviceKey = '', string $serviceName = ''): array

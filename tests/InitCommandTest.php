@@ -239,6 +239,7 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
+            $this->changeAppFileCall('Providers/AppServiceProvider.php', 'Providers/AppServiceProvider.php', 'Providers/AppServiceProviderUpdated.php'),
             $this->changeAppFileCall('Models/User.php', 'user_model.php', 'user_model_fillable_updated.php'),
             $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
         );
@@ -697,6 +698,7 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
+            $this->changeAppFileCall('Providers/AppServiceProvider.php', 'Providers/AppServiceProvider.php', 'Providers/AppServiceProviderUpdated.php'),
             $this->changeAppFileCall('Models/User.php', 'user_model.php', 'user_model_fillable_updated.php'),
             $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
         );
@@ -817,6 +819,7 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
+            $this->changeAppFileCall('Providers/AppServiceProvider.php', 'Providers/AppServiceProvider.php', 'Providers/AppServiceProviderUpdated.php'),
             $this->changeAppFileCall('Models/User.php', 'user_model.php', 'user_model_fillable_updated.php'),
             $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
         );
