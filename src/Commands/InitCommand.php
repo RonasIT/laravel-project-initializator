@@ -24,7 +24,6 @@ use RonasIT\ProjectInitializator\Support\FileSaver;
 use RonasIT\ProjectInitializator\Support\MigrationPublisher;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
-
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;
 
@@ -111,10 +110,6 @@ class InitCommand extends Command implements Isolatable
         }
 
         if (confirm('Do you want to generate an admin user?')) {
-            if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->publishAdminsTableMigration();
-            }
-
             $this->createAdminUser();
         }
 
@@ -273,6 +268,8 @@ class InitCommand extends Command implements Isolatable
             fileName: 'Admin',
             fileDirectory: 'app/Models',
         );
+
+        $this->migrationPublisher->publish('admins_create_table');
 
         $config = ArrayFile::open(base_path('config/auth.php'));
 
@@ -458,10 +455,6 @@ class InitCommand extends Command implements Isolatable
             if (!empty($this->adminCredentials) && confirm("Is {$resource->title}'s admin the same as default one?")) {
                 $adminCredentials = $this->adminCredentials;
             } else {
-                if ($this->authType === AuthTypeEnum::Clerk && !$this->migrationPublisher->isMigrationExists('admins_create_table')) {
-                    $this->publishAdminsTableMigration();
-                }
-
                 $adminCredentials = $this->createAdminUser($resource->key, $resource->title);
             }
 
@@ -673,10 +666,5 @@ class InitCommand extends Command implements Isolatable
             : 'add_default_user';
 
         $this->migrationPublisher->publish($templateName, $adminCredentials, $migrationName);
-    }
-
-    protected function publishAdminsTableMigration(): void
-    {
-        $this->migrationPublisher->publish('admins_create_table');
     }
 }
