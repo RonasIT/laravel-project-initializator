@@ -33,11 +33,11 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
         ], 'base-request');
 
         $this->publishes([
-            __DIR__ . '/../stubs/models/User_with_role.php' => app_path('Models/User.php'),
+            __DIR__ . '/../stubs/models/user_with_role.php' => app_path('Models/User.php'),
         ], 'initializator-user-model-with-role');
 
         $this->publishes([
-            __DIR__ . '/../stubs/models/User_with_clerk.php' => app_path('Models/User.php'),
+            __DIR__ . '/../stubs/models/user_with_clerk.php' => app_path('Models/User.php'),
         ], 'initializator-user-model-with-clerk');
     }
 }
