@@ -13,6 +13,18 @@ class InitCommandTest extends TestCase
 {
     use InitCommandMockTrait;
 
+    /*
+     * The mock has to be defined before the first call to the unqualified function
+     * in the tested class. This is documented in [Bug #68541](https://bugs.php.net/bug.php?id=68541).
+     * https://github.com/php-mock/php-mock/blob/master/README.md?plain=1#L25
+     */
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        static::defineFunctionMock('RonasIT\ProjectInitializator\Commands', 'class_exists');
+    }
+
     public function testRunWithoutAdminAndReadmeCreationConvertAppNameToPascalCaseTelescopeAlreadyInstalled()
     {
         $this->mockNativeFunction(
@@ -26,7 +38,7 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->changeAppFileCall( 'Providers/AppServiceProvider.php','providers/app_service_provider.php', 'providers/app_service_provider_changed.php'),
+            $this->changeAppFileCall('Providers/AppServiceProvider.php', 'providers/app_service_provider.php', 'providers/app_service_provider_changed.php'),
             $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
         );
 
