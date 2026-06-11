@@ -97,6 +97,10 @@ class InitCommand extends Command implements Isolatable
             default: AppTypeEnum::Multiplatform->value,
         ));
 
+        if ($this->appType === AppTypeEnum::Web || $this->appType === AppTypeEnum::Multiplatform) {
+            $this->configureCors();
+        }
+
         $this->authType = AuthTypeEnum::from(select(
             label: 'Please choose the authentication type',
             options: AuthTypeEnum::values(),
@@ -441,6 +445,17 @@ class InitCommand extends Command implements Isolatable
                 password: $this->adminCredentials['password'],
             ));
         }
+    }
+
+    protected function configureCors(): void
+    {
+        shell_exec('php artisan config:publish cors --force');
+
+        $config = ArrayFile::open(base_path('config/cors.php'));
+
+        $config->set('paths', ['']);
+
+        $config->write();
     }
 
     protected function setupMediaStorage(): void
