@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Telescope\TelescopeServiceProvider;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
-use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
@@ -102,9 +101,9 @@ class InitCommand extends Command implements Isolatable
         ));
 
         if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->configureClerk();
+            $this->configureClerkAuth();
         } else {
-            $this->publishRoleMigrations();
+            $this->configureDefaultAuth();
         }
 
         if ($this->confirm('Do you want to generate an admin user?', true)) {
@@ -243,13 +242,11 @@ class InitCommand extends Command implements Isolatable
         ]);
     }
 
-    protected function configureClerk(): void
+    protected function configureClerkAuth(): void
     {
         $this->enableClerk();
 
-        new PHPFileBuilder(app_path('Models/User.php'))
-            ->addArrayPropertyItem('fillable', 'clerk_id')
-            ->save();
+        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force');
 
         $data = [
             'AUTH_GUARD' => 'clerk',
@@ -325,8 +322,10 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
-    protected function publishRoleMigrations(): void
+    protected function configureDefaultAuth(): void
     {
+        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
+
         if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
             && !$this->migrationPublisher->isMigrationExists('create_roles_table')
         ) {
