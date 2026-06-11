@@ -20,8 +20,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
             $this->changeConfigFileCall('config/services.php', 'services.php', 'services_after_changes.php'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -70,6 +70,8 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent(base_path('/resources/views/telegram/telescope-report.blade.php'), $this->getFixture('resources/telescope-report.blade.php')),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -100,8 +102,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -142,6 +144,8 @@ class InitCommandTest extends TestCase
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -169,8 +173,8 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -213,6 +217,8 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111115_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -247,8 +253,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.app_name_not_pascal_case.yml', 'env.clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -297,6 +303,8 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('default_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -364,8 +372,8 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -408,6 +416,8 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -471,8 +481,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_filesystem_disk_added.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -521,6 +531,8 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('full_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -593,8 +605,8 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -639,6 +651,8 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme_with_telescope.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -712,8 +726,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.app_name_not_pascal_case.yml', 'env.clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -760,6 +774,8 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('default_readme_with_mobile_app.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111115_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -833,8 +849,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -882,6 +898,8 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -949,8 +967,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_pascal_case.yml', 'env.development_storage_gcs.yml'),
             $this->changeConfigFileCall('config/filesystems.php', 'filesystems.php', 'filesystems_after_changes.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_storage_gcs.yml', 'env.development_storage_gcs.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -995,6 +1013,8 @@ class InitCommandTest extends TestCase
 
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
