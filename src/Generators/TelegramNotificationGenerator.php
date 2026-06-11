@@ -5,7 +5,7 @@ namespace RonasIT\ProjectInitializator\Generators;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\Support\FileSaver;
 use RonasIT\TelescopeExtension\Contracts\ReportNotificationContract;
-use RonasIT\TelescopeExtension\Notifications\ReportNotification;
+use RonasIT\TelescopeExtension\Notifications\TelescopeReportNotification;
 use Winter\LaravelConfigWriter\ArrayFile;
 
 class TelegramNotificationGenerator
