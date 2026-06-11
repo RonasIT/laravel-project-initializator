@@ -153,8 +153,6 @@ class InitCommand extends Command implements Isolatable
 
         $this->patchApplication();
 
-        $this->migrationPublisher->publish('drop_jobs_table');
-
         if ($this->shouldUninstallPackage) {
             shell_exec('composer remove --dev ronasit/laravel-project-initializator --ansi');
         }
@@ -582,6 +580,10 @@ class InitCommand extends Command implements Isolatable
         $this->publishWebLogin();
         $this->configureBootstrap();
         $this->publishBaseRequest();
+
+        if (!$this->migrationPublisher->isMigrationExists('drop_jobs_table')) {
+            $this->migrationPublisher->publish('drop_jobs_table');
+        }
     }
 
     protected function publishWebLogin(): void
