@@ -143,8 +143,6 @@ class InitCommand extends Command implements Isolatable
 
         $this->setupComposerHooks();
 
-        $this->setAutoDocContactEmail($this->codeOwnerEmail);
-
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
         }
@@ -577,6 +575,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function patchApplication(): void
     {
+        $this->setAutoDocContactEmail($this->codeOwnerEmail);
         $this->publishWebLogin();
         $this->configureBootstrap();
         $this->publishBaseRequest();
