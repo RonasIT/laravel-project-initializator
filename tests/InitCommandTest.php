@@ -19,12 +19,14 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
+            $this->changeConfigFileCall('config/services.php', 'services.php', 'services_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
+            $this->changeAppFileCall( 'Providers/AppServiceProvider.php','providers/app_service_provider.php', 'providers/app_service_provider_changed.php'),
             $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
         );
 
@@ -35,8 +37,6 @@ class InitCommandTest extends TestCase
 
             $this->callCopy('.env.example', '.env'),
             $this->callCopy('.env.example', '.env.development'),
-
-            $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer.json')),
 
@@ -50,6 +50,11 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
+            $this->callShellExec('composer require laravel-notification-channels/telegram --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -60,6 +65,9 @@ class InitCommandTest extends TestCase
             $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+
+            $this->callFilePutContent(base_path('app/Notifications/TelescopeReportNotification.php'), $this->getFixture('TelescopeReportNotification.php')),
+            $this->callFilePutContent(base_path('/resources/views/telegram/telescope-report.blade.php'), $this->getFixture('resources/telescope-report.blade.php')),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
         );
@@ -78,6 +86,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the project send emails?')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
@@ -146,6 +155,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the project send emails?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
@@ -221,6 +231,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the project send emails?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
@@ -333,6 +344,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the project send emails?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
@@ -442,6 +454,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need an `Environments` part?', 'yes')
             ->expectsConfirmation('Do you need a `Credentials and Access` part?', 'yes')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the project send emails?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
@@ -566,6 +579,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
             ->expectsChoice('Which storage will be used for media files?', 's3', ['gcs', 'local', 's3'])
+            ->expectsConfirmation('Will the project send emails?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
@@ -679,6 +693,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
             ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the project send emails?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
@@ -795,6 +810,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the project send emails?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
@@ -917,6 +933,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the project send emails?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
@@ -993,6 +1010,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
             ->expectsChoice('Which storage will be used for media files?', 'gcs', ['gcs', 'local', 's3'])
+            ->expectsConfirmation('Will the project send emails?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
