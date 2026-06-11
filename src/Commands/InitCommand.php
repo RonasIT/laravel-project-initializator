@@ -639,5 +639,4 @@ class InitCommand extends Command implements Isolatable
     {
         $this->migrationPublisher->publish('admins_create_table');
     }
-
 }
