@@ -19,6 +19,7 @@ use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
+use RonasIT\ProjectInitializator\Generators\TelegramNotificationGenerator;
 use RonasIT\ProjectInitializator\Support\FileSaver;
 use RonasIT\ProjectInitializator\Support\MigrationPublisher;
 use Winter\LaravelConfigWriter\ArrayFile;
@@ -123,6 +124,10 @@ class InitCommand extends Command implements Isolatable
 
         if (confirm('Will project work with media files? (upload, store and return content)', false)) {
             $this->setupMediaStorage();
+        }
+
+        if (!confirm('Will the project send emails?')) {
+            $this->setupTelegramNotifications();
         }
 
         if (confirm('Would you use Renovate dependabot?')) {
@@ -510,7 +515,14 @@ class InitCommand extends Command implements Isolatable
         $this->fileSaver->publishJSON('renovate.json', $data);
     }
 
-    protected function installLaravelTelescope()
+    protected function setupTelegramNotifications(): void
+    {
+        app(TelegramNotificationGenerator::class)->generate();
+
+        array_push($this->shellCommands, 'composer require laravel-notification-channels/telegram');
+    }
+
+    protected function installLaravelTelescope(): void
     {
         if (!class_exists(TelescopeServiceProvider::class)) {
             array_push(
