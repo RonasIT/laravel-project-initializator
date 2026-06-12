@@ -97,7 +97,7 @@ class InitCommand extends Command implements Isolatable
             default: AppTypeEnum::Multiplatform->value,
         ));
 
-        if ($this->appType === AppTypeEnum::Web || $this->appType === AppTypeEnum::Multiplatform) {
+        if (in_array($this->appType, [AppTypeEnum::Web, AppTypeEnum::Multiplatform], true)) {
             $this->configureCors();
         }
 
