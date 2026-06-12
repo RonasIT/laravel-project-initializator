@@ -325,14 +325,14 @@ class InitCommand extends Command implements Isolatable
     {
         shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
 
+        $this->fileSaver->publishClass(
+            template: view('initializator::enums.role_enum'),
+            fileName: 'RoleEnum',
+            fileDirectory: 'app/Enums/User',
+        );
+
         if (!$this->migrationPublisher->isMigrationExists('users_add_role')) {
             $this->migrationPublisher->publish('users_add_role');
-
-            $this->fileSaver->publishClass(
-                template: view('initializator::enums.role_enum'),
-                fileName: 'RoleEnum',
-                fileDirectory: 'app/Enums/User',
-            );
         }
     }
 

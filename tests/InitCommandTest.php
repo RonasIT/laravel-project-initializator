@@ -56,8 +56,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -127,8 +127,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
@@ -198,8 +198,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_add_default_admin.php', 'migration.php'),
             $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
@@ -393,8 +393,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->mockReadmeFileWrite('partial_readme.md'),
@@ -503,8 +503,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_add_default_admin.php', 'migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_nova_admin.php', 'nova_users_table_migration.php'),
             $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
@@ -620,8 +620,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_add_telescope_admin.php', 'telescope_users_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_nova_admin.php', 'nova_users_table_migration.php'),
             $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
@@ -978,8 +978,8 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
             $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_id_migration.php'),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
