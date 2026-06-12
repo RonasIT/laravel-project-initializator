@@ -309,7 +309,7 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::None) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
-            $adminCredentials['role'] = $this->ask("Please enter admin role{$serviceLabel}", RoleEnum::Admin->value);
+            $adminCredentials['role'] = RoleEnum::Admin->value;
         }
 
         if (!$isServiceAdmin) {
