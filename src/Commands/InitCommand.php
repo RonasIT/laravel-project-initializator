@@ -147,8 +147,6 @@ class InitCommand extends Command implements Isolatable
 
         $this->setupComposerHooks();
 
-        $this->setAutoDocContactEmail($this->codeOwnerEmail);
-
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
         }
@@ -592,9 +590,14 @@ class InitCommand extends Command implements Isolatable
 
     protected function patchApplication(): void
     {
+        $this->setAutoDocContactEmail($this->codeOwnerEmail);
         $this->publishWebLogin();
         $this->configureBootstrap();
         $this->publishBaseRequest();
+
+        if (!$this->migrationPublisher->isMigrationExists('drop_jobs_table')) {
+            $this->migrationPublisher->publish('drop_jobs_table');
+        }
     }
 
     protected function publishWebLogin(): void
