@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Telescope\TelescopeServiceProvider;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
-use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
@@ -24,6 +23,9 @@ use RonasIT\ProjectInitializator\Support\FileSaver;
 use RonasIT\ProjectInitializator\Support\MigrationPublisher;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
+
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\select;
 
 class InitCommand extends Command implements Isolatable
 {
@@ -89,25 +91,25 @@ class InitCommand extends Command implements Isolatable
 
         $this->setupEnvFiles();
 
-        $this->appType = AppTypeEnum::from($this->choice(
-            question: 'What type of application will your API serve?',
-            choices: AppTypeEnum::values(),
+        $this->appType = AppTypeEnum::from(select(
+            label: 'What type of application will your API serve?',
+            options: AppTypeEnum::values(),
             default: AppTypeEnum::Multiplatform->value,
         ));
 
-        $this->authType = AuthTypeEnum::from($this->choice(
-            question: 'Please choose the authentication type',
-            choices: AuthTypeEnum::values(),
+        $this->authType = AuthTypeEnum::from(select(
+            label: 'Please choose the authentication type',
+            options: AuthTypeEnum::values(),
             default: AuthTypeEnum::None->value,
         ));
 
         if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->configureClerk();
+            $this->configureClerkAuth();
         } else {
-            $this->publishRoleMigrations();
+            $this->configureDefaultAuth();
         }
 
-        if ($this->confirm('Do you want to generate an admin user?', true)) {
+        if (confirm('Do you want to generate an admin user?')) {
             if ($this->authType === AuthTypeEnum::Clerk) {
                 $this->publishAdminsTableMigration();
             }
@@ -115,21 +117,21 @@ class InitCommand extends Command implements Isolatable
             $this->createAdminUser();
         }
 
-        if ($this->confirm('Do you want to generate a README file?', true)) {
+        if (confirm('Do you want to generate a README file?')) {
             $this->configureReadme();
         }
 
-        if ($this->confirm('Will project work with media files? (upload, store and return content)')) {
+        if (confirm('Will project work with media files? (upload, store and return content)', false)) {
             $this->setupMediaStorage();
         }
 
         if (in_array($this->appType, [AppTypeEnum::Multiplatform, AppTypeEnum::Mobile])) {
-            if ($this->confirm('Will the application use push notifications?')) {
+            if (confirm('Will the application use push notifications?')) {
                 $this->setupPushNotifications();
             }
         }
 
-        if ($this->confirm('Would you use Renovate dependabot?', true)) {
+        if (confirm('Would you use Renovate dependabot?')) {
             $this->saveRenovateJSON();
 
             $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Renovate);
@@ -143,13 +145,9 @@ class InitCommand extends Command implements Isolatable
 
         $this->installLaravelTelescope();
 
-        if ($this->confirm('Do you want to uninstall project-initializator package?', true)) {
-            $this->shouldUninstallPackage = true;
-        }
+        $this->shouldUninstallPackage = confirm('Do you want to uninstall project-initializator package?');
 
         $this->setupComposerHooks();
-
-        $this->setAutoDocContactEmail($this->codeOwnerEmail);
 
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
@@ -199,7 +197,7 @@ class InitCommand extends Command implements Isolatable
 
         $pascalCaseAppName = ucfirst(Str::camel($appName));
 
-        if ($appName !== $pascalCaseAppName && $this->confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}", true)) {
+        if ($appName !== $pascalCaseAppName && confirm("The application name is not in PascalCase, would you like to use {$pascalCaseAppName}")) {
             $appName = $pascalCaseAppName;
         }
 
@@ -249,13 +247,11 @@ class InitCommand extends Command implements Isolatable
         ]);
     }
 
-    protected function configureClerk(): void
+    protected function configureClerkAuth(): void
     {
         $this->enableClerk();
 
-        new PHPFileBuilder(app_path('Models/User.php'))
-            ->addArrayPropertyItem('fillable', 'clerk_id')
-            ->save();
+        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force');
 
         $data = [
             'AUTH_GUARD' => 'clerk',
@@ -331,8 +327,10 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
-    protected function publishRoleMigrations(): void
+    protected function configureDefaultAuth(): void
     {
+        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
+
         if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
             && !$this->migrationPublisher->isMigrationExists('create_roles_table')
         ) {
@@ -351,18 +349,18 @@ class InitCommand extends Command implements Isolatable
             codeOwnerEmail: $this->codeOwnerEmail,
         );
 
-        $shouldGenerateAllParts = $this->confirm('Do you want to generate all README parts?', true);
+        $shouldGenerateAllParts = confirm('Do you want to generate all README parts?');
 
-        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Resources & Contacts` part?', true)) {
+        if ($shouldGenerateAllParts || confirm('Do you need a `Resources & Contacts` part?')) {
             $this->configureResources();
             $this->configureManagerEmail();
         }
 
-        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Prerequisites` part?', true)) {
+        if ($shouldGenerateAllParts || confirm('Do you need a `Prerequisites` part?')) {
             $this->readmeGenerator->addBlock(ReadmeBlockEnum::Prerequisites);
         }
 
-        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Getting Started` part?', true)) {
+        if ($shouldGenerateAllParts || confirm('Do you need a `Getting Started` part?')) {
             $gitProjectPath = shell_exec('git ls-remote --get-url origin');
 
             $this->readmeGenerator->setGitProjectPath($gitProjectPath);
@@ -370,11 +368,11 @@ class InitCommand extends Command implements Isolatable
             $this->readmeGenerator->addBlock(ReadmeBlockEnum::GettingStarted);
         }
 
-        if ($shouldGenerateAllParts || $this->confirm('Do you need an `Environments` part?', true)) {
+        if ($shouldGenerateAllParts || confirm('Do you need an `Environments` part?')) {
             $this->readmeGenerator->addBlock(ReadmeBlockEnum::Environments);
         }
 
-        if ($shouldGenerateAllParts || $this->confirm('Do you need a `Credentials and Access` part?', true)) {
+        if ($shouldGenerateAllParts || confirm('Do you need a `Credentials and Access` part?')) {
             $this->configureCredentialsAndAccess();
 
             $this->readmeGenerator->addBlock(ReadmeBlockEnum::CredentialsAndAccess);
@@ -426,7 +424,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         foreach ($this->readmeGenerator->getAccessRequiredResources() as $resource) {
-            if (!empty($this->adminCredentials) && $this->confirm("Is {$resource->title}'s admin the same as default one?", true)) {
+            if (!empty($this->adminCredentials) && confirm("Is {$resource->title}'s admin the same as default one?")) {
                 $adminCredentials = $this->adminCredentials;
             } else {
                 if ($this->authType === AuthTypeEnum::Clerk && !$this->migrationPublisher->isMigrationExists('admins_create_table')) {
@@ -453,9 +451,9 @@ class InitCommand extends Command implements Isolatable
     {
         $this->shellCommands[] = 'composer require ronasit/laravel-media';
 
-        $storage = StorageEnum::from($this->choice(
-            question: 'Which storage will be used for media files?',
-            choices: StorageEnum::values(),
+        $storage = StorageEnum::from(select(
+            label: 'Which storage will be used for media files?',
+            options: StorageEnum::values(),
             default: StorageEnum::GCS->value,
         ));
 
@@ -583,9 +581,14 @@ class InitCommand extends Command implements Isolatable
 
     protected function patchApplication(): void
     {
+        $this->setAutoDocContactEmail($this->codeOwnerEmail);
         $this->publishWebLogin();
         $this->configureBootstrap();
         $this->publishBaseRequest();
+
+        if (!$this->migrationPublisher->isMigrationExists('drop_jobs_table')) {
+            $this->migrationPublisher->publish('drop_jobs_table');
+        }
     }
 
     protected function publishWebLogin(): void

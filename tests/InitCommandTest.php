@@ -19,8 +19,8 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -40,6 +40,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -61,6 +62,8 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -72,7 +75,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('The email of code owner/ team lead field must be a valid email address.')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
+            ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
@@ -91,8 +94,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -107,6 +110,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -134,6 +138,8 @@ class InitCommandTest extends TestCase
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -142,7 +148,7 @@ class InitCommandTest extends TestCase
             ->artisan('init "MyApp"')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
+            ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
@@ -161,8 +167,8 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -179,6 +185,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -204,6 +211,8 @@ class InitCommandTest extends TestCase
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111115_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -213,7 +222,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
+            ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
@@ -238,13 +247,12 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.app_name_not_pascal_case.yml', 'env.clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->changeAppFileCall('Models/User.php', 'user_model.php', 'user_model_fillable_updated.php'),
             $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
         );
 
@@ -257,6 +265,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -288,6 +297,8 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('default_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -297,7 +308,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
+            ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
@@ -355,8 +366,8 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -373,6 +384,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -398,6 +410,8 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -407,7 +421,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsQuestion('What type of application will your API serve?', 'Web')
+            ->expectsChoice('What type of application will your API serve?', 'Web', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
@@ -460,8 +474,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_filesystem_disk_added.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -478,6 +492,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -509,6 +524,8 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('full_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -518,7 +535,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsQuestion('What type of application will your API serve?', 'Mobile')
+            ->expectsChoice('What type of application will your API serve?', 'Mobile', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
@@ -581,8 +598,8 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -599,6 +616,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -626,6 +644,8 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme_with_telescope.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -635,7 +655,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsQuestion('What type of application will your API serve?', 'Web')
+            ->expectsChoice('What type of application will your API serve?', 'Web', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
@@ -698,13 +718,12 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.app_name_not_pascal_case.yml', 'env.clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->changeAppFileCall('Models/User.php', 'user_model.php', 'user_model_fillable_updated.php'),
             $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
         );
 
@@ -717,6 +736,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -746,6 +766,8 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('default_readme_with_mobile_app.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111115_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -755,7 +777,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsQuestion('What type of application will your API serve?', 'Mobile')
+            ->expectsChoice('What type of application will your API serve?', 'Mobile', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
@@ -819,13 +841,12 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->changeAppFileCall('Models/User.php', 'user_model.php', 'user_model_fillable_updated.php'),
             $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
         );
 
@@ -838,6 +859,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -868,6 +890,8 @@ class InitCommandTest extends TestCase
 
             $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -877,7 +901,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsQuestion('What type of application will your API serve?', 'Web')
+            ->expectsChoice('What type of application will your API serve?', 'Web', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
@@ -934,8 +958,8 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_pascal_case.yml', 'env.development_storage_gcs.yml'),
             $this->changeConfigFileCall('config/filesystems.php', 'filesystems.php', 'filesystems_after_changes.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_storage_gcs.yml', 'env.development_storage_gcs.yml'),
-            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
         $this->mockNativeFunction(
@@ -955,6 +979,7 @@ class InitCommandTest extends TestCase
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -979,6 +1004,8 @@ class InitCommandTest extends TestCase
 
             $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
             $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -988,7 +1015,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
-            ->expectsQuestion('What type of application will your API serve?', 'Multiplatform')
+            ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
@@ -1009,7 +1036,7 @@ class InitCommandTest extends TestCase
         $commandMock = Mockery::mock(InitCommand::class)->shouldAllowMockingProtectedMethods();
 
         $commandMock->shouldReceive('ask')->andReturnUsing(fn ($question, $default) => $default);
-        $commandMock->shouldReceive('publishRoleMigrations');
+        $commandMock->shouldReceive('configureDefaultAuth');
         $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
 
         $this->setReflectionProperty($commandMock, InitCommand::class, 'authType', AuthTypeEnum::None);
