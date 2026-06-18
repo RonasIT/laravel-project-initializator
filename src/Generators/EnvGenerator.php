@@ -2,8 +2,8 @@
 
 namespace RonasIT\ProjectInitializator\Generators;
 
-use Illuminate\Support\Arr;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
+use RonasIT\ProjectInitializator\Enums\EnvironmentEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use Winter\LaravelConfigWriter\EnvFile;
 
@@ -18,20 +18,23 @@ class EnvGenerator
         'password' => '',
     ];
 
-    protected string $appName;
-    protected string $appUrl;
+    protected array $envVariables = [];
 
-    public function setAppInfo(string $appName, string $appUrl): self
+    public function setupEnv(string $appName, string $appUrl): void
     {
-        $this->appName = $appName;
-        $this->appUrl = $appUrl;
+        $this->setEnvVariables([
+            'APP_NAME' => $appName,
+            'DB_CONNECTION' => self::DEFAULT_DB_CONNECTION_CONFIG['driver'],
+            'DB_HOST' => self::DEFAULT_DB_CONNECTION_CONFIG['host'],
+            'DB_PORT' => self::DEFAULT_DB_CONNECTION_CONFIG['port'],
+            'DB_DATABASE' => self::DEFAULT_DB_CONNECTION_CONFIG['database'],
+            'DB_USERNAME' => self::DEFAULT_DB_CONNECTION_CONFIG['username'],
+            'DB_PASSWORD' => self::DEFAULT_DB_CONNECTION_CONFIG['password'],
+        ], ...EnvironmentEnum::cases());
 
-        return $this;
-    }
+        $this->configureDevelopment($appUrl);
 
-    public function generate(): void
-    {
-        $this->writeBaseEnvFiles();
+        $this->configureTesting();
     }
 
     public function configureClerk(AppTypeEnum $appType): void
@@ -40,53 +43,45 @@ class EnvGenerator
             'AUTH_GUARD' => 'clerk',
             'CLERK_ALLOWED_ISSUER' => '',
             'CLERK_SECRET_KEY' => '',
-            'CLERK_SIGNER_KEY_PATH' => '',
         ];
 
         if ($appType !== AppTypeEnum::Mobile) {
             $data['CLERK_ALLOWED_ORIGINS'] = '';
         }
 
-        $this->updateEnvFile('.env', $data);
-        $this->updateEnvFile('.env.example', $data);
-        $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
+        $this->setEnvVariables($data, EnvironmentEnum::Local, EnvironmentEnum::Example, EnvironmentEnum::Development);
+
+        $this->setEnvVariables([
+            'CLERK_SIGNER_KEY_PATH' => '',
+        ], EnvironmentEnum::Local, EnvironmentEnum::Example);
     }
 
     public function configureGcsStorage(): void
     {
-        $this->updateEnvFile('.env.development', [
+        $this->setEnvVariables([
             'FILESYSTEM_DISK' => StorageEnum::GCS->value,
             'GOOGLE_CLOUD_STORAGE_PATH_PREFIX' => 'api',
             'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
             'GOOGLE_CLOUD_PROJECT_ID' => '',
-        ]);
+        ], EnvironmentEnum::Development);
     }
 
-    protected function writeBaseEnvFiles(): void
+    public function apply(): void
     {
-        $envConfig = [
-            'APP_NAME' => $this->appName,
-            'DB_CONNECTION' => self::DEFAULT_DB_CONNECTION_CONFIG['driver'],
-            'DB_HOST' => self::DEFAULT_DB_CONNECTION_CONFIG['host'],
-            'DB_PORT' => self::DEFAULT_DB_CONNECTION_CONFIG['port'],
-            'DB_DATABASE' => self::DEFAULT_DB_CONNECTION_CONFIG['database'],
-            'DB_USERNAME' => self::DEFAULT_DB_CONNECTION_CONFIG['username'],
-            'DB_PASSWORD' => self::DEFAULT_DB_CONNECTION_CONFIG['password'],
-        ];
+        foreach (EnvironmentEnum::cases() as $environment) {
+            if ($environment !== EnvironmentEnum::Example) {
+                $this->createEnvFileIfNotExists($environment->value, EnvironmentEnum::Example->value);
+            }
 
-        $this->updateEnvFile('.env.example', $envConfig);
-
-        if (!file_exists('.env')) {
-            copy('.env.example', '.env');
-        } else {
-            $this->updateEnvFile('.env', $envConfig);
+            $this->updateEnvFile($environment->value, $this->envVariables[$environment->value]);
         }
+    }
 
-        $this->createEnvFileIfNotExists('.env.development', '.env.example');
-        $this->updateEnvFile('.env.development', [
-            'APP_NAME' => $this->appName,
+    protected function configureDevelopment(string $appUrl): void
+    {
+        $this->setEnvVariables([
             'APP_ENV' => 'development',
-            'APP_URL' => $this->appUrl,
+            'APP_URL' => $appUrl,
             'APP_MAINTENANCE_DRIVER' => 'cache',
             'APP_MAINTENANCE_STORE' => 'redis',
             'CACHE_STORE' => 'redis',
@@ -98,30 +93,42 @@ class EnvGenerator
             'DB_DATABASE' => '',
             'DB_USERNAME' => '',
             'DB_PASSWORD' => '',
-        ]);
+        ], EnvironmentEnum::Development);
+    }
 
+    protected function configureTesting(): void
+    {
         $appKey = $this->generateAppKey();
 
-        $testingEnvConfig = [
-            ...$envConfig,
+        $this->setEnvVariables([
             'APP_ENV' => 'testing',
             'APP_KEY' => $appKey,
             'LOG_CHANNEL' => 'stderr',
-        ];
+        ], EnvironmentEnum::CiTesting, EnvironmentEnum::Testing);
 
-        $this->createEnvFileIfNotExists('.env.ci-testing', '.env.example');
-        $this->updateEnvFile('.env.ci-testing', [
-            ...$testingEnvConfig,
+        $this->setEnvVariables([
             'DB_DATABASE' => 'forge',
             'DB_USERNAME' => 'forge',
-        ]);
+        ], EnvironmentEnum::CiTesting);
 
-        $this->createEnvFileIfNotExists('.env.testing', '.env.example');
-        $this->updateEnvFile('.env.testing', [
-            ...$testingEnvConfig,
+        $this->setEnvVariables([
             'DB_HOST' => 'pgsql_test',
             'FAIL_EXPORT_JSON' => false,
-        ]);
+        ], EnvironmentEnum::Testing);
+    }
+
+    protected function setEnvVariables(array $data, EnvironmentEnum ...$environments): void
+    {
+        foreach ($environments as $environment) {
+            foreach ($data as $key => $value) {
+                $this->envVariables[$environment->value][$key] = $value;
+            }
+        }
+    }
+
+    protected function generateAppKey(): string
+    {
+        return 'base64:' . base64_encode(random_bytes(32));
     }
 
     protected function createEnvFileIfNotExists(string $filePath, string $source): void
@@ -140,10 +147,5 @@ class EnvGenerator
         $env->set($data);
 
         $env->write();
-    }
-
-    protected function generateAppKey(): string
-    {
-        return 'base64:' . base64_encode(random_bytes(32));
     }
 }

@@ -81,8 +81,6 @@ class InitCommand extends Command implements Isolatable
 
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabAppName}.com");
 
-        $this->envGenerator->setAppInfo($this->appName, $this->appUrl)->generate();
-
         $this->appType = AppTypeEnum::from(select(
             label: 'What type of application will your API serve?',
             options: AppTypeEnum::values(),
@@ -94,6 +92,8 @@ class InitCommand extends Command implements Isolatable
             options: AuthTypeEnum::values(),
             default: AuthTypeEnum::None->value,
         ));
+
+        $this->envGenerator->setupEnv($this->appName, $this->appUrl);
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->configureClerkAuth();
@@ -116,6 +116,8 @@ class InitCommand extends Command implements Isolatable
         if (confirm('Will project work with media files? (upload, store and return content)', false)) {
             $this->setupMediaStorage();
         }
+
+        $this->envGenerator->apply();
 
         if (confirm('Would you use Renovate dependabot?')) {
             $this->saveRenovateJSON();
