@@ -23,7 +23,6 @@ use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 use RonasIT\ProjectInitializator\Support\FileSaver;
 use RonasIT\ProjectInitializator\Support\MigrationPublisher;
 use Winter\LaravelConfigWriter\ArrayFile;
-use Winter\LaravelConfigWriter\EnvFile;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;
