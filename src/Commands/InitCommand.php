@@ -451,7 +451,7 @@ class InitCommand extends Command implements Isolatable
 
         $config = ArrayFile::open(base_path('config/cors.php'));
 
-        $config->set('paths', ['']);
+        $config->set('paths', ['*']);
 
         $config->write();
     }
