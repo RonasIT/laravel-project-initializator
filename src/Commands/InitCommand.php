@@ -298,8 +298,8 @@ class InitCommand extends Command implements Isolatable
 
         new PHPFileBuilder(app_path('Providers/AppServiceProvider.php'))
             ->addImports([
-                'RonasIT\Clerk\Contracts\UserRepositoryContract',
                 'App\Support\Clerk\ClerkUserRepository',
+                'RonasIT\Clerk\Contracts\UserRepositoryContract',
             ])
             ->insertCodeToMethod(
                 methodName: 'boot',

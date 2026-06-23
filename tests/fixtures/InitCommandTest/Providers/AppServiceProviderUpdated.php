@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use RonasIT\Clerk\Contracts\UserRepositoryContract;
 use App\Support\Clerk\ClerkUserRepository;
+use RonasIT\Clerk\Contracts\UserRepositoryContract;
 
 class AppServiceProvider extends ServiceProvider
 {
