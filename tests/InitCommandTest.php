@@ -1123,7 +1123,10 @@ class InitCommandTest extends TestCase
         $createAdminMethod = ReflectionMethod::createFromMethodName(InitCommand::class . '::createAdminUser');
         $credentials = $createAdminMethod->invoke($commandMock);
 
+        $this->assertEquals('admin@my-app.com', $credentials['email']);
+        $this->assertNotEmpty($credentials['password']);
         $this->assertEquals('Admin', $credentials['name']);
+        $this->assertEquals(1, $credentials['role_id']);
     }
 
     protected function setReflectionProperty(object $object, string $class, string $property, mixed $value): void
