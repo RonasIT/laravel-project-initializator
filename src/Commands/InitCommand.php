@@ -40,6 +40,8 @@ class InitCommand extends Command implements Isolatable
 
     protected array $emptyResourcesList = [];
 
+    protected array $manualActionsList = [];
+
     protected array $shellCommands = [
         'composer require laravel/ui',
         'composer require ronasit/laravel-helpers',
@@ -104,11 +106,7 @@ class InitCommand extends Command implements Isolatable
             default: AuthTypeEnum::None->value,
         ));
 
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->configureClerkAuth();
-        } else {
-            $this->configureDefaultAuth();
-        }
+        $this->configureAuthType();
 
         if (confirm('Do you want to generate an admin user?')) {
             if ($this->authType === AuthTypeEnum::Clerk) {
@@ -164,6 +162,14 @@ class InitCommand extends Command implements Isolatable
             $this->warn('Don`t forget to fill the following empty values:');
 
             foreach ($this->emptyResourcesList as $value) {
+                $this->warn("- {$value}");
+            }
+        }
+
+        if ($this->manualActionsList) {
+            $this->warn('Please complete the following steps manually:');
+
+            foreach ($this->manualActionsList as $value) {
                 $this->warn("- {$value}");
             }
         }
@@ -264,6 +270,51 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
     }
 
+    protected function configureAuthType(): void
+    {
+        match ($this->authType) {
+            AuthTypeEnum::Clerk => $this->configureClerkAuth(),
+            AuthTypeEnum::Jwt => $this->configureJwtAuth(),
+            AuthTypeEnum::None => $this->publishRoleBasedUserModel(),
+        };
+    }
+
+    protected function configureJwtAuth(): void
+    {
+        $this->publishRoleBasedUserModel();
+
+        array_push(
+            $this->shellCommands,
+            'composer require tymon/jwt-auth',
+            'php artisan jwt:secret',
+            'php artisan vendor:publish --provider="Tymon\\JWTAuth\\Providers\\LaravelServiceProvider"',
+        );
+
+        $envData = [
+            'AUTH_GUARD' => 'api',
+            'JWT_SECRET' => '',
+        ];
+
+        $this->updateEnvFile('.env', Arr::except($envData, ['JWT_SECRET']));
+        $this->updateEnvFile('.env.example', $envData);
+        $this->updateEnvFile('.env.development', $envData);
+
+        $this->addJwtGuardToConfig();
+
+        $this->manualActionsList[] = 'Implement the `Tymon\JWTAuth\Contracts\JWTSubject` interface in the `App\Models\User` model (add the `getJWTIdentifier()` and `getJWTCustomClaims()` methods)';
+    }
+
+    protected function addJwtGuardToConfig(): void
+    {
+        $config = ArrayFile::open(base_path('config/auth.php'));
+
+        $config
+            ->set('guards.api.driver', 'jwt')
+            ->set('guards.api.provider', 'users');
+
+        $config->write();
+    }
+
     protected function updateEnvFile(string $fileName, array $data): void
     {
         $env = EnvFile::open($fileName);
@@ -324,7 +375,7 @@ class InitCommand extends Command implements Isolatable
 
         $adminName = when($isServiceAdmin, "{$serviceName} Admin", 'Admin');
 
-        if ($this->authType === AuthTypeEnum::None) {
+        if (in_array($this->authType, [AuthTypeEnum::None, AuthTypeEnum::Jwt], true)) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
         }
@@ -336,19 +387,6 @@ class InitCommand extends Command implements Isolatable
         $this->publishAdminMigration($adminCredentials, $serviceKey);
 
         return $adminCredentials;
-    }
-
-    protected function configureDefaultAuth(): void
-    {
-        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
-
-        if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
-            && !$this->migrationPublisher->isMigrationExists('create_roles_table')
-        ) {
-            $this->migrationPublisher->publish('roles_create_table');
-
-            $this->migrationPublisher->publish('users_add_role_id');
-        }
     }
 
     protected function configureReadme(): void
@@ -658,5 +696,18 @@ class InitCommand extends Command implements Isolatable
     protected function publishAdminsTableMigration(): void
     {
         $this->migrationPublisher->publish('admins_create_table');
+    }
+
+    protected function publishRoleBasedUserModel(): void
+    {
+        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
+
+        if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
+            && !$this->migrationPublisher->isMigrationExists('create_roles_table')
+        ) {
+            $this->migrationPublisher->publish('roles_create_table');
+
+            $this->migrationPublisher->publish('users_add_role_id');
+        }
     }
 }
