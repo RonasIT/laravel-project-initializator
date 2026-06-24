@@ -326,7 +326,7 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::None) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
-            $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
+            $adminCredentials['role'] = RoleEnum::Admin->value;
         }
 
         if (!$isServiceAdmin) {
@@ -342,12 +342,14 @@ class InitCommand extends Command implements Isolatable
     {
         shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
 
-        if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
-            && !$this->migrationPublisher->isMigrationExists('create_roles_table')
-        ) {
-            $this->migrationPublisher->publish('roles_create_table');
+        $this->fileSaver->publishClass(
+            template: view('initializator::enums.role_enum'),
+            fileName: 'RoleEnum',
+            fileDirectory: 'app/Enums/User',
+        );
 
-            $this->migrationPublisher->publish('users_add_role_id');
+        if (!$this->migrationPublisher->isMigrationExists('users_add_role')) {
+            $this->migrationPublisher->publish('users_add_role');
         }
     }
 

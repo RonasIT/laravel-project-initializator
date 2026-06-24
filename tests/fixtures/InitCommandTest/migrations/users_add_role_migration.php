@@ -8,22 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasColumn('users', 'role_id')) {
+        if (!Schema::hasColumn('users', 'role')) {
             Schema::table('users', function (Blueprint $table) {
-                $table
-                    ->foreignId('role_id')
-                    ->constrained('roles')
-                    ->onUpdate('cascade');
+                $table->enum('role', ['admin', 'user'])->default('user');
             });
         }
     }
 
     public function down(): void
     {
-        if (Schema::hasColumn('users', 'role_id')) {
+        if (Schema::hasColumn('users', 'role')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->dropForeign(['role_id']);
-                $table->dropColumn('role_id');
+                $table->dropColumn('role');
             });
         }
     }

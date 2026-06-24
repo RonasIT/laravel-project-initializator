@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\User\RoleEnum;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,7 +13,7 @@ use RonasIT\Support\Traits\ModelTrait;
  * @property int $id
  * @property string $name
  * @property string $email
- * @property int $role_id
+ * @property RoleEnum $role
  * @property string $password
  * @property string|null $remember_token
  * @property Carbon|null $email_verified_at
@@ -29,7 +30,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id',
+        'role',
     ];
 
     protected $hidden = [
@@ -43,6 +44,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => RoleEnum::class,
         ];
     }
 }

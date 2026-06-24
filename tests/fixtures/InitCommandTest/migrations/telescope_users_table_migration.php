@@ -14,7 +14,7 @@ return new class extends Migration
                 'name' => 'Telescope Admin',
                 'email' => 'telescope_mail@mail.com',
                 'password' => Hash::make('654321'),
-                'role_id' => 1,
+                'role' => 'admin',
             ]);
         }
     }
