@@ -275,15 +275,13 @@ class InitCommand extends Command implements Isolatable
         match ($this->authType) {
             AuthTypeEnum::Clerk => $this->configureClerkAuth(),
             AuthTypeEnum::Jwt => $this->configureJwtAuth(),
-            AuthTypeEnum::None => $this->configureDefaultAuth(),
+            AuthTypeEnum::None => $this->publishRoleBasedUserModel(),
         };
     }
 
     protected function configureJwtAuth(): void
     {
-        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
-
-        $this->publishRolesTableMigration();
+        $this->publishRoleBasedUserModel();
 
         array_push(
             $this->shellCommands,
@@ -389,13 +387,6 @@ class InitCommand extends Command implements Isolatable
         $this->publishAdminMigration($adminCredentials, $serviceKey);
 
         return $adminCredentials;
-    }
-
-    protected function configureDefaultAuth(): void
-    {
-        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
-
-        $this->publishRolesTableMigration();
     }
 
     protected function configureReadme(): void
@@ -707,8 +698,10 @@ class InitCommand extends Command implements Isolatable
         $this->migrationPublisher->publish('admins_create_table');
     }
 
-    protected function publishRolesTableMigration(): void
+    protected function publishRoleBasedUserModel(): void
     {
+        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
+
         if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
             && !$this->migrationPublisher->isMigrationExists('create_roles_table')
         ) {
