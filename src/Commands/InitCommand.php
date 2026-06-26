@@ -258,10 +258,10 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env.example', $data);
         $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
 
-        $this->configureAdminAuth();
+        $this->configureClerkAdminAuth();
     }
 
-    protected function configureAdminAuth(): void
+    protected function configureClerkAdminAuth(): void
     {
         $this->fileSaver->publishClass(
             template: view('initializator::models.admin'),
@@ -271,6 +271,11 @@ class InitCommand extends Command implements Isolatable
 
         $this->migrationPublisher->publish('admins_create_table');
 
+        $this->registerAdminAuthProvider();
+    }
+
+    protected function registerAdminAuthProvider(): void
+    {
         $config = ArrayFile::open(base_path('config/auth.php'));
 
         $config
@@ -452,11 +457,9 @@ class InitCommand extends Command implements Isolatable
         }
 
         foreach ($this->readmeGenerator->getAccessRequiredResources() as $resource) {
-            if (!empty($this->adminCredentials) && confirm("Is {$resource->title}'s admin the same as default one?")) {
-                $adminCredentials = $this->adminCredentials;
-            } else {
-                $adminCredentials = $this->createAdminUser($resource->key, $resource->title);
-            }
+            $adminCredentials = (!empty($this->adminCredentials) && confirm("Is {$resource->title}'s admin the same as default one?"))
+                ? $this->adminCredentials
+                : $this->createAdminUser($resource->key, $resource->title);
 
             $resource->setCredentials($adminCredentials['email'], $adminCredentials['password']);
         }
