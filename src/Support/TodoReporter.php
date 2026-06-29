@@ -3,7 +3,6 @@
 namespace RonasIT\ProjectInitializator\Support;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
 use RonasIT\ProjectInitializator\DTO\TodoItemDTO;
 use RonasIT\ProjectInitializator\Enums\TodoCategoryEnum;
 
@@ -68,25 +67,9 @@ class TodoReporter
         );
     }
 
-    public function isEmpty(): bool
-    {
-        return empty($this->items);
-    }
-
-    /**
-     * @return array<string, TodoItemDTO[]>
-     */
-    public function grouped(): array
-    {
-        return Collection::make($this->items)
-            ->groupBy(fn (TodoItemDTO $item) => $item->category->value)
-            ->map(fn (Collection $items) => $items->all())
-            ->all();
-    }
-
     public function render(Command $output): void
     {
-        if ($this->isEmpty()) {
+        if (empty($this->items)) {
             return;
         }
 
@@ -122,5 +105,19 @@ class TodoReporter
             hint: $hint,
             meta: $meta,
         );
+    }
+
+    /**
+     * @return array<string, TodoItemDTO[]>
+     */
+    protected function grouped(): array
+    {
+        $grouped = [];
+
+        foreach ($this->items as $item) {
+            $grouped[$item->category->value][] = $item;
+        }
+
+        return $grouped;
     }
 }
