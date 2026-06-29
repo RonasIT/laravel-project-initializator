@@ -347,11 +347,12 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
-            ->expectsOutput('- Figma link')
-            ->expectsOutput('- Sentry link')
-            ->expectsOutput('- Manager\'s email')
+            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput('README:')
+            ->expectsOutput('  - Fill Issue Tracker link (in README)')
+            ->expectsOutput('  - Fill Figma link (in README)')
+            ->expectsOutput('  - Fill Sentry link (in README)')
+            ->expectsOutput('  - Fill Manager\'s email (in README)')
             ->assertExitCode(0);
     }
 
@@ -457,8 +458,9 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
+            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput('README:')
+            ->expectsOutput('  - Fill Issue Tracker link (in README)')
             ->assertExitCode(0);
     }
 
@@ -698,8 +700,9 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
+            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput('README:')
+            ->expectsOutput('  - Fill Issue Tracker link (in README)')
             ->assertExitCode(0);
     }
 
@@ -818,11 +821,12 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
-            ->expectsOutput('- Figma link')
-            ->expectsOutput('- Sentry link')
-            ->expectsOutput('- Manager\'s email')
+            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput('README:')
+            ->expectsOutput('  - Fill Issue Tracker link (in README)')
+            ->expectsOutput('  - Fill Figma link (in README)')
+            ->expectsOutput('  - Fill Sentry link (in README)')
+            ->expectsOutput('  - Fill Manager\'s email (in README)')
             ->assertExitCode(0);
     }
 
@@ -1019,9 +1023,12 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- GOOGLE_CLOUD_STORAGE_BUCKET')
-            ->expectsOutput('- GOOGLE_CLOUD_PROJECT_ID')
+            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput('Environment:')
+            ->expectsOutput('  - GOOGLE_CLOUD_STORAGE_BUCKET (in .env.development)')
+            ->expectsOutput('  - GOOGLE_CLOUD_PROJECT_ID (in .env.development)')
+            ->expectsOutput('Configuration:')
+            ->expectsOutput('  - Provide the GCS service account key (set disks.gcs.key_file_path or disks.gcs.key_file in config/filesystems.php)')
             ->assertExitCode(0);
     }
 

@@ -22,6 +22,7 @@ use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 use RonasIT\ProjectInitializator\Support\FileSaver;
 use RonasIT\ProjectInitializator\Support\MigrationPublisher;
+use RonasIT\ProjectInitializator\Support\TodoReporter;
 use Winter\LaravelConfigWriter\ArrayFile;
 use Winter\LaravelConfigWriter\EnvFile;
 
@@ -37,8 +38,6 @@ class InitCommand extends Command implements Isolatable
     protected $description = 'Initialize required project parameters to run DEV environment';
 
     protected array $adminCredentials = [];
-
-    protected array $emptyResourcesList = [];
 
     protected array $shellCommands = [
         'composer require laravel/ui',
@@ -75,6 +74,7 @@ class InitCommand extends Command implements Isolatable
     public function __construct(
         protected FileSaver $fileSaver,
         protected MigrationPublisher $migrationPublisher,
+        protected TodoReporter $todoReporter,
     ) {
         parent::__construct();
     }
@@ -160,13 +160,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
-        if ($this->emptyResourcesList) {
-            $this->warn('Don`t forget to fill the following empty values:');
-
-            foreach ($this->emptyResourcesList as $value) {
-                $this->warn("- {$value}");
-            }
-        }
+        $this->todoReporter->render($this);
     }
 
     protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
@@ -410,7 +404,7 @@ class InitCommand extends Command implements Isolatable
             if (empty($answer)) {
                 $resource->setLink($link);
             } elseif ($answer === UserAnswerEnum::Later) {
-                $this->emptyResourcesList[] = "{$resource->title} link";
+                $this->todoReporter->addReadmeResourceLink($resource->title);
             }
 
             $resource->setActive($answer !== UserAnswerEnum::No);
@@ -424,7 +418,7 @@ class InitCommand extends Command implements Isolatable
         if ($link = $this->ask("Please enter a Manager's email", '')) {
             $this->readmeGenerator->setManagerEmail($link);
         } else {
-            $this->emptyResourcesList[] = "Manager's email";
+            $this->todoReporter->addReadmeField("Manager's email");
         }
     }
 
@@ -477,10 +471,16 @@ class InitCommand extends Command implements Isolatable
                 'GOOGLE_CLOUD_PROJECT_ID' => '',
             ]);
 
-            $this->emptyResourcesList[] = 'GOOGLE_CLOUD_STORAGE_BUCKET';
-            $this->emptyResourcesList[] = 'GOOGLE_CLOUD_PROJECT_ID';
+            $this->todoReporter->addEnvVariable('GOOGLE_CLOUD_STORAGE_BUCKET', file: '.env.development');
+            $this->todoReporter->addEnvVariable('GOOGLE_CLOUD_PROJECT_ID', file: '.env.development');
 
             $this->addGcsDiskToConfig();
+
+            $this->todoReporter->addConfiguration(
+                integration: 'GCS',
+                label: 'Provide the GCS service account key',
+                hint: 'set disks.gcs.key_file_path or disks.gcs.key_file in config/filesystems.php',
+            );
         }
 
         $this->updateEnvFile('.env.development', [
