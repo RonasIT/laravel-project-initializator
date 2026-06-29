@@ -256,6 +256,10 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env', $data);
         $this->updateEnvFile('.env.example', $data);
         $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
+
+        foreach (array_keys(Arr::except($data, ['AUTH_GUARD'])) as $envVar) {
+            $this->todoReporter->addEnvVariable($envVar, hint: 'get it from the Clerk dashboard');
+        }
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
