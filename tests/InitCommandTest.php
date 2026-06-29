@@ -287,6 +287,7 @@ class InitCommandTest extends TestCase
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
@@ -758,6 +759,7 @@ class InitCommandTest extends TestCase
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
 
@@ -882,6 +884,7 @@ class InitCommandTest extends TestCase
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'admins_add_telescope_admin_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),

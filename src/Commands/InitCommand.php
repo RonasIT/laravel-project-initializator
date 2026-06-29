@@ -270,7 +270,9 @@ class InitCommand extends Command implements Isolatable
             fileDirectory: 'app/Models',
         );
 
-        $this->migrationPublisher->publish('admins_create_table');
+        if (!$this->migrationPublisher->isMigrationExists('admins_create_table')) {
+            $this->migrationPublisher->publish('admins_create_table');
+        }
 
         $this->registerAdminAuthProvider();
     }
