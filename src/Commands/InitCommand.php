@@ -576,13 +576,19 @@ class InitCommand extends Command implements Isolatable
     {
         $config = ArrayFile::open(base_path('config/telescope.php'));
 
-        // TODO: add Authorize::class middleware after implementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
         $config->set('middleware', [
             'web',
             'auth:web',
         ]);
 
         $config->write();
+
+        // TODO: add Authorize::class middleware after implementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
+        $this->todoReporter->addConfiguration(
+            integration: 'Telescope',
+            label: 'Restrict Telescope access with the Authorize middleware',
+            hint: 'add Authorize::class to the middleware list in config/telescope.php',
+        );
     }
 
     protected function setAutoDocContactEmail(string $email): void
