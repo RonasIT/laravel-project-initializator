@@ -10,7 +10,7 @@ readonly class TodoItemDTO
         public TodoCategoryEnum $category,
         public string $label,
         public ?string $hint = null,
-        public array $meta = [],
+        public ?string $subcategory = null,
     ) {
     }
 }
