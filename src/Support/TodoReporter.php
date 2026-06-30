@@ -2,7 +2,6 @@
 
 namespace RonasIT\ProjectInitializator\Support;
 
-use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use RonasIT\ProjectInitializator\DTO\TodoItemDTO;
 use RonasIT\ProjectInitializator\Enums\TodoCategoryEnum;
@@ -55,19 +54,22 @@ class TodoReporter
         );
     }
 
-    public function render(Command $output): void
+    /**
+     * @return string[]
+     */
+    public function toLines(): array
     {
         if ($this->items->isEmpty()) {
-            return;
+            return [];
         }
 
-        $output->warn('Don`t forget to finish the setup:');
+        $lines = ['Don`t forget to finish the setup:'];
 
         $byCategory = $this->items->groupBy(fn (TodoItemDTO $item) => $item->category->value);
 
         foreach ($byCategory as $categoryValue => $items) {
-            $output->newLine();
-            $output->warn(TodoCategoryEnum::from($categoryValue)->label() . ':');
+            $lines[] = '';
+            $lines[] = TodoCategoryEnum::from($categoryValue)->label() . ':';
 
             $bySubcategory = $items->groupBy(fn (TodoItemDTO $item) => $item->subcategory ?? '');
 
@@ -75,7 +77,7 @@ class TodoReporter
                 $indent = '  ';
 
                 if ($subcategory !== '') {
-                    $output->warn("  {$subcategory}:");
+                    $lines[] = "  {$subcategory}:";
 
                     $indent = '    ';
                 }
@@ -87,10 +89,12 @@ class TodoReporter
                         $line .= " ({$item->hint})";
                     }
 
-                    $output->warn($line);
+                    $lines[] = $line;
                 }
             }
         }
+
+        return $lines;
     }
 
     protected function addItem(

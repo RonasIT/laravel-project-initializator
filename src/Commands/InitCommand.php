@@ -160,7 +160,9 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
-        $this->todoReporter->render($this);
+        foreach ($this->todoReporter->toLines() as $line) {
+            $this->warn($line);
+        }
     }
 
     protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
