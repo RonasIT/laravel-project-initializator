@@ -259,9 +259,10 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env.example', $data);
         $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
 
-        foreach (array_keys(Arr::except($data, ['AUTH_GUARD'])) as $envVar) {
-            $this->todoReporter->addEnvVariable($envVar, hint: 'get it from the Clerk dashboard');
-        }
+        $this->todoReporter->addEnvVariables(
+            names: array_keys(Arr::except($data, ['AUTH_GUARD'])),
+            hint: 'get it from the Clerk dashboard',
+        );
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
@@ -477,16 +478,12 @@ class InitCommand extends Command implements Isolatable
                 'GOOGLE_CLOUD_PROJECT_ID' => '',
             ]);
 
-            $this->todoReporter->addEnvVariable('GOOGLE_CLOUD_STORAGE_BUCKET', file: '.env.development');
-            $this->todoReporter->addEnvVariable('GOOGLE_CLOUD_PROJECT_ID', file: '.env.development');
+            $this->todoReporter->addEnvVariables(
+                names: ['GOOGLE_CLOUD_STORAGE_BUCKET', 'GOOGLE_CLOUD_PROJECT_ID', 'CLERK_SIGNER_KEY_PATH'],
+                file: '.env.development',
+            );
 
             $this->addGcsDiskToConfig();
-
-            $this->todoReporter->addConfiguration(
-                integration: 'GCS',
-                label: 'Provide the GCS service account key',
-                hint: 'set disks.gcs.key_file_path or disks.gcs.key_file in config/filesystems.php',
-            );
         }
 
         $this->updateEnvFile('.env.development', [

@@ -44,6 +44,16 @@ class TodoReporter
         );
     }
 
+    /**
+     * @param string[] $names
+     */
+    public function addEnvVariables(array $names, ?string $hint = null, string $file = '.env'): void
+    {
+        foreach ($names as $name) {
+            $this->addEnvVariable($name, $hint, $file);
+        }
+    }
+
     public function addConfiguration(string $integration, string $label, ?string $hint = null): void
     {
         $this->addItem(
