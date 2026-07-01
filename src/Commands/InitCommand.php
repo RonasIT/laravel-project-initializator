@@ -482,6 +482,7 @@ class InitCommand extends Command implements Isolatable
                 names: [
                     'GOOGLE_CLOUD_STORAGE_BUCKET',
                     'GOOGLE_CLOUD_PROJECT_ID',
+                    'GOOGLE_CLOUD_KEY_FILE',
                 ],
                 file: '.env.development',
             );
