@@ -13,11 +13,13 @@ use Laravel\Telescope\TelescopeServiceProvider;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
+use RonasIT\ProjectInitializator\DTO\TodoItemDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
+use RonasIT\ProjectInitializator\Enums\TodoCategoryEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 use RonasIT\ProjectInitializator\Support\FileSaver;
@@ -160,9 +162,7 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
-        foreach ($this->todoReporter->toLines() as $line) {
-            $this->warn($line);
-        }
+        $this->renderTodo();
     }
 
     protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
@@ -667,5 +667,53 @@ class InitCommand extends Command implements Isolatable
     protected function publishAdminsTableMigration(): void
     {
         $this->migrationPublisher->publish('admins_create_table');
+    }
+
+    protected function renderTodo(): void
+    {
+        $grouped = $this->todoReporter->getGrouped();
+
+        if ($grouped->isEmpty()) {
+            return;
+        }
+
+        $this->newLine();
+        $this->warn("Don't forget to finish the setup:");
+
+        foreach ($grouped as $categoryValue => $items) {
+            $label = TodoCategoryEnum::from($categoryValue)->label();
+
+            $this->newLine();
+            $this->line('<options=bold>' . $label . ':</>');
+
+            $bySubcategory = $items->groupBy(fn (TodoItemDTO $item) => $item->subcategory ?? '');
+
+            foreach ($bySubcategory as $subcategory => $subItems) {
+                if ($subcategory === '') {
+                    foreach ($subItems as $item) {
+                        $this->line($this->formatTodoItem($item));
+                    }
+
+                    continue;
+                }
+
+                $this->line("  <options=bold>{$subcategory}:</>");
+
+                foreach ($subItems as $item) {
+                    $this->line($this->formatTodoItem($item, indent: '    '));
+                }
+            }
+        }
+    }
+
+    protected function formatTodoItem(TodoItemDTO $item, string $indent = '  '): string
+    {
+        $line = "{$indent}- {$item->label}";
+
+        if (!empty($item->hint)) {
+            $line .= " <fg=gray>({$item->hint})</>";
+        }
+
+        return $line;
     }
 }

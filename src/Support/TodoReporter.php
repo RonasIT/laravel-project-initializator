@@ -68,59 +68,17 @@ class TodoReporter
     }
 
     /**
-     * @return string[]
+     * @return Collection<string, Collection<int, TodoItemDTO>>
      */
-    public function toLines(): array
+    public function getGrouped(): Collection
     {
-        if ($this->items->isEmpty()) {
-            return [];
-        }
-
-        $lines = ['Don`t forget to finish the setup:'];
-
-        $byCategory = $this->items->groupBy(fn (TodoItemDTO $item) => $item->category->value);
-
-        foreach (TodoCategoryEnum::cases() as $category) {
-            $items = $byCategory->get($category->value);
-
-            if (empty($items)) {
-                continue;
-            }
-
-            $lines[] = '';
-            $lines[] = $category->label() . ':';
-
-            $bySubcategory = $items->groupBy(fn (TodoItemDTO $item) => $item->subcategory ?? '');
-
-            foreach ($bySubcategory as $subcategory => $subItems) {
-                if ($subcategory === '') {
-                    foreach ($subItems as $item) {
-                        $lines[] = $this->formatItem($item);
-                    }
-
-                    continue;
-                }
-
-                $lines[] = "  {$subcategory}:";
-
-                foreach ($subItems as $item) {
-                    $lines[] = $this->formatItem($item, indent: '    ');
-                }
-            }
-        }
-
-        return $lines;
-    }
-
-    protected function formatItem(TodoItemDTO $item, string $indent = '  '): string
-    {
-        $line = "{$indent}- {$item->label}";
-
-        if (!empty($item->hint)) {
-            $line .= " ({$item->hint})";
-        }
-
-        return $line;
+        return collect(TodoCategoryEnum::cases())
+            ->mapWithKeys(fn (TodoCategoryEnum $category) => [
+                $category->value => $this->items
+                    ->filter(fn (TodoItemDTO $item) => $item->category === $category)
+                    ->values(),
+            ])
+            ->filter(fn (Collection $items) => $items->isNotEmpty());
     }
 
     protected function addItem(
