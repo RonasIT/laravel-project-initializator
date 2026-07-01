@@ -259,7 +259,7 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env.example', $data);
         $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
 
-        $this->todoReporter->addEnvVariables(
+        $this->todoReporter->addEnvVars(
             names: array_keys(Arr::except($data, ['AUTH_GUARD'])),
             hint: 'get it from the Clerk dashboard',
         );
@@ -478,7 +478,7 @@ class InitCommand extends Command implements Isolatable
                 'GOOGLE_CLOUD_PROJECT_ID' => '',
             ]);
 
-            $this->todoReporter->addEnvVariables(
+            $this->todoReporter->addEnvVars(
                 names: ['GOOGLE_CLOUD_STORAGE_BUCKET', 'GOOGLE_CLOUD_PROJECT_ID', 'CLERK_SIGNER_KEY_PATH'],
                 file: '.env.development',
             );

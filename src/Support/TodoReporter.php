@@ -34,23 +34,26 @@ class TodoReporter
         );
     }
 
-    public function addEnvVariable(string $name, ?string $hint = null, string $file = '.env'): void
+    public function addEnvVar(string $name, ?string $hint = null, string $file = '.env'): void
     {
+        if ($file !== '.env') {
+            $hint = ($hint === null) ? "in {$file}" : "{$hint}, in {$file}";
+        }
+
         $this->addItem(
             category: TodoCategoryEnum::Environment,
             label: $name,
             hint: $hint,
-            subcategory: $file,
         );
     }
 
     /**
      * @param string[] $names
      */
-    public function addEnvVariables(array $names, ?string $hint = null, string $file = '.env'): void
+    public function addEnvVars(array $names, ?string $hint = null, string $file = '.env'): void
     {
         foreach ($names as $name) {
-            $this->addEnvVariable($name, $hint, $file);
+            $this->addEnvVar($name, $hint, $file);
         }
     }
 
@@ -94,14 +97,14 @@ class TodoReporter
                     foreach ($subItems as $item) {
                         $lines[] = $this->formatItem($item);
                     }
-                } elseif ($subItems->count() > 1) {
-                    $lines[] = "  {$subcategory}:";
 
-                    foreach ($subItems as $item) {
-                        $lines[] = $this->formatItem($item, indent: '    ');
-                    }
-                } else {
-                    $lines[] = $this->formatItem($subItems->first(), prefix: "{$subcategory}: ");
+                    continue;
+                }
+
+                $lines[] = "  {$subcategory}:";
+
+                foreach ($subItems as $item) {
+                    $lines[] = $this->formatItem($item, indent: '    ');
                 }
             }
         }
@@ -109,9 +112,9 @@ class TodoReporter
         return $lines;
     }
 
-    protected function formatItem(TodoItemDTO $item, string $indent = '  ', string $prefix = ''): string
+    protected function formatItem(TodoItemDTO $item, string $indent = '  '): string
     {
-        $line = "{$indent}- {$prefix}{$item->label}";
+        $line = "{$indent}- {$item->label}";
 
         if (!empty($item->hint)) {
             $line .= " ({$item->hint})";
