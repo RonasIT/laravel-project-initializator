@@ -3,6 +3,7 @@
 namespace RonasIT\ProjectInitializator\Support;
 
 use Illuminate\Support\Collection;
+use RonasIT\ProjectInitializator\DTO\TodoGroupDTO;
 use RonasIT\ProjectInitializator\DTO\TodoItemDTO;
 use RonasIT\ProjectInitializator\Enums\TodoCategoryEnum;
 
@@ -68,17 +69,22 @@ class TodoReporter
     }
 
     /**
-     * @return Collection<string, Collection<int, TodoItemDTO>>
+     * @return Collection<string, Collection<int, TodoGroupDTO>>
      */
     public function getGrouped(): Collection
     {
         return collect(TodoCategoryEnum::cases())
             ->mapWithKeys(fn (TodoCategoryEnum $category) => [
-                $category->value => $this->items
-                    ->filter(fn (TodoItemDTO $item) => $item->category === $category)
-                    ->values(),
+                $category->value => $this->items->filter(fn (TodoItemDTO $item) => $item->category === $category),
             ])
-            ->filter(fn (Collection $items) => $items->isNotEmpty());
+            ->filter(fn (Collection $items) => $items->isNotEmpty())
+            ->map(fn (Collection $items) => $items
+                ->groupBy(fn (TodoItemDTO $item) => $item->subcategory ?? '')
+                ->map(fn (Collection $groupItems, string $key) => new TodoGroupDTO(
+                    subcategory: ($key === '') ? null : $key,
+                    items: $groupItems->values(),
+                ))
+                ->values());
     }
 
     protected function addItem(

@@ -680,27 +680,23 @@ class InitCommand extends Command implements Isolatable
         $this->newLine();
         $this->warn("Don't forget to finish the setup:");
 
-        foreach ($grouped as $categoryValue => $items) {
+        foreach ($grouped as $categoryValue => $groups) {
             $label = TodoCategoryEnum::from($categoryValue)->label();
 
             $this->newLine();
             $this->line('<options=bold>' . $label . ':</>');
 
-            $bySubcategory = $items->groupBy(fn (TodoItemDTO $item) => $item->subcategory ?? '');
+            foreach ($groups as $group) {
+                $indent = '  ';
 
-            foreach ($bySubcategory as $subcategory => $subItems) {
-                if ($subcategory === '') {
-                    foreach ($subItems as $item) {
-                        $this->line($this->formatTodoItem($item));
-                    }
+                if ($group->subcategory !== null) {
+                    $this->line("  <options=bold>{$group->subcategory}:</>");
 
-                    continue;
+                    $indent = '    ';
                 }
 
-                $this->line("  <options=bold>{$subcategory}:</>");
-
-                foreach ($subItems as $item) {
-                    $this->line($this->formatTodoItem($item, indent: '    '));
+                foreach ($group->items as $item) {
+                    $this->line($this->formatTodoItem($item, $indent));
                 }
             }
         }
