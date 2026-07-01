@@ -83,10 +83,10 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput("Don't forget to finish the setup:")
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - Restrict access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
+            ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -158,10 +158,10 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput("Don't forget to finish the setup:")
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - Restrict access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
+            ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -238,10 +238,10 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput("Don't forget to finish the setup:")
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - Restrict access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
+            ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -359,21 +359,20 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to finish the setup:')
-            ->expectsOutput('Environment:')
-            ->expectsOutput('  .env:')
-            ->expectsOutput('    - CLERK_ALLOWED_ISSUER (get it from the Clerk dashboard)')
-            ->expectsOutput('    - CLERK_SECRET_KEY (get it from the Clerk dashboard)')
-            ->expectsOutput('    - CLERK_SIGNER_KEY_PATH (get it from the Clerk dashboard)')
-            ->expectsOutput('    - CLERK_ALLOWED_ORIGINS (get it from the Clerk dashboard)')
+            ->expectsOutput("Don't forget to finish the setup:")
             ->expectsOutput('README:')
-            ->expectsOutput('  - Fill Issue Tracker link (in README)')
-            ->expectsOutput('  - Fill Figma link (in README)')
-            ->expectsOutput('  - Fill Sentry link (in README)')
-            ->expectsOutput('  - Fill Manager\'s email (in README)')
+            ->expectsOutput('  - Issue Tracker link')
+            ->expectsOutput('  - Figma link')
+            ->expectsOutput('  - Sentry link')
+            ->expectsOutput("  - Manager's email")
+            ->expectsOutput('Environment:')
+            ->expectsOutput('  - CLERK_ALLOWED_ISSUER (get it from the Clerk dashboard)')
+            ->expectsOutput('  - CLERK_SECRET_KEY (get it from the Clerk dashboard)')
+            ->expectsOutput('  - CLERK_SIGNER_KEY_PATH (get it from the Clerk dashboard)')
+            ->expectsOutput('  - CLERK_ALLOWED_ORIGINS (get it from the Clerk dashboard)')
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - Restrict access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
+            ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -479,12 +478,12 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput("Don't forget to finish the setup:")
             ->expectsOutput('README:')
-            ->expectsOutput('  - Fill Issue Tracker link (in README)')
+            ->expectsOutput('  - Issue Tracker link')
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - Restrict access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
+            ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -609,10 +608,10 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput("Don't forget to finish the setup:")
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - Restrict access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
+            ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -728,12 +727,12 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput("Don't forget to finish the setup:")
             ->expectsOutput('README:')
-            ->expectsOutput('  - Fill Issue Tracker link (in README)')
+            ->expectsOutput('  - Issue Tracker link')
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - Restrict access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
+            ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -852,20 +851,19 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to finish the setup:')
-            ->expectsOutput('Environment:')
-            ->expectsOutput('  .env:')
-            ->expectsOutput('    - CLERK_ALLOWED_ISSUER (get it from the Clerk dashboard)')
-            ->expectsOutput('    - CLERK_SECRET_KEY (get it from the Clerk dashboard)')
-            ->expectsOutput('    - CLERK_SIGNER_KEY_PATH (get it from the Clerk dashboard)')
+            ->expectsOutput("Don't forget to finish the setup:")
             ->expectsOutput('README:')
-            ->expectsOutput('  - Fill Issue Tracker link (in README)')
-            ->expectsOutput('  - Fill Figma link (in README)')
-            ->expectsOutput('  - Fill Sentry link (in README)')
-            ->expectsOutput('  - Fill Manager\'s email (in README)')
+            ->expectsOutput('  - Issue Tracker link')
+            ->expectsOutput('  - Figma link')
+            ->expectsOutput('  - Sentry link')
+            ->expectsOutput("  - Manager's email")
+            ->expectsOutput('Environment:')
+            ->expectsOutput('  - CLERK_ALLOWED_ISSUER (get it from the Clerk dashboard)')
+            ->expectsOutput('  - CLERK_SECRET_KEY (get it from the Clerk dashboard)')
+            ->expectsOutput('  - CLERK_SIGNER_KEY_PATH (get it from the Clerk dashboard)')
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - Restrict access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
+            ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -984,16 +982,15 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput("Don't forget to finish the setup:")
             ->expectsOutput('Environment:')
-            ->expectsOutput('  .env:')
-            ->expectsOutput('    - CLERK_ALLOWED_ISSUER (get it from the Clerk dashboard)')
-            ->expectsOutput('    - CLERK_SECRET_KEY (get it from the Clerk dashboard)')
-            ->expectsOutput('    - CLERK_SIGNER_KEY_PATH (get it from the Clerk dashboard)')
-            ->expectsOutput('    - CLERK_ALLOWED_ORIGINS (get it from the Clerk dashboard)')
+            ->expectsOutput('  - CLERK_ALLOWED_ISSUER (get it from the Clerk dashboard)')
+            ->expectsOutput('  - CLERK_SECRET_KEY (get it from the Clerk dashboard)')
+            ->expectsOutput('  - CLERK_SIGNER_KEY_PATH (get it from the Clerk dashboard)')
+            ->expectsOutput('  - CLERK_ALLOWED_ORIGINS (get it from the Clerk dashboard)')
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - Restrict access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
+            ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -1072,16 +1069,13 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to finish the setup:')
+            ->expectsOutput("Don't forget to finish the setup:")
             ->expectsOutput('Environment:')
-            ->expectsOutput('  .env.development:')
-            ->expectsOutput('    - GOOGLE_CLOUD_STORAGE_BUCKET (in .env.development)')
-            ->expectsOutput('    - GOOGLE_CLOUD_PROJECT_ID (in .env.development)')
+            ->expectsOutput('  - GOOGLE_CLOUD_STORAGE_BUCKET (in .env.development)')
+            ->expectsOutput('  - GOOGLE_CLOUD_PROJECT_ID (in .env.development)')
             ->expectsOutput('Configuration:')
-            ->expectsOutput('  GCS:')
-            ->expectsOutput('    - Provide the service account key (set disks.gcs.key_file_path or disks.gcs.key_file in config/filesystems.php)')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - Restrict access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
+            ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);
     }
 
