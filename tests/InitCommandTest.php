@@ -1075,7 +1075,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('  - GOOGLE_CLOUD_PROJECT_ID (in .env.development)')
             ->expectsOutput('Configuration:')
             ->expectsOutput('  GCS:')
-            ->expectsOutput('    - Provide the service account key (set disks.gcs.key_file_path or disks.gcs.key_file in config/filesystems.php)')
+            ->expectsOutput('    - Provide the service account key (set disks.gcs.key_file_path or disks.gcs.key_file in config/filesystems.php, or provide GOOGLE_APPLICATION_CREDENTIALS (Google ADC) in the environment)')
             ->expectsOutput('  Telescope:')
             ->expectsOutput('    - Restrict Telescope access with the Authorize middleware (add Authorize::class to the middleware list in config/telescope.php)')
             ->assertExitCode(0);

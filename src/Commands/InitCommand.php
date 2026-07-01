@@ -482,12 +482,17 @@ class InitCommand extends Command implements Isolatable
                 names: [
                     'GOOGLE_CLOUD_STORAGE_BUCKET',
                     'GOOGLE_CLOUD_PROJECT_ID',
-                    'GOOGLE_CLOUD_KEY_FILE',
                 ],
                 file: '.env.development',
             );
 
             $this->addGcsDiskToConfig();
+
+            $this->todoReporter->addConfiguration(
+                integration: 'GCS',
+                label: 'Provide the service account key',
+                hint: 'set disks.gcs.key_file_path or disks.gcs.key_file in config/filesystems.php, or provide GOOGLE_APPLICATION_CREDENTIALS (Google ADC) in the environment',
+            );
         }
 
         $this->updateEnvFile('.env.development', [
