@@ -49,7 +49,7 @@ class TodoReporter
     }
 
     /**
-     * @param string[] $names
+     * @param  string[]  $names
      */
     public function addEnvVars(array $names, ?string $hint = null, string $file = '.env'): void
     {

@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 readonly class TodoGroupDTO
 {
     /**
-     * @param Collection<int, TodoItemDTO> $items
+     * @param  Collection<int, TodoItemDTO>  $items
      */
     public function __construct(
         public ?string $subcategory,
