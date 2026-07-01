@@ -20,8 +20,8 @@ class TodoReporter
     {
         $this->addItem(
             category: TodoCategoryEnum::Readme,
-            label: $label ?? "Fill {$name}",
-            hint: $hint ?? 'in README',
+            label: $label ?? $name,
+            hint: $hint,
         );
     }
 
@@ -29,8 +29,8 @@ class TodoReporter
     {
         $this->addItem(
             category: TodoCategoryEnum::Readme,
-            label: $label ?? "Fill {$name} link",
-            hint: $hint ?? 'in README',
+            label: $label ?? "{$name} link",
+            hint: $hint,
         );
     }
 
@@ -39,7 +39,7 @@ class TodoReporter
         $this->addItem(
             category: TodoCategoryEnum::Environment,
             label: $name,
-            hint: $hint ?? "in {$file}",
+            hint: $hint,
             subcategory: $file,
         );
     }
@@ -77,34 +77,47 @@ class TodoReporter
 
         $byCategory = $this->items->groupBy(fn (TodoItemDTO $item) => $item->category->value);
 
-        foreach ($byCategory as $categoryValue => $items) {
+        foreach (TodoCategoryEnum::cases() as $category) {
+            $items = $byCategory->get($category->value);
+
+            if (empty($items)) {
+                continue;
+            }
+
             $lines[] = '';
-            $lines[] = TodoCategoryEnum::from($categoryValue)->label() . ':';
+            $lines[] = $category->label() . ':';
 
             $bySubcategory = $items->groupBy(fn (TodoItemDTO $item) => $item->subcategory ?? '');
 
             foreach ($bySubcategory as $subcategory => $subItems) {
-                $indent = '  ';
-
-                if ($subcategory !== '') {
+                if ($subcategory === '') {
+                    foreach ($subItems as $item) {
+                        $lines[] = $this->formatItem($item);
+                    }
+                } elseif ($subItems->count() > 1) {
                     $lines[] = "  {$subcategory}:";
 
-                    $indent = '    ';
-                }
-
-                foreach ($subItems as $item) {
-                    $line = "{$indent}- {$item->label}";
-
-                    if (!empty($item->hint)) {
-                        $line .= " ({$item->hint})";
+                    foreach ($subItems as $item) {
+                        $lines[] = $this->formatItem($item, indent: '    ');
                     }
-
-                    $lines[] = $line;
+                } else {
+                    $lines[] = $this->formatItem($subItems->first(), prefix: "{$subcategory}: ");
                 }
             }
         }
 
         return $lines;
+    }
+
+    protected function formatItem(TodoItemDTO $item, string $indent = '  ', string $prefix = ''): string
+    {
+        $line = "{$indent}- {$prefix}{$item->label}";
+
+        if (!empty($item->hint)) {
+            $line .= " ({$item->hint})";
+        }
+
+        return $line;
     }
 
     protected function addItem(
