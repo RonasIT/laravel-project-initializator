@@ -479,7 +479,10 @@ class InitCommand extends Command implements Isolatable
             ]);
 
             $this->todoReporter->addEnvVars(
-                names: ['GOOGLE_CLOUD_STORAGE_BUCKET', 'GOOGLE_CLOUD_PROJECT_ID', 'CLERK_SIGNER_KEY_PATH'],
+                names: [
+                    'GOOGLE_CLOUD_STORAGE_BUCKET',
+                    'GOOGLE_CLOUD_PROJECT_ID',
+                ],
                 file: '.env.development',
             );
 
