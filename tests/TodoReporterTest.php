@@ -2,6 +2,7 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use RonasIT\ProjectInitializator\DTO\TodoItemDTO;
 use RonasIT\ProjectInitializator\Enums\TodoCategoryEnum;
 use RonasIT\ProjectInitializator\Support\TodoReporter;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\TodoReporterTrait;
@@ -29,21 +30,21 @@ class TodoReporterTest extends TestCase
     {
         $this->todoReporter->addReadmeResourceLink('Issue Tracker');
 
-        $this->assertTodoItem(TodoCategoryEnum::Readme, 'Fill the Issue Tracker link', null);
+        $this->assertSingleTodoItem(TodoCategoryEnum::Readme, 'Fill the Issue Tracker link', null);
     }
 
     public function testAddReadmeField(): void
     {
         $this->todoReporter->addReadmeField("Manager's email");
 
-        $this->assertTodoItem(TodoCategoryEnum::Readme, "Fill the Manager's email", null);
+        $this->assertSingleTodoItem(TodoCategoryEnum::Readme, "Fill the Manager's email", null);
     }
 
     public function testAddEnvVar(): void
     {
         $this->todoReporter->addEnvVar('CLERK_SECRET_KEY');
 
-        $this->assertTodoItem(TodoCategoryEnum::Environment, 'Set the CLERK_SECRET_KEY value in .env.development', null);
+        $this->assertSingleTodoItem(TodoCategoryEnum::Environment, 'Set the CLERK_SECRET_KEY value in .env.development', null);
     }
 
     public function testAddEnvVarWithCustomFile(): void
@@ -53,7 +54,7 @@ class TodoReporterTest extends TestCase
             file: '.env.example',
         );
 
-        $this->assertTodoItem(TodoCategoryEnum::Environment, 'Set the GOOGLE_CLOUD_PROJECT_ID value in .env.example', null);
+        $this->assertSingleTodoItem(TodoCategoryEnum::Environment, 'Set the GOOGLE_CLOUD_PROJECT_ID value in .env.example', null);
     }
 
     public function testAddEnvVarWithCustomHint(): void
@@ -64,7 +65,7 @@ class TodoReporterTest extends TestCase
             file: '.env',
         );
 
-        $this->assertTodoItem(
+        $this->assertSingleTodoItem(
             category: TodoCategoryEnum::Environment,
             label: 'Set the CLERK_SECRET_KEY value in .env',
             hint: 'get it from the Clerk dashboard',
@@ -75,7 +76,7 @@ class TodoReporterTest extends TestCase
     {
         $this->todoReporter->addConfiguration('GCS', 'set the service account key', 'config/filesystems.php');
 
-        $this->assertTodoItem(TodoCategoryEnum::Configuration, 'GCS: set the service account key', 'config/filesystems.php');
+        $this->assertSingleTodoItem(TodoCategoryEnum::Configuration, 'GCS: set the service account key', 'config/filesystems.php');
     }
 
     public function testGetItemsGroupedByCategory(): void
@@ -91,7 +92,13 @@ class TodoReporterTest extends TestCase
             TodoCategoryEnum::Environment->value,
         ], $groupedItems->keys()->all());
 
-        $this->assertCount(2, $groupedItems[TodoCategoryEnum::Readme->value]);
-        $this->assertCount(1, $groupedItems[TodoCategoryEnum::Environment->value]);
+        $this->assertEquals([
+            new TodoItemDTO(TodoCategoryEnum::Readme, 'Fill the Figma link'),
+            new TodoItemDTO(TodoCategoryEnum::Readme, "Fill the Manager's email"),
+        ], $groupedItems[TodoCategoryEnum::Readme->value]->all());
+
+        $this->assertEquals([
+            new TodoItemDTO(TodoCategoryEnum::Environment, 'Set the GOOGLE_CLOUD_PROJECT_ID value in .env.development'),
+        ], $groupedItems[TodoCategoryEnum::Environment->value]->all());
     }
 }
