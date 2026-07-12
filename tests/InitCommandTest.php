@@ -347,11 +347,14 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
-            ->expectsOutput('- Figma link')
-            ->expectsOutput('- Sentry link')
-            ->expectsOutput('- Manager\'s email')
+            ->expectsOutput('Don\'t forget to complete the following steps:')
+            ->expectsOutput('README:')
+            ->expectsOutput('- Fill the Issue Tracker link')
+            ->expectsOutput('- Fill the Figma link')
+            ->expectsOutput('- Fill the Sentry link')
+            ->expectsOutput('- Fill the Manager\'s email')
+            ->expectsOutput('Configuration:')
+            ->expectsOutput('- Telescope: add the Authorize::class middleware (in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -457,8 +460,11 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
+            ->expectsOutput('Don\'t forget to complete the following steps:')
+            ->expectsOutput('README:')
+            ->expectsOutput('- Fill the Issue Tracker link')
+            ->expectsOutput('Configuration:')
+            ->expectsOutput('- Telescope: add the Authorize::class middleware (in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -698,8 +704,11 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
+            ->expectsOutput('Don\'t forget to complete the following steps:')
+            ->expectsOutput('README:')
+            ->expectsOutput('- Fill the Issue Tracker link')
+            ->expectsOutput('Configuration:')
+            ->expectsOutput('- Telescope: add the Authorize::class middleware (in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -818,11 +827,18 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
-            ->expectsOutput('- Figma link')
-            ->expectsOutput('- Sentry link')
-            ->expectsOutput('- Manager\'s email')
+            ->expectsOutput('Don\'t forget to complete the following steps:')
+            ->expectsOutput('README:')
+            ->expectsOutput('- Fill the Issue Tracker link')
+            ->expectsOutput('- Fill the Figma link')
+            ->expectsOutput('- Fill the Sentry link')
+            ->expectsOutput('- Fill the Manager\'s email')
+            ->expectsOutput('Environment variables:')
+            ->expectsOutput('- Set the CLERK_ALLOWED_ISSUER value in .env.development')
+            ->expectsOutput('- Set the CLERK_SECRET_KEY value in .env.development')
+            ->expectsOutput('- Set the CLERK_SIGNER_KEY_PATH value in .env.development')
+            ->expectsOutput('Configuration:')
+            ->expectsOutput('- Telescope: add the Authorize::class middleware (in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -1019,9 +1035,13 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- GOOGLE_CLOUD_STORAGE_BUCKET')
-            ->expectsOutput('- GOOGLE_CLOUD_PROJECT_ID')
+            ->expectsOutput('Don\'t forget to complete the following steps:')
+            ->expectsOutput('Environment variables:')
+            ->expectsOutput('- Set the GOOGLE_CLOUD_STORAGE_BUCKET value in .env.development')
+            ->expectsOutput('- Set the GOOGLE_CLOUD_PROJECT_ID value in .env.development')
+            ->expectsOutput('Configuration:')
+            ->expectsOutput('- GCS: provide the service account key (set disks.gcs.key_file_path in config/filesystems.php)')
+            ->expectsOutput('- Telescope: add the Authorize::class middleware (in config/telescope.php)')
             ->assertExitCode(0);
     }
 
