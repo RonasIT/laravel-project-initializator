@@ -18,7 +18,7 @@ trait InitCommandMockTrait
 
     protected function callCopy(string $source, string $result): array
     {
-        return $this->functionCall('copy', [$source, $result], true);
+        return $this->functionCall('copy', [$source, $result]);
     }
 
     protected function callFileExists(string $fileName, bool $result = true): array
