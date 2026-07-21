@@ -173,14 +173,23 @@ class InitCommand extends Command implements Isolatable
         $this->newLine();
         $this->warn("Don't forget to complete the following steps:");
 
-        foreach ($this->todoReporter->getItemsGroupedByCategory() as $categoryValue => $items) {
+        foreach ($this->todoReporter->getItemsGroupedByCategory() as $categoryValue => $subcategories) {
             $categoryTitle = TodoCategoryEnum::from($categoryValue)->title();
 
             $this->newLine();
             $this->warn("{$categoryTitle}:");
 
-            foreach ($items as $item) {
-                $this->warn(($item->hint) ? "- {$item->label} ({$item->hint})" : "- {$item->label}");
+            foreach ($subcategories as $subcategory => $items) {
+                if ($subcategory !== '') {
+                    $this->warn("  {$subcategory}:");
+                }
+
+                foreach ($items as $item) {
+                    $indent = ($subcategory !== '') ? '    ' : '  ';
+                    $line = "{$indent}- {$item->label}" . ($item->hint ? " ({$item->hint})" : '');
+
+                    $this->warn($line);
+                }
             }
         }
     }
@@ -278,13 +287,9 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env', $envData);
         $this->updateEnvFile('.env.example', $envData);
         $this->updateEnvFile('.env.development', Arr::except($envData, ['CLERK_SIGNER_KEY_PATH']));
-
-        foreach (array_keys(Arr::except($envData, ['AUTH_GUARD'])) as $envVariable) {
-            $this->todoReporter->addEnvVar($envVariable);
-        }
     }
 
-    protected function updateEnvFile(string $fileName, array $data): void
+    protected function updateEnvFile(string $fileName, array $data, bool $reportEmpty = true): void
     {
         $env = EnvFile::open($fileName);
 
@@ -293,6 +298,12 @@ class InitCommand extends Command implements Isolatable
         $env->set($data);
 
         $env->write();
+
+        if ($reportEmpty) {
+            foreach (array_keys(array_filter($data, fn (string $value) => $value === '')) as $key) {
+                $this->todoReporter->addEnvVar($key, $fileName);
+            }
+        }
     }
 
     protected function enableClerk(): void
@@ -444,7 +455,7 @@ class InitCommand extends Command implements Isolatable
         if ($link = $this->ask("Please enter a Manager's email", '')) {
             $this->readmeGenerator->setManagerEmail($link);
         } else {
-            $this->todoReporter->addReadmeField("Manager's email");
+            $this->todoReporter->addReadmeContact("Manager's email");
         }
     }
 
@@ -496,9 +507,6 @@ class InitCommand extends Command implements Isolatable
                 'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
                 'GOOGLE_CLOUD_PROJECT_ID' => '',
             ]);
-
-            $this->todoReporter->addEnvVar('GOOGLE_CLOUD_STORAGE_BUCKET');
-            $this->todoReporter->addEnvVar('GOOGLE_CLOUD_PROJECT_ID');
 
             $this->addGcsDiskToConfig();
 

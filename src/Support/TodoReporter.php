@@ -20,22 +20,22 @@ class TodoReporter
 
     public function addReadmeResourceLink(string $name, ?string $hint = null): void
     {
-        $this->addItem(TodoCategoryEnum::Readme, "Fill the {$name} link", $hint);
+        $this->addItem(TodoCategoryEnum::Readme, "Fill the {$name} link", $hint, subcategory: 'Resources');
     }
 
-    public function addReadmeField(string $name, ?string $hint = null): void
+    public function addReadmeContact(string $name, ?string $hint = null): void
     {
-        $this->addItem(TodoCategoryEnum::Readme, "Fill the {$name}", $hint);
+        $this->addItem(TodoCategoryEnum::Readme, "Fill the {$name}", $hint, subcategory: 'Contacts');
     }
 
-    public function addEnvVar(string $name, ?string $hint = null, string $file = '.env.development'): void
+    public function addEnvVar(string $name, string $file = '.env.development', ?string $hint = null): void
     {
-        $this->addItem(TodoCategoryEnum::Environment, "Set the {$name} value in {$file}", $hint);
+        $this->addItem(TodoCategoryEnum::Environment, $name, $hint, subcategory: $file);
     }
 
     public function addConfiguration(string $integration, string $label, ?string $hint = null): void
     {
-        $this->addItem(TodoCategoryEnum::Configuration, "{$integration}: {$label}", $hint);
+        $this->addItem(TodoCategoryEnum::Configuration, $label, $hint, subcategory: $integration);
     }
 
     public function isEmpty(): bool
@@ -44,7 +44,7 @@ class TodoReporter
     }
 
     /**
-     * @return Collection<string, Collection<int, TodoItemDTO>>
+     * @return Collection<string, Collection<string, Collection<int, TodoItemDTO>>>
      */
     public function getItemsGroupedByCategory(): Collection
     {
@@ -52,13 +52,22 @@ class TodoReporter
             ->mapWithKeys(fn (TodoCategoryEnum $category) => [
                 $category->value => $this->items
                     ->filter(fn (TodoItemDTO $item) => $item->category === $category)
-                    ->values(),
+                    ->groupBy(fn (TodoItemDTO $item) => $item->subcategory ?? '')
+                    ->map(fn (Collection $items) => $items->values()),
             ])
-            ->filter(fn (Collection $items) => $items->isNotEmpty());
+            ->filter(fn (Collection $subcategories) => $subcategories->isNotEmpty());
     }
 
-    protected function addItem(TodoCategoryEnum $category, string $label, ?string $hint = null): void
-    {
-        $this->items->push(new TodoItemDTO($category, $label, $hint));
+    protected function addItem(
+        TodoCategoryEnum $category,
+        string $label,
+        ?string $hint = null,
+        ?string $subcategory = null,
+    ): void {
+        $item = new TodoItemDTO($category, $label, $hint, $subcategory);
+
+        if ($this->items->doesntContain($item)) {
+            $this->items->push($item);
+        }
     }
 }
