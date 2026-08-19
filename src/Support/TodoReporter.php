@@ -20,22 +20,42 @@ class TodoReporter
 
     public function addReadmeResourceLink(string $name, ?string $hint = null): void
     {
-        $this->addItem(TodoCategoryEnum::Readme, "Fill the {$name} link", $hint, subcategory: 'Resources');
+        $this->addItem(
+            category: TodoCategoryEnum::Readme,
+            label: "Fill the {$name} link",
+            hint: $hint,
+            subcategory: 'Resources',
+        );
     }
 
     public function addReadmeContact(string $name, ?string $hint = null): void
     {
-        $this->addItem(TodoCategoryEnum::Readme, "Fill the {$name}", $hint, subcategory: 'Contacts');
+        $this->addItem(
+            category: TodoCategoryEnum::Readme,
+            label: "Fill the {$name}",
+            hint: $hint,
+            subcategory: 'Contacts',
+        );
     }
 
     public function addEnvVar(string $name, string $file = '.env.development', ?string $hint = null): void
     {
-        $this->addItem(TodoCategoryEnum::Environment, $name, $hint, subcategory: $file);
+        $this->addItem(
+            category: TodoCategoryEnum::Environment,
+            label: $name,
+            hint: $hint,
+            subcategory: $file,
+        );
     }
 
     public function addConfiguration(string $integration, string $label, ?string $hint = null): void
     {
-        $this->addItem(TodoCategoryEnum::Configuration, $label, $hint, subcategory: $integration);
+        $this->addItem(
+            category: TodoCategoryEnum::Configuration,
+            label: $label,
+            hint: $hint,
+            subcategory: $integration,
+        );
     }
 
     public function isEmpty(): bool

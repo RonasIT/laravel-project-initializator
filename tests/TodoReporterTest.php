@@ -30,21 +30,36 @@ class TodoReporterTest extends TestCase
     {
         $this->todoReporter->addReadmeResourceLink('Issue Tracker');
 
-        $this->assertSingleTodoItem(TodoCategoryEnum::Readme, 'Fill the Issue Tracker link', null, subcategory: 'Resources');
+        $this->assertSingleTodoItem(
+            category: TodoCategoryEnum::Readme,
+            label: 'Fill the Issue Tracker link',
+            hint: null,
+            subcategory: 'Resources',
+        );
     }
 
     public function testAddReadmeContact(): void
     {
         $this->todoReporter->addReadmeContact("Manager's email");
 
-        $this->assertSingleTodoItem(TodoCategoryEnum::Readme, "Fill the Manager's email", null, subcategory: 'Contacts');
+        $this->assertSingleTodoItem(
+            category: TodoCategoryEnum::Readme,
+            label: "Fill the Manager's email",
+            hint: null,
+            subcategory: 'Contacts',
+        );
     }
 
     public function testAddEnvVar(): void
     {
         $this->todoReporter->addEnvVar('CLERK_SECRET_KEY');
 
-        $this->assertSingleTodoItem(TodoCategoryEnum::Environment, 'CLERK_SECRET_KEY', null, subcategory: '.env.development');
+        $this->assertSingleTodoItem(
+            category: TodoCategoryEnum::Environment,
+            label: 'CLERK_SECRET_KEY',
+            hint: null,
+            subcategory: '.env.development',
+        );
     }
 
     public function testAddEnvVarWithCustomFile(): void
@@ -54,7 +69,12 @@ class TodoReporterTest extends TestCase
             file: '.env.example',
         );
 
-        $this->assertSingleTodoItem(TodoCategoryEnum::Environment, 'GOOGLE_CLOUD_PROJECT_ID', null, subcategory: '.env.example');
+        $this->assertSingleTodoItem(
+            category: TodoCategoryEnum::Environment,
+            label: 'GOOGLE_CLOUD_PROJECT_ID',
+            hint: null,
+            subcategory: '.env.example',
+        );
     }
 
     public function testAddEnvVarWithCustomHint(): void
@@ -75,8 +95,14 @@ class TodoReporterTest extends TestCase
 
     public function testAddEnvVarReportedForMultipleFilesAppearsUnderEachFile(): void
     {
-        $this->todoReporter->addEnvVar('CLERK_SECRET_KEY', file: '.env');
-        $this->todoReporter->addEnvVar('CLERK_SECRET_KEY', file: '.env.development');
+        $this->todoReporter->addEnvVar(
+            name: 'CLERK_SECRET_KEY',
+            file: '.env',
+        );
+        $this->todoReporter->addEnvVar(
+            name: 'CLERK_SECRET_KEY',
+            file: '.env.development',
+        );
 
         $groupedItems = $this->todoReporter->getItemsGroupedByCategory();
         $subcategories = $groupedItems[TodoCategoryEnum::Environment->value];
@@ -90,7 +116,12 @@ class TodoReporterTest extends TestCase
     {
         $this->todoReporter->addConfiguration('GCS', 'set the service account key', 'config/filesystems.php');
 
-        $this->assertSingleTodoItem(TodoCategoryEnum::Configuration, 'set the service account key', 'config/filesystems.php', subcategory: 'GCS');
+        $this->assertSingleTodoItem(
+            category: TodoCategoryEnum::Configuration,
+            label: 'set the service account key',
+            hint: 'config/filesystems.php',
+            subcategory: 'GCS',
+        );
     }
 
     public function testGetItemsGroupedByCategory(): void
@@ -109,15 +140,27 @@ class TodoReporterTest extends TestCase
         $readmeSubcategories = $groupedItems[TodoCategoryEnum::Readme->value];
 
         $this->assertEquals([
-            new TodoItemDTO(TodoCategoryEnum::Readme, 'Fill the Figma link', subcategory: 'Resources'),
+            new TodoItemDTO(
+                category: TodoCategoryEnum::Readme,
+                label: 'Fill the Figma link',
+                subcategory: 'Resources',
+            ),
         ], $readmeSubcategories['Resources']->all());
 
         $this->assertEquals([
-            new TodoItemDTO(TodoCategoryEnum::Readme, "Fill the Manager's email", subcategory: 'Contacts'),
+            new TodoItemDTO(
+                category: TodoCategoryEnum::Readme,
+                label: "Fill the Manager's email",
+                subcategory: 'Contacts',
+            ),
         ], $readmeSubcategories['Contacts']->all());
 
         $this->assertEquals([
-            new TodoItemDTO(TodoCategoryEnum::Environment, 'GOOGLE_CLOUD_PROJECT_ID', subcategory: '.env.development'),
+            new TodoItemDTO(
+                category: TodoCategoryEnum::Environment,
+                label: 'GOOGLE_CLOUD_PROJECT_ID',
+                subcategory: '.env.development',
+            ),
         ], $groupedItems[TodoCategoryEnum::Environment->value]['.env.development']->all());
     }
 }
