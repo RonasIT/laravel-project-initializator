@@ -241,6 +241,8 @@ class InitCommand extends Command implements Isolatable
 
         if (!file_exists('.env')) {
             copy('.env.example', '.env');
+
+            $this->reportEmptyEnvVars($envConfig, '.env');
         } else {
             $this->updateEnvFile('.env', $envConfig);
         }
@@ -289,7 +291,7 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env.development', Arr::except($envData, ['CLERK_SIGNER_KEY_PATH']));
     }
 
-    protected function updateEnvFile(string $fileName, array $data, bool $reportEmpty = true): void
+    protected function updateEnvFile(string $fileName, array $data): void
     {
         $env = EnvFile::open($fileName);
 
@@ -299,10 +301,13 @@ class InitCommand extends Command implements Isolatable
 
         $env->write();
 
-        if ($reportEmpty) {
-            foreach (array_keys(array_filter($data, fn (string $value) => $value === '')) as $key) {
-                $this->todoReporter->addEnvVar($key, $fileName);
-            }
+        $this->reportEmptyEnvVars($data, $fileName);
+    }
+
+    protected function reportEmptyEnvVars(array $data, string $fileName): void
+    {
+        foreach (array_keys(array_filter($data, fn (string $value) => $value === '')) as $key) {
+            $this->todoReporter->addEnvVar($key, $fileName);
         }
     }
 
