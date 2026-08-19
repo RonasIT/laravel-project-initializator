@@ -241,8 +241,6 @@ class InitCommand extends Command implements Isolatable
 
         if (!file_exists('.env')) {
             copy('.env.example', '.env');
-
-            $this->reportEmptyEnvVars($envConfig, '.env');
         } else {
             $this->updateEnvFile('.env', $envConfig);
         }
@@ -267,6 +265,12 @@ class InitCommand extends Command implements Isolatable
             'DB_USERNAME' => '',
             'DB_PASSWORD' => '',
         ]);
+
+        $this->todoReporter->addEnvVar('DB_HOST', '.env.development');
+        $this->todoReporter->addEnvVar('DB_PORT', '.env.development');
+        $this->todoReporter->addEnvVar('DB_DATABASE', '.env.development');
+        $this->todoReporter->addEnvVar('DB_USERNAME', '.env.development');
+        $this->todoReporter->addEnvVar('DB_PASSWORD', '.env.development');
     }
 
     protected function configureClerkAuth(): void
@@ -289,6 +293,17 @@ class InitCommand extends Command implements Isolatable
         $this->updateEnvFile('.env', $envData);
         $this->updateEnvFile('.env.example', $envData);
         $this->updateEnvFile('.env.development', Arr::except($envData, ['CLERK_SIGNER_KEY_PATH']));
+
+        $this->todoReporter->addEnvVar('CLERK_ALLOWED_ISSUER', '.env');
+        $this->todoReporter->addEnvVar('CLERK_ALLOWED_ISSUER', '.env.development');
+        $this->todoReporter->addEnvVar('CLERK_SECRET_KEY', '.env');
+        $this->todoReporter->addEnvVar('CLERK_SECRET_KEY', '.env.development');
+        $this->todoReporter->addEnvVar('CLERK_SIGNER_KEY_PATH', '.env');
+
+        if ($this->appType !== AppTypeEnum::Mobile) {
+            $this->todoReporter->addEnvVar('CLERK_ALLOWED_ORIGINS', '.env');
+            $this->todoReporter->addEnvVar('CLERK_ALLOWED_ORIGINS', '.env.development');
+        }
     }
 
     protected function updateEnvFile(string $fileName, array $data): void
@@ -300,19 +315,6 @@ class InitCommand extends Command implements Isolatable
         $env->set($data);
 
         $env->write();
-
-        $this->reportEmptyEnvVars($data, $fileName);
-    }
-
-    protected function reportEmptyEnvVars(array $data, string $fileName): void
-    {
-        if ($fileName === '.env.example') {
-            return;
-        }
-
-        foreach (array_keys(array_filter($data, fn (string $value) => $value === '')) as $key) {
-            $this->todoReporter->addEnvVar($key, $fileName);
-        }
     }
 
     protected function enableClerk(): void
@@ -516,6 +518,9 @@ class InitCommand extends Command implements Isolatable
                 'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
                 'GOOGLE_CLOUD_PROJECT_ID' => '',
             ]);
+
+            $this->todoReporter->addEnvVar('GOOGLE_CLOUD_STORAGE_BUCKET', '.env.development');
+            $this->todoReporter->addEnvVar('GOOGLE_CLOUD_PROJECT_ID', '.env.development');
 
             $this->addGcsDiskToConfig();
 

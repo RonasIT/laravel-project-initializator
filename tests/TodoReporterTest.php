@@ -52,7 +52,7 @@ class TodoReporterTest extends TestCase
 
     public function testAddEnvVar(): void
     {
-        $this->todoReporter->addEnvVar('CLERK_SECRET_KEY');
+        $this->todoReporter->addEnvVar('CLERK_SECRET_KEY', '.env.development');
 
         $this->assertSingleTodoItem(
             category: TodoCategoryEnum::Environment,
@@ -126,7 +126,7 @@ class TodoReporterTest extends TestCase
 
     public function testGetItemsGroupedByCategory(): void
     {
-        $this->todoReporter->addEnvVar('GOOGLE_CLOUD_PROJECT_ID');
+        $this->todoReporter->addEnvVar('GOOGLE_CLOUD_PROJECT_ID', '.env.development');
         $this->todoReporter->addReadmeResourceLink('Figma');
         $this->todoReporter->addReadmeContact("Manager's email");
 

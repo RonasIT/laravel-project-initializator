@@ -38,7 +38,7 @@ class TodoReporter
         );
     }
 
-    public function addEnvVar(string $name, string $file = '.env.development', ?string $hint = null): void
+    public function addEnvVar(string $name, string $file, ?string $hint = null): void
     {
         $this->addItem(
             category: TodoCategoryEnum::Environment,
