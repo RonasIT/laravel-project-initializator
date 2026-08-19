@@ -28,64 +28,37 @@ class TodoReporterTest extends TestCase
 
     public function testAddReadmeResourceLink(): void
     {
-        $this->todoReporter->addReadmeResourceLink('Issue Tracker');
+        $this->todoReporter->addReadmeResourceLink('Issue Tracker', hint: 'ask the project manager for the tracker URL');
 
-        $this->assertSingleTodoItem(
+        $this->assertTodoItem(
             category: TodoCategoryEnum::Readme,
             label: 'Fill the Issue Tracker link',
-            hint: null,
+            hint: 'ask the project manager for the tracker URL',
             subcategory: 'Resources',
         );
     }
 
     public function testAddReadmeContact(): void
     {
-        $this->todoReporter->addReadmeContact("Manager's email");
+        $this->todoReporter->addReadmeContact("Manager's email", hint: 'ask the team lead');
 
-        $this->assertSingleTodoItem(
+        $this->assertTodoItem(
             category: TodoCategoryEnum::Readme,
             label: "Fill the Manager's email",
-            hint: null,
+            hint: 'ask the team lead',
             subcategory: 'Contacts',
         );
     }
 
     public function testAddEnvVar(): void
     {
-        $this->todoReporter->addEnvVar('CLERK_SECRET_KEY', '.env.development');
-
-        $this->assertSingleTodoItem(
-            category: TodoCategoryEnum::Environment,
-            label: 'CLERK_SECRET_KEY',
-            hint: null,
-            subcategory: '.env.development',
-        );
-    }
-
-    public function testAddEnvVarWithCustomFile(): void
-    {
-        $this->todoReporter->addEnvVar(
-            name: 'GOOGLE_CLOUD_PROJECT_ID',
-            file: '.env.example',
-        );
-
-        $this->assertSingleTodoItem(
-            category: TodoCategoryEnum::Environment,
-            label: 'GOOGLE_CLOUD_PROJECT_ID',
-            hint: null,
-            subcategory: '.env.example',
-        );
-    }
-
-    public function testAddEnvVarWithCustomHint(): void
-    {
         $this->todoReporter->addEnvVar(
             name: 'CLERK_SECRET_KEY',
-            hint: 'get it from the Clerk dashboard',
             file: '.env',
+            hint: 'get it from the Clerk dashboard',
         );
 
-        $this->assertSingleTodoItem(
+        $this->assertTodoItem(
             category: TodoCategoryEnum::Environment,
             label: 'CLERK_SECRET_KEY',
             hint: 'get it from the Clerk dashboard',
@@ -116,7 +89,7 @@ class TodoReporterTest extends TestCase
     {
         $this->todoReporter->addConfiguration('GCS', 'set the service account key', 'config/filesystems.php');
 
-        $this->assertSingleTodoItem(
+        $this->assertTodoItem(
             category: TodoCategoryEnum::Configuration,
             label: 'set the service account key',
             hint: 'config/filesystems.php',

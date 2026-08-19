@@ -7,11 +7,11 @@ use RonasIT\ProjectInitializator\Enums\TodoCategoryEnum;
 
 trait TodoReporterTrait
 {
-    protected function assertSingleTodoItem(
+    protected function assertTodoItem(
         TodoCategoryEnum $category,
         string $label,
-        ?string $hint,
-        ?string $subcategory = null,
+        ?string $hint = null,
+        string $subcategory = '',
     ): void {
         $groupedItems = $this->todoReporter->getItemsGroupedByCategory();
 
@@ -19,10 +19,10 @@ trait TodoReporterTrait
 
         $subcategories = $groupedItems[$category->value];
 
-        $this->assertSame([$subcategory ?? ''], $subcategories->keys()->all());
-        $this->assertCount(1, $subcategories[$subcategory ?? '']);
+        $this->assertSame([$subcategory], $subcategories->keys()->all());
+        $this->assertCount(1, $subcategories[$subcategory]);
 
-        $item = $subcategories[$subcategory ?? ''][0];
+        $item = $subcategories[$subcategory][0];
 
         $this->assertInstanceOf(TodoItemDTO::class, $item);
         $this->assertSame($category, $item->category);
