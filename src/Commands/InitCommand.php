@@ -306,6 +306,10 @@ class InitCommand extends Command implements Isolatable
 
     protected function reportEmptyEnvVars(array $data, string $fileName): void
     {
+        if ($fileName === '.env.example') {
+            return;
+        }
+
         foreach (array_keys(array_filter($data, fn (string $value) => $value === '')) as $key) {
             $this->todoReporter->addEnvVar($key, $fileName);
         }
