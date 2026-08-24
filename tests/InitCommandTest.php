@@ -751,6 +751,8 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
             $this->callShellExec('php artisan laravel-clerk:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-exponent-push-notifications --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config" --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
@@ -820,7 +822,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
-            ->expectsConfirmation('Will the application use push notifications?')
+            ->expectsConfirmation('Will the application use push notifications?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')

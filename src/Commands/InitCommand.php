@@ -126,10 +126,8 @@ class InitCommand extends Command implements Isolatable
             $this->setupMediaStorage();
         }
 
-        if (in_array($this->appType, [AppTypeEnum::Multiplatform, AppTypeEnum::Mobile])) {
-            if (confirm('Will the application use push notifications?')) {
-                $this->setupPushNotifications();
-            }
+        if ($this->appType !== AppTypeEnum::Web && confirm('Will the application use push notifications?', false)) {
+            $this->setupPushNotifications();
         }
 
         if (confirm('Would you use Renovate dependabot?')) {
