@@ -15,6 +15,7 @@ This will prompt you with questions regarding the project and the necessary pack
 Upon completion:
  - A new README.md file will be created
  - `.env` files will be configured
+ - For `Web` and `Multiplatform` application types, `config/cors.php` will be published and its `paths` option will be set to `['*']`
  - Required packages will be installed:
    - [`laravel/ui`](https://github.com/laravel/ui)
    - [`ronasit/laravel-helpers`](https://github.com/RonasIT/laravel-helpers)
