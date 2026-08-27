@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Telescope\TelescopeServiceProvider;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
+use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
@@ -127,6 +128,10 @@ class InitCommand extends Command implements Isolatable
 
         if (confirm('Will project work with media files? (upload, store and return content)', false)) {
             $this->setupMediaStorage();
+        }
+
+        if ($this->appType !== AppTypeEnum::Web && confirm('Will the application use push notifications?', false)) {
+            $this->setupPushNotifications();
         }
 
         if (confirm('Would you use Renovate dependabot?')) {
@@ -288,11 +293,27 @@ class InitCommand extends Command implements Isolatable
 
         $this->migrationPublisher->publish('users_format_to_clerk');
 
+        $this->addClerkUserRepository();
+    }
+
+    protected function addClerkUserRepository(): void
+    {
         $this->fileSaver->publishClass(
             template: view('initializator::clerk_user_repository'),
             fileName: 'ClerkUserRepository',
             fileDirectory: 'app/Support/Clerk',
         );
+
+        new PHPFileBuilder(app_path('Providers/AppServiceProvider.php'))
+            ->addImports([
+                'App\Support\Clerk\ClerkUserRepository',
+                'RonasIT\Clerk\Contracts\UserRepositoryContract',
+            ])
+            ->insertCodeToMethod(
+                methodName: 'boot',
+                code: '$this->app->bind(UserRepositoryContract::class, ClerkUserRepository::class);',
+            )
+            ->save();
     }
 
     protected function createAdminUser(string $serviceKey = '', string $serviceName = ''): array
@@ -656,5 +677,11 @@ class InitCommand extends Command implements Isolatable
     protected function publishAdminsTableMigration(): void
     {
         $this->migrationPublisher->publish('admins_create_table');
+    }
+
+    protected function setupPushNotifications(): void
+    {
+        $this->shellCommands[] = 'composer require ronasit/laravel-exponent-push-notifications';
+        $this->shellCommands[] = 'php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config"';
     }
 }
