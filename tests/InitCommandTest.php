@@ -76,7 +76,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
-            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsChoice('Please choose the authentication type', 'default', ['clerk', 'default'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
@@ -149,7 +149,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
-            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsChoice('Please choose the authentication type', 'default', ['clerk', 'default'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
@@ -223,7 +223,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
-            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsChoice('Please choose the authentication type', 'default', ['clerk', 'default'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
@@ -310,7 +310,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
-            ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
+            ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'default'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
@@ -423,7 +423,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Web', ['Mobile', 'Web', 'Multiplatform'])
-            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsChoice('Please choose the authentication type', 'default', ['clerk', 'default'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsConfirmation('Do you want to generate all README parts?')
@@ -537,7 +537,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Mobile', ['Mobile', 'Web', 'Multiplatform'])
-            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsChoice('Please choose the authentication type', 'default', ['clerk', 'default'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
@@ -657,7 +657,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Web', ['Mobile', 'Web', 'Multiplatform'])
-            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsChoice('Please choose the authentication type', 'default', ['clerk', 'default'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsConfirmation('Do you want to generate all README parts?')
@@ -782,7 +782,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Mobile', ['Mobile', 'Web', 'Multiplatform'])
-            ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
+            ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'default'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
@@ -907,7 +907,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Web', ['Mobile', 'Web', 'Multiplatform'])
-            ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'none'])
+            ->expectsChoice('Please choose the authentication type', 'clerk', ['clerk', 'default'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsConfirmation('Do you want to generate all README parts?')
@@ -1021,7 +1021,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
             ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
             ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
-            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsChoice('Please choose the authentication type', 'default', ['clerk', 'default'])
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
@@ -1044,7 +1044,7 @@ class InitCommandTest extends TestCase
         $commandMock->shouldReceive('configureDefaultAuth');
         $commandMock->shouldReceive('publishAdminMigration')->andReturnNull();
 
-        $this->setReflectionProperty($commandMock, InitCommand::class, 'authType', AuthTypeEnum::None);
+        $this->setReflectionProperty($commandMock, InitCommand::class, 'authType', AuthTypeEnum::Default);
         $this->setReflectionProperty($commandMock, InitCommand::class, 'kebabAppName', 'my-app');
 
         $createAdminMethod = ReflectionMethod::createFromMethodName(InitCommand::class . '::createAdminUser');
