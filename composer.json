@@ -31,9 +31,9 @@
         "laravel/framework": ">=12",
         "php-mock/php-mock-phpunit": "^2.10",
         "ext-json": "*",
-        "ronasit/laravel-helpers": ">=3.5.7",
+        "ronasit/laravel-helpers": "dev-guzzle-8-support",
         "winter/laravel-config-writer": ">=1.2.1",
-        "ronasit/larabuilder": ">=0.0.8"
+        "ronasit/larabuilder": "dev-master"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23.1",
