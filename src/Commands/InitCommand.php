@@ -596,6 +596,10 @@ class InitCommand extends Command implements Isolatable
 
     protected function patchApplication(): void
     {
+        if ($this->appType !== AppTypeEnum::Mobile) {
+            $this->configureCors();
+        }
+
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
         $this->publishWebLogin();
         $this->configureBootstrap();
@@ -604,6 +608,17 @@ class InitCommand extends Command implements Isolatable
         if (!$this->migrationPublisher->isMigrationExists('drop_jobs_table')) {
             $this->migrationPublisher->publish('drop_jobs_table');
         }
+    }
+
+    protected function configureCors(): void
+    {
+        shell_exec('php artisan config:publish cors --force');
+
+        $config = ArrayFile::open(base_path('config/cors.php'));
+
+        $config->set('paths', ['*']);
+
+        $config->write();
     }
 
     protected function publishWebLogin(): void
