@@ -19,9 +19,9 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_pascal_case.yml', 'env.development_app_name_pascal_case_with_telescope_mail.yml'),
-            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -97,9 +97,9 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_pascal_case.yml', 'env.development_app_name_pascal_case_with_telescope_mail.yml'),
-            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -173,9 +173,9 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_app_name_not_pascal_case_with_telescope_mail.yml'),
-            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -256,9 +256,9 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.app_name_not_pascal_case.yml', 'env.clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_clerk_credentials_added.yml', 'env.development_clerk_credentials_added_with_telescope_mail.yml'),
-            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -379,9 +379,9 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_app_name_not_pascal_case_with_telescope_mail.yml'),
-            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -615,9 +615,9 @@ class InitCommandTest extends TestCase
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_app_name_not_pascal_case_with_telescope_mail.yml'),
-            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -865,9 +865,9 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_clerk_credentials_added.yml', 'env.development_clerk_credentials_added_with_telescope_mail.yml'),
-            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -986,9 +986,9 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_pascal_case.yml', 'env.development_storage_gcs.yml'),
             $this->changeConfigFileCall('config/filesystems.php', 'filesystems.php', 'filesystems_after_changes.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_storage_gcs.yml', 'env.development_storage_gcs.yml'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_storage_gcs.yml', 'env.development_storage_gcs_with_telescope_mail.yml'),
-            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 

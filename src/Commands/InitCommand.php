@@ -152,8 +152,6 @@ class InitCommand extends Command implements Isolatable
             shell_exec("{$shellCommand} --ansi");
         }
 
-        $this->configureTelescope();
-
         $this->patchApplication();
 
         if ($this->shouldUninstallPackage) {
@@ -600,6 +598,7 @@ class InitCommand extends Command implements Isolatable
             $this->configureCors();
         }
 
+        $this->configureTelescope();
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
         $this->publishWebLogin();
         $this->configureBootstrap();
