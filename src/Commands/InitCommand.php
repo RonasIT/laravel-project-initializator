@@ -152,7 +152,7 @@ class InitCommand extends Command implements Isolatable
             shell_exec("{$shellCommand} --ansi");
         }
 
-        $this->changeMiddlewareForTelescopeAuthorization();
+        $this->configureTelescope();
 
         $this->patchApplication();
 
@@ -683,5 +683,14 @@ class InitCommand extends Command implements Isolatable
     {
         $this->shellCommands[] = 'composer require ronasit/laravel-exponent-push-notifications';
         $this->shellCommands[] = 'php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config"';
+    }
+
+    protected function configureTelescope(): void
+    {
+        $this->changeMiddlewareForTelescopeAuthorization();
+
+        $this->updateEnvFile('.env.development', [
+            'TELESCOPE_REPORT_MAIL_TO' => $this->codeOwnerEmail,
+        ]);
     }
 }
