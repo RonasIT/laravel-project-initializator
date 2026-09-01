@@ -216,7 +216,7 @@ class InitCommand extends Command implements Isolatable
             'DB_PASSWORD' => $this->defaultDBConnectionConfig['password'],
         ];
 
-        $this->updateEnvFile('.env.example', $envConfig);
+        $this->updateEnvFile('.env.example', array_merge($envConfig, ['SESSION_DRIVER' => 'redis']));
 
         if (!file_exists('.env')) {
             copy('.env.example', '.env');
