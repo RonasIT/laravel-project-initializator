@@ -545,7 +545,7 @@ class InitCommandTest extends TestCase
             ->artisan('init "My App"')
             ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
             ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
-            ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsQuestion('Please enter an application URL', 'https://mysite.com/')
             ->expectsChoice('What type of application will your API serve?', 'Mobile', ['Mobile', 'Web', 'Multiplatform'])
             ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
             ->expectsConfirmation('Do you want to generate an admin user?', 'yes')

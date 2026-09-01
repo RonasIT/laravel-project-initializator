@@ -17,6 +17,7 @@ Below are links to tools and services used in this project:
 - [Laravel Telescope](https://mypsite.com/telescope-link): This is debug assistant for the Laravel framework.
 - [Laravel Nova](https://mypsite.com/nova-link): This is admin panel for the Laravel framework.
 - [API Documentation](https://mysite.com)
+- [Postman Collection](https://mysite.com/auto-doc/documentation/postman)
 
 ### Contacts
 

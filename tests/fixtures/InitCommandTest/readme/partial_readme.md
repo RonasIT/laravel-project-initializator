@@ -13,6 +13,7 @@ process, so you can efficiently find what you need or reach out to who you need.
 Below are links to tools and services used in this project:
 - [Issue Tracker](): Here, you can report any issues or bugs related to the project. (will be added later)
 - [API Documentation](https://mysite.com)
+- [Postman Collection](https://mysite.com/auto-doc/documentation/postman)
 
 ### Contacts
 
