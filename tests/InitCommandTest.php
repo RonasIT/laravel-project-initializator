@@ -20,6 +20,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -50,6 +51,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -79,13 +81,14 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
             ->assertExitCode(0);
     }
 
-    public function testRunWithoutAdminAndReadmeCreation()
+    public function testRunWithoutAdminAndReadmeCreationWithPushNotification()
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
@@ -93,6 +96,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -118,9 +122,12 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-exponent-push-notifications --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config" --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -148,6 +155,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
@@ -162,6 +170,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -192,6 +201,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -223,6 +233,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin name', 'TestAdmin')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
@@ -239,6 +250,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -273,6 +285,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -338,6 +351,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
@@ -358,6 +372,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -388,6 +403,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -571,6 +587,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
             ->expectsChoice('Which storage will be used for media files?', 's3', ['gcs', 'local', 's3'])
+            ->expectsConfirmation('Will the application use push notifications?')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
@@ -585,6 +602,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -615,6 +633,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -733,6 +752,8 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
             $this->callShellExec('php artisan laravel-clerk:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-exponent-push-notifications --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config" --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
@@ -802,6 +823,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
@@ -825,6 +847,7 @@ class InitCommandTest extends TestCase
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -858,6 +881,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -943,6 +967,7 @@ class InitCommandTest extends TestCase
             $this->changeConfigFileCall('config/filesystems.php', 'filesystems.php', 'filesystems_after_changes.php'),
             $this->changeEnvFileCall('.env.development', 'env.development_storage_gcs.yml', 'env.development_storage_gcs.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -975,6 +1000,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -1004,6 +1030,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
             ->expectsChoice('Which storage will be used for media files?', 'gcs', ['gcs', 'local', 's3'])
+            ->expectsConfirmation('Will the application use push notifications?')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')

@@ -126,6 +126,10 @@ class InitCommand extends Command implements Isolatable
             $this->setupMediaStorage();
         }
 
+        if ($this->appType !== AppTypeEnum::Web && confirm('Will the application use push notifications?', false)) {
+            $this->setupPushNotifications();
+        }
+
         if (confirm('Would you use Renovate dependabot?')) {
             $this->saveRenovateJSON();
 
@@ -594,6 +598,10 @@ class InitCommand extends Command implements Isolatable
 
     protected function patchApplication(): void
     {
+        if ($this->appType !== AppTypeEnum::Mobile) {
+            $this->configureCors();
+        }
+
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
         $this->publishWebLogin();
         $this->configureBootstrap();
@@ -602,6 +610,17 @@ class InitCommand extends Command implements Isolatable
         if (!$this->migrationPublisher->isMigrationExists('drop_jobs_table')) {
             $this->migrationPublisher->publish('drop_jobs_table');
         }
+    }
+
+    protected function configureCors(): void
+    {
+        shell_exec('php artisan config:publish cors --force');
+
+        $config = ArrayFile::open(base_path('config/cors.php'));
+
+        $config->set('paths', ['*']);
+
+        $config->write();
     }
 
     protected function publishWebLogin(): void
@@ -660,5 +679,11 @@ class InitCommand extends Command implements Isolatable
     protected function publishAdminsTableMigration(): void
     {
         $this->migrationPublisher->publish('admins_create_table');
+    }
+
+    protected function setupPushNotifications(): void
+    {
+        $this->shellCommands[] = 'composer require ronasit/laravel-exponent-push-notifications';
+        $this->shellCommands[] = 'php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config"';
     }
 }
