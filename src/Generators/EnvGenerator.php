@@ -2,6 +2,7 @@
 
 namespace RonasIT\ProjectInitializator\Generators;
 
+use RonasIT\ProjectInitializator\DTO\DBConnectionDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\EnvFileEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
@@ -9,32 +10,18 @@ use Winter\LaravelConfigWriter\EnvFile;
 
 class EnvGenerator
 {
-    public const array DEFAULT_DB_CONNECTION_CONFIG = [
-        'driver' => 'pgsql',
-        'host' => 'pgsql',
-        'port' => '5432',
-        'database' => 'postgres',
-        'username' => 'postgres',
-        'password' => '',
-    ];
-
     protected array $envVariables = [];
 
-    public function setupEnv(string $appName, string $appUrl): void
+    public function setupEnv(string $appName, string $appUrl, DBConnectionDTO $dbConnection): void
     {
         $this->setEnvVariables([
             'APP_NAME' => $appName,
-            'DB_CONNECTION' => self::DEFAULT_DB_CONNECTION_CONFIG['driver'],
-            'DB_HOST' => self::DEFAULT_DB_CONNECTION_CONFIG['host'],
-            'DB_PORT' => self::DEFAULT_DB_CONNECTION_CONFIG['port'],
-            'DB_DATABASE' => self::DEFAULT_DB_CONNECTION_CONFIG['database'],
-            'DB_USERNAME' => self::DEFAULT_DB_CONNECTION_CONFIG['username'],
-            'DB_PASSWORD' => self::DEFAULT_DB_CONNECTION_CONFIG['password'],
+            ...$this->getDBVariables($dbConnection),
         ], ...EnvFileEnum::cases());
 
-        $this->configureDevelopment($appUrl);
+        $this->configureDevelopment($appUrl, $dbConnection);
 
-        $this->configureTesting();
+        $this->configureTesting($dbConnection);
     }
 
     public function configureClerk(AppTypeEnum $appType): void
@@ -90,7 +77,7 @@ class EnvGenerator
         }
     }
 
-    protected function configureDevelopment(string $appUrl): void
+    protected function configureDevelopment(string $appUrl, DBConnectionDTO $dbConnection): void
     {
         $this->setEnvVariables([
             'APP_ENV' => 'development',
@@ -100,7 +87,7 @@ class EnvGenerator
             'CACHE_STORE' => 'redis',
             'QUEUE_CONNECTION' => 'redis',
             'SESSION_DRIVER' => 'redis',
-            'DB_CONNECTION' => self::DEFAULT_DB_CONNECTION_CONFIG['driver'],
+            'DB_CONNECTION' => $dbConnection->driver,
             'DB_HOST' => '',
             'DB_PORT' => '',
             'DB_DATABASE' => '',
@@ -109,20 +96,31 @@ class EnvGenerator
         ], EnvFileEnum::Development);
     }
 
-    protected function configureTesting(): void
+    protected function configureTesting(DBConnectionDTO $dbConnection): void
     {
-        $appKey = $this->generateAppKey();
-
         $this->setEnvVariables([
             'APP_ENV' => 'testing',
-            'APP_KEY' => $appKey,
+            'APP_KEY' => $this->generateAppKey(),
             'LOG_CHANNEL' => 'stderr',
-            'DB_HOST' => 'pgsql_test',
+            ...$this->getDBVariables($dbConnection),
+            'DB_HOST' => "{$dbConnection->host}_test",
         ], EnvFileEnum::CiTesting, EnvFileEnum::Testing);
 
         $this->setEnvVariables([
             'FAIL_EXPORT_JSON' => false,
         ], EnvFileEnum::Testing);
+    }
+
+    protected function getDBVariables(DBConnectionDTO $dbConnection): array
+    {
+        return [
+            'DB_CONNECTION' => $dbConnection->driver,
+            'DB_HOST' => $dbConnection->host,
+            'DB_PORT' => $dbConnection->port,
+            'DB_DATABASE' => $dbConnection->database,
+            'DB_USERNAME' => $dbConnection->username,
+            'DB_PASSWORD' => $dbConnection->password,
+        ];
     }
 
     protected function setEnvVariables(array $data, EnvFileEnum ...$envFiles): void

@@ -2,6 +2,7 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use RonasIT\ProjectInitializator\DTO\DBConnectionDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Generators\EnvGenerator;
@@ -34,7 +35,7 @@ class EnvGeneratorTest extends TestCase
 
         $generator = new EnvGenerator();
 
-        $generator->setupEnv('MyApp', 'https://mysite.com');
+        $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
 
         $generator->apply();
     }
@@ -62,7 +63,7 @@ class EnvGeneratorTest extends TestCase
 
         $generator = new EnvGenerator();
 
-        $generator->setupEnv('MyApp', 'https://mysite.com');
+        $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
         $generator->configureClerk(AppTypeEnum::Multiplatform);
 
         $generator->apply();
@@ -91,7 +92,7 @@ class EnvGeneratorTest extends TestCase
 
         $generator = new EnvGenerator();
 
-        $generator->setupEnv('MyApp', 'https://mysite.com');
+        $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
         $generator->configureClerk(AppTypeEnum::Mobile);
 
         $generator->apply();
@@ -120,7 +121,7 @@ class EnvGeneratorTest extends TestCase
 
         $generator = new EnvGenerator();
 
-        $generator->setupEnv('MyApp', 'https://mysite.com');
+        $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
         $generator->setFilesystemDisk(StorageEnum::S3);
 
         $generator->apply();
@@ -149,7 +150,7 @@ class EnvGeneratorTest extends TestCase
 
         $generator = new EnvGenerator();
 
-        $generator->setupEnv('MyApp', 'https://mysite.com');
+        $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
         $generator->setFilesystemDisk(StorageEnum::GCS);
         $generator->configureGcsStorage();
 
@@ -179,7 +180,7 @@ class EnvGeneratorTest extends TestCase
 
         $generator = new EnvGenerator();
 
-        $generator->setupEnv('MyApp', 'https://mysite.com');
+        $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
 
         $generator->apply();
     }

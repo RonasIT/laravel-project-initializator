@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Laravel\Telescope\TelescopeServiceProvider;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
+use RonasIT\ProjectInitializator\DTO\DBConnectionDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
@@ -63,12 +64,16 @@ class InitCommand extends Command implements Isolatable
 
     protected ?ReadmeGenerator $readmeGenerator = null;
 
+    protected DBConnectionDTO $dbConnection;
+
     public function __construct(
         protected FileSaver $fileSaver,
         protected MigrationPublisher $migrationPublisher,
         protected EnvGenerator $envGenerator,
     ) {
         parent::__construct();
+
+        $this->dbConnection = new DBConnectionDTO();
     }
 
     public function handle(): void
@@ -94,7 +99,7 @@ class InitCommand extends Command implements Isolatable
             default: AuthTypeEnum::None->value,
         ));
 
-        $this->envGenerator->setupEnv($this->appName, $this->appUrl);
+        $this->envGenerator->setupEnv($this->appName, $this->appUrl, $this->dbConnection);
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->configureClerkAuth();
@@ -572,11 +577,11 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
-        $driver = EnvGenerator::DEFAULT_DB_CONNECTION_CONFIG['driver'];
+        $driver = $this->dbConnection->driver;
 
         config([
             'database.default' => $driver,
-            "database.connections.{$driver}" => EnvGenerator::DEFAULT_DB_CONNECTION_CONFIG,
+            "database.connections.{$driver}" => $this->dbConnection->toArray(),
         ]);
 
         DB::purge($driver);
