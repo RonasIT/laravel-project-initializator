@@ -20,8 +20,6 @@ Upon completion:
    - `.env.development` — the application name, `APP_ENV=development`, the application URL, the Redis-based maintenance, cache, queue and session drivers, emptied database connection settings, the selected filesystem disk with the Google Cloud Storage keys for the `gcs` storage, and the Clerk credentials except `CLERK_SIGNER_KEY_PATH`
    - `.env.ci-testing` — the application name, `APP_ENV=testing`, a generated `APP_KEY`, `LOG_CHANNEL=stderr` and the test database connection settings, where `DB_HOST` gets a `_test` suffix (`pgsql_test`) and must be provided by the project's `docker-compose.yml`
    - `.env.testing` — the same as `.env.ci-testing`, plus `FAIL_EXPORT_JSON=false`
-
-   Both testing files are intended to be committed: the default Laravel `.gitignore` only excludes `/.env`, `.env.backup` and `.env.production`.
  - For `Web` and `Multiplatform` application types, `config/cors.php` will be published and its `paths` option will be set to `['*']`
  - Required packages will be installed:
    - [`laravel/ui`](https://github.com/laravel/ui)
