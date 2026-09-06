@@ -3,7 +3,7 @@
 namespace RonasIT\ProjectInitializator\Generators;
 
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
-use RonasIT\ProjectInitializator\Enums\EnvironmentEnum;
+use RonasIT\ProjectInitializator\Enums\EnvFileEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use Winter\LaravelConfigWriter\EnvFile;
 
@@ -30,7 +30,7 @@ class EnvGenerator
             'DB_DATABASE' => self::DEFAULT_DB_CONNECTION_CONFIG['database'],
             'DB_USERNAME' => self::DEFAULT_DB_CONNECTION_CONFIG['username'],
             'DB_PASSWORD' => self::DEFAULT_DB_CONNECTION_CONFIG['password'],
-        ], ...EnvironmentEnum::cases());
+        ], ...EnvFileEnum::cases());
 
         $this->configureDevelopment($appUrl);
 
@@ -49,31 +49,44 @@ class EnvGenerator
             $data['CLERK_ALLOWED_ORIGINS'] = '';
         }
 
-        $this->setEnvVariables($data, EnvironmentEnum::Local, EnvironmentEnum::Example, EnvironmentEnum::Development);
+        $this->setEnvVariables($data, EnvFileEnum::Local, EnvFileEnum::Example, EnvFileEnum::Development);
 
         $this->setEnvVariables([
             'CLERK_SIGNER_KEY_PATH' => '',
-        ], EnvironmentEnum::Local, EnvironmentEnum::Example);
+        ], EnvFileEnum::Local, EnvFileEnum::Example);
+    }
+
+    public function setFilesystemDisk(StorageEnum $storage): void
+    {
+        $this->setEnvVariables([
+            'FILESYSTEM_DISK' => $storage->value,
+        ], EnvFileEnum::Development);
     }
 
     public function configureGcsStorage(): void
     {
         $this->setEnvVariables([
-            'FILESYSTEM_DISK' => StorageEnum::GCS->value,
             'GOOGLE_CLOUD_STORAGE_PATH_PREFIX' => 'api',
             'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
             'GOOGLE_CLOUD_PROJECT_ID' => '',
-        ], EnvironmentEnum::Development);
+        ], EnvFileEnum::Development);
     }
 
     public function apply(): void
     {
-        foreach (EnvironmentEnum::cases() as $environment) {
-            if ($environment !== EnvironmentEnum::Example) {
-                $this->createEnvFileIfNotExists($environment->value, EnvironmentEnum::Example->value);
-            }
+        $this->createMissingEnvFiles();
 
-            $this->updateEnvFile($environment->value, $this->envVariables[$environment->value]);
+        foreach (EnvFileEnum::cases() as $envFile) {
+            $this->updateEnvFile($envFile->value, $this->envVariables[$envFile->value]);
+        }
+    }
+
+    protected function createMissingEnvFiles(): void
+    {
+        foreach (EnvFileEnum::cases() as $envFile) {
+            if ($envFile !== EnvFileEnum::Example) {
+                $this->createEnvFileIfNotExists($envFile->value, EnvFileEnum::Example->value);
+            }
         }
     }
 
@@ -93,7 +106,7 @@ class EnvGenerator
             'DB_DATABASE' => '',
             'DB_USERNAME' => '',
             'DB_PASSWORD' => '',
-        ], EnvironmentEnum::Development);
+        ], EnvFileEnum::Development);
     }
 
     protected function configureTesting(): void
@@ -104,24 +117,19 @@ class EnvGenerator
             'APP_ENV' => 'testing',
             'APP_KEY' => $appKey,
             'LOG_CHANNEL' => 'stderr',
-        ], EnvironmentEnum::CiTesting, EnvironmentEnum::Testing);
-
-        $this->setEnvVariables([
-            'DB_DATABASE' => 'forge',
-            'DB_USERNAME' => 'forge',
-        ], EnvironmentEnum::CiTesting);
-
-        $this->setEnvVariables([
             'DB_HOST' => 'pgsql_test',
+        ], EnvFileEnum::CiTesting, EnvFileEnum::Testing);
+
+        $this->setEnvVariables([
             'FAIL_EXPORT_JSON' => false,
-        ], EnvironmentEnum::Testing);
+        ], EnvFileEnum::Testing);
     }
 
-    protected function setEnvVariables(array $data, EnvironmentEnum ...$environments): void
+    protected function setEnvVariables(array $data, EnvFileEnum ...$envFiles): void
     {
-        foreach ($environments as $environment) {
+        foreach ($envFiles as $envFile) {
             foreach ($data as $key => $value) {
-                $this->envVariables[$environment->value][$key] = $value;
+                $this->envVariables[$envFile->value][$key] = $value;
             }
         }
     }

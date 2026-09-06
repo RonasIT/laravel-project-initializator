@@ -4,7 +4,7 @@ namespace RonasIT\ProjectInitializator\Enums;
 
 use RonasIT\Support\Traits\EnumTrait;
 
-enum EnvironmentEnum: string
+enum EnvFileEnum: string
 {
     use EnumTrait;
 

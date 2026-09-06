@@ -412,6 +412,8 @@ class InitCommand extends Command implements Isolatable
 
             $this->addGcsDiskToConfig();
         }
+
+        $this->envGenerator->setFilesystemDisk($storage);
     }
 
     protected function addGcsDiskToConfig(): void
