@@ -85,7 +85,10 @@ class InitCommand extends Command implements Isolatable
             rules: 'required|email',
         );
 
-        $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabAppName}.com");
+        $this->appUrl = rtrim(
+            string: $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabAppName}.com"),
+            characters: '/',
+        );
 
         $this->appType = AppTypeEnum::from(select(
             label: 'What type of application will your API serve?',

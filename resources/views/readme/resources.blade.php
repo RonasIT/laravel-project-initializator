@@ -7,3 +7,4 @@ Below are links to tools and services used in this project:
 @endif
 @endforeach
 - [API Documentation]({{ $apiLink }})
+- [Postman Collection]({{ $postmanLink }})

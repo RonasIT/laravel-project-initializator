@@ -8,6 +8,8 @@ use RonasIT\ProjectInitializator\Support\FileSaver;
 
 class ReadmeGenerator
 {
+    protected const string POSTMAN_COLLECTION_PATH = '/auto-doc/documentation/postman';
+
     protected string $readmeContent = '';
 
     protected string $appName;
@@ -116,6 +118,7 @@ class ReadmeGenerator
         $this->addContent('resources', [
             'resources' => $this->resources,
             'apiLink' => $this->appUrl,
+            'postmanLink' => $this->appUrl . self::POSTMAN_COLLECTION_PATH,
         ]);
 
         $this->addContent('contacts', [

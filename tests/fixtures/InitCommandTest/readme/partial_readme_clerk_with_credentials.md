@@ -14,6 +14,7 @@ Below are links to tools and services used in this project:
 - [Laravel Telescope](): This is debug assistant for the Laravel framework. (will be added later)
 - [Laravel Nova](): This is admin panel for the Laravel framework. (will be added later)
 - [API Documentation](https://mysite.com)
+- [Postman Collection](https://mysite.com/auto-doc/documentation/postman)
 
 ### Contacts
 
