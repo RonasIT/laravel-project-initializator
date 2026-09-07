@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Laravel\Telescope\TelescopeServiceProvider;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
+use RonasIT\ProjectInitializator\DTO\DBConnectionDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
@@ -19,11 +20,11 @@ use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
+use RonasIT\ProjectInitializator\Generators\EnvGenerator;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 use RonasIT\ProjectInitializator\Support\FileSaver;
 use RonasIT\ProjectInitializator\Support\MigrationPublisher;
 use Winter\LaravelConfigWriter\ArrayFile;
-use Winter\LaravelConfigWriter\EnvFile;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;
@@ -63,20 +64,16 @@ class InitCommand extends Command implements Isolatable
 
     protected ?ReadmeGenerator $readmeGenerator = null;
 
-    protected array $defaultDBConnectionConfig = [
-        'driver' => 'pgsql',
-        'host' => 'pgsql',
-        'port' => '5432',
-        'database' => 'postgres',
-        'username' => 'postgres',
-        'password' => '',
-    ];
+    protected DBConnectionDTO $dbConnection;
 
     public function __construct(
         protected FileSaver $fileSaver,
         protected MigrationPublisher $migrationPublisher,
+        protected EnvGenerator $envGenerator,
     ) {
         parent::__construct();
+
+        $this->dbConnection = new DBConnectionDTO();
     }
 
     public function handle(): void
@@ -90,8 +87,6 @@ class InitCommand extends Command implements Isolatable
 
         $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabAppName}.com");
 
-        $this->setupEnvFiles();
-
         $this->appType = AppTypeEnum::from(select(
             label: 'What type of application will your API serve?',
             options: AppTypeEnum::values(),
@@ -103,6 +98,8 @@ class InitCommand extends Command implements Isolatable
             options: AuthTypeEnum::values(),
             default: AuthTypeEnum::None->value,
         ));
+
+        $this->envGenerator->setupEnv($this->appName, $this->appUrl, $this->dbConnection);
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->configureClerkAuth();
@@ -130,6 +127,10 @@ class InitCommand extends Command implements Isolatable
             $this->setupPushNotifications();
         }
 
+        $this->envGenerator->configureTelescope($this->codeOwnerEmail);
+
+        $this->envGenerator->apply();
+
         if (confirm('Would you use Renovate dependabot?')) {
             $this->saveRenovateJSON();
 
@@ -151,6 +152,8 @@ class InitCommand extends Command implements Isolatable
         foreach ($this->shellCommands as $shellCommand) {
             shell_exec("{$shellCommand} --ansi");
         }
+
+        $this->changeMiddlewareForTelescopeAuthorization();
 
         $this->patchApplication();
 
@@ -202,79 +205,13 @@ class InitCommand extends Command implements Isolatable
         $this->kebabAppName = Str::kebab($appName);
     }
 
-    protected function setupEnvFiles(): void
-    {
-        $envConfig = [
-            'APP_NAME' => $this->appName,
-            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
-            'DB_HOST' => $this->defaultDBConnectionConfig['host'],
-            'DB_PORT' => $this->defaultDBConnectionConfig['port'],
-            'DB_DATABASE' => $this->defaultDBConnectionConfig['database'],
-            'DB_USERNAME' => $this->defaultDBConnectionConfig['username'],
-            'DB_PASSWORD' => $this->defaultDBConnectionConfig['password'],
-        ];
-
-        $this->updateEnvFile('.env.example', $envConfig);
-
-        if (!file_exists('.env')) {
-            copy('.env.example', '.env');
-        } else {
-            $this->updateEnvFile('.env', $envConfig);
-        }
-
-        if (!file_exists('.env.development')) {
-            copy('.env.example', '.env.development');
-        }
-
-        $this->updateEnvFile('.env.development', [
-            'APP_NAME' => $this->appName,
-            'APP_ENV' => 'development',
-            'APP_URL' => $this->appUrl,
-            'APP_MAINTENANCE_DRIVER' => 'cache',
-            'APP_MAINTENANCE_STORE' => 'redis',
-            'CACHE_STORE' => 'redis',
-            'QUEUE_CONNECTION' => 'redis',
-            'SESSION_DRIVER' => 'redis',
-            'DB_CONNECTION' => $this->defaultDBConnectionConfig['driver'],
-            'DB_HOST' => '',
-            'DB_PORT' => '',
-            'DB_DATABASE' => '',
-            'DB_USERNAME' => '',
-            'DB_PASSWORD' => '',
-        ]);
-    }
-
     protected function configureClerkAuth(): void
     {
         $this->enableClerk();
 
         shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force');
 
-        $data = [
-            'AUTH_GUARD' => 'clerk',
-            'CLERK_ALLOWED_ISSUER' => '',
-            'CLERK_SECRET_KEY' => '',
-            'CLERK_SIGNER_KEY_PATH' => '',
-        ];
-
-        if ($this->appType !== AppTypeEnum::Mobile) {
-            $data['CLERK_ALLOWED_ORIGINS'] = '';
-        }
-
-        $this->updateEnvFile('.env', $data);
-        $this->updateEnvFile('.env.example', $data);
-        $this->updateEnvFile('.env.development', Arr::except($data, ['CLERK_SIGNER_KEY_PATH']));
-    }
-
-    protected function updateEnvFile(string $fileName, array $data): void
-    {
-        $env = EnvFile::open($fileName);
-
-        $env->addEmptyLine();
-
-        $env->set($data);
-
-        $env->write();
+        $this->envGenerator->configureClerk($this->appType);
     }
 
     protected function enableClerk(): void
@@ -328,7 +265,7 @@ class InitCommand extends Command implements Isolatable
 
         if ($this->authType === AuthTypeEnum::None) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
-            $adminCredentials['role_id'] = $this->ask("Please enter admin role id{$serviceLabel}", RoleEnum::Admin->value);
+            $adminCredentials['role'] = RoleEnum::Admin->value;
         }
 
         if (!$isServiceAdmin) {
@@ -344,12 +281,14 @@ class InitCommand extends Command implements Isolatable
     {
         shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
 
-        if (!$this->migrationPublisher->isMigrationExists('roles_create_table')
-            && !$this->migrationPublisher->isMigrationExists('create_roles_table')
-        ) {
-            $this->migrationPublisher->publish('roles_create_table');
+        $this->fileSaver->publishClass(
+            template: view('initializator::enums.role_enum'),
+            fileName: 'RoleEnum',
+            fileDirectory: 'app/Enums/User',
+        );
 
-            $this->migrationPublisher->publish('users_add_role_id');
+        if (!$this->migrationPublisher->isMigrationExists('users_add_role')) {
+            $this->migrationPublisher->publish('users_add_role');
         }
     }
 
@@ -473,11 +412,7 @@ class InitCommand extends Command implements Isolatable
         if ($storage === StorageEnum::GCS) {
             $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage';
 
-            $this->updateEnvFile('.env.development', [
-                'GOOGLE_CLOUD_STORAGE_PATH_PREFIX' => 'api',
-                'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
-                'GOOGLE_CLOUD_PROJECT_ID' => '',
-            ]);
+            $this->envGenerator->configureGcsStorage();
 
             $this->emptyResourcesList[] = 'GOOGLE_CLOUD_STORAGE_BUCKET';
             $this->emptyResourcesList[] = 'GOOGLE_CLOUD_PROJECT_ID';
@@ -485,9 +420,7 @@ class InitCommand extends Command implements Isolatable
             $this->addGcsDiskToConfig();
         }
 
-        $this->updateEnvFile('.env.development', [
-            'FILESYSTEM_DISK' => $storage->value,
-        ]);
+        $this->envGenerator->setFilesystemDisk($storage);
     }
 
     protected function addGcsDiskToConfig(): void
@@ -598,7 +531,6 @@ class InitCommand extends Command implements Isolatable
             $this->configureCors();
         }
 
-        $this->configureTelescope();
         $this->setAutoDocContactEmail($this->codeOwnerEmail);
         $this->publishWebLogin();
         $this->configureBootstrap();
@@ -647,11 +579,11 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
-        $driver = $this->defaultDBConnectionConfig['driver'];
+        $driver = $this->dbConnection->driver;
 
         config([
             'database.default' => $driver,
-            "database.connections.{$driver}" => $this->defaultDBConnectionConfig,
+            "database.connections.{$driver}" => $this->dbConnection->toArray(),
         ]);
 
         DB::purge($driver);
@@ -682,14 +614,5 @@ class InitCommand extends Command implements Isolatable
     {
         $this->shellCommands[] = 'composer require ronasit/laravel-exponent-push-notifications';
         $this->shellCommands[] = 'php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config"';
-    }
-
-    protected function configureTelescope(): void
-    {
-        $this->changeMiddlewareForTelescopeAuthorization();
-
-        $this->updateEnvFile('.env.development', [
-            'TELESCOPE_REPORT_MAIL_TO' => $this->codeOwnerEmail,
-        ]);
     }
 }

@@ -9,21 +9,12 @@ use RonasIT\Support\Traits\MockTrait;
 
 trait InitCommandMockTrait
 {
+    use EnvMockTrait;
     use MockTrait;
 
     protected function callClassExists(string $class, bool $result = true): array
     {
         return $this->functionCall('class_exists', [$class], $result);
-    }
-
-    protected function callCopy(string $source, string $result): array
-    {
-        return $this->functionCall('copy', [$source, $result], true);
-    }
-
-    protected function callFileExists(string $fileName, bool $result = true): array
-    {
-        return $this->functionCall('file_exists', [$fileName], $result);
     }
 
     protected function callFileGetContent(string $fileName, string $sourceFixture): array
@@ -44,15 +35,6 @@ trait InitCommandMockTrait
     protected function callGlob(string $pattern, array $result): array
     {
         return $this->functionCall('glob', [$pattern], $result);
-    }
-
-    protected function changeEnvFileCall(string $fileName, string $sourceFixture, string $resultFixture): array
-    {
-        return [
-            $this->functionCall('is_file', [$fileName]),
-            $this->callFileGetContent($fileName, $this->getFixture("env/{$sourceFixture}")),
-            $this->callFilePutContent($fileName, $this->getFixture("env/{$resultFixture}")),
-        ];
     }
 
     protected function changeBootstrapAppCall(string $sourceFixture, string $resultFixture): array
