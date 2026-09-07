@@ -17,7 +17,7 @@ class EnvGeneratorTest extends TestCase
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.configured.yml'),
-            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.configured.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.session_driver_file.yml', 'env.configured.yml'),
             $this->changeEnvFileCall('.env.development', 'env.example.yml', 'env.development_configured.yml'),
             $this->changeEnvFileCall('.env.ci-testing', 'env.example.yml', 'env.ci-testing_configured.yml'),
             $this->changeEnvFileCall('.env.testing', 'env.example.yml', 'env.testing_configured.yml'),

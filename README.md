@@ -15,7 +15,7 @@ This will prompt you with questions regarding the project and the necessary pack
 Upon completion:
  - A new README.md file will be created
  - `.env` files will be configured, missing ones are created from `.env.example` beforehand:
-   - `.env.example` — the application name and the default database connection settings, plus the Clerk credentials when the `clerk` authentication type is selected
+   - `.env.example` — the application name, the default database connection settings, `SESSION_DRIVER=redis`, plus the Clerk credentials when the `clerk` authentication type is selected
    - `.env` — the application name and the default database connection settings, plus the Clerk credentials when the `clerk` authentication type is selected
    - `.env.development` — the application name, `APP_ENV=development`, the application URL, the Redis-based maintenance, cache, queue and session drivers, emptied database connection settings, the selected filesystem disk with the Google Cloud Storage keys for the `gcs` storage, and the Clerk credentials except `CLERK_SIGNER_KEY_PATH`
    - `.env.ci-testing` — the application name, `APP_ENV=testing`, a generated `APP_KEY`, `LOG_CHANNEL=stderr` and the test database connection settings, where `DB_HOST` gets a `_test` suffix (`pgsql_test`) and must be provided by the project's `docker-compose.yml`
