@@ -127,10 +127,6 @@ class InitCommand extends Command implements Isolatable
             $this->setupPushNotifications();
         }
 
-        $this->envGenerator->configureTelescope($this->codeOwnerEmail);
-
-        $this->envGenerator->apply();
-
         if (confirm('Would you use Renovate dependabot?')) {
             $this->saveRenovateJSON();
 
@@ -143,7 +139,9 @@ class InitCommand extends Command implements Isolatable
             $this->info('README generated successfully!');
         }
 
-        $this->installLaravelTelescope();
+        $this->setupLaravelTelescope();
+
+        $this->envGenerator->apply();
 
         $this->shouldUninstallPackage = confirm('Do you want to uninstall project-initializator package?');
 
@@ -462,7 +460,7 @@ class InitCommand extends Command implements Isolatable
         $this->fileSaver->publishJSON('renovate.json', $data);
     }
 
-    protected function installLaravelTelescope()
+    protected function setupLaravelTelescope(): void
     {
         if (!class_exists(TelescopeServiceProvider::class)) {
             array_push(
@@ -472,6 +470,8 @@ class InitCommand extends Command implements Isolatable
                 'php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force',
             );
         }
+
+        $this->envGenerator->configureTelescope($this->codeOwnerEmail);
     }
 
     protected function setupComposerHooks(): void
