@@ -98,6 +98,35 @@ class EnvGeneratorTest extends TestCase
         $generator->apply();
     }
 
+    public function testConfigureTelescope(): void
+    {
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.configured.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.configured.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.example.yml', 'env.development_telescope_configured.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.example.yml', 'env.ci-testing_configured.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.example.yml', 'env.testing_configured.yml'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+            $this->copyEnvFileCall('.env.development'),
+            $this->copyEnvFileCall('.env.ci-testing'),
+            $this->copyEnvFileCall('.env.testing'),
+
+            $this->callRandomBytes(),
+        );
+
+        $generator = new EnvGenerator();
+
+        $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
+        $generator->configureTelescope('test@example.com');
+
+        $generator->apply();
+    }
+
     public function testSetFilesystemDisk(): void
     {
         $this->mockNativeFunction(

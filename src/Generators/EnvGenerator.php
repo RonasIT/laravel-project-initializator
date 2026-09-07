@@ -43,6 +43,13 @@ class EnvGenerator
         ], EnvFileEnum::Local, EnvFileEnum::Example);
     }
 
+    public function configureTelescope(string $reportMailTo): void
+    {
+        $this->setEnvVariables([
+            'TELESCOPE_REPORT_MAIL_TO' => $reportMailTo,
+        ], EnvFileEnum::Development);
+    }
+
     public function setFilesystemDisk(StorageEnum $storage): void
     {
         $this->setEnvVariables([
