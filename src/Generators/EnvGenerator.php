@@ -22,6 +22,8 @@ class EnvGenerator
         $this->configureDevelopment($appUrl, $dbConnection);
 
         $this->configureTesting($dbConnection);
+
+        $this->configureExample();
     }
 
     public function configureClerk(AppTypeEnum $appType): void
@@ -109,6 +111,13 @@ class EnvGenerator
         $this->setEnvVariables([
             'FAIL_EXPORT_JSON' => false,
         ], EnvFileEnum::Testing);
+    }
+
+    protected function configureExample(): void
+    {
+        $this->setEnvVariables([
+            'SESSION_DRIVER' => 'redis',
+        ], EnvFileEnum::Example);
     }
 
     protected function getDBVariables(DBConnectionDTO $dbConnection): array
