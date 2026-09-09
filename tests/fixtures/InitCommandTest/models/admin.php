@@ -9,6 +9,7 @@ use RonasIT\Support\Traits\ModelTrait;
  * @property int $id
  * @property string $email
  * @property string $password
+ * @property string|null $remember_token
  */
 class Admin extends Authenticatable
 {
