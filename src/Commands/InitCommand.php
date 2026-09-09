@@ -212,7 +212,9 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureClerkAdminAuth(): void
     {
-        $this->migrationPublisher->publish('admins_create_table');
+        if (!$this->migrationPublisher->isMigrationExists('admins_create_table')) {
+            $this->migrationPublisher->publish('admins_create_table');
+        }
 
         $this->fileSaver->publishClass(
             template: view('initializator::models.admin'),
