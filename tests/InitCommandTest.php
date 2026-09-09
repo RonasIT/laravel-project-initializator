@@ -17,9 +17,13 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.example.yml', 'env.development_from_example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -29,13 +33,17 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+            $this->copyEnvFileCall('.env.development'),
+            $this->copyEnvFileCall('.env.ci-testing'),
+            $this->copyEnvFileCall('.env.testing'),
+
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
-            $this->callFileExists('.env', false),
-            $this->callFileExists('.env.development', false),
-
-            $this->callCopy('.env.example', '.env'),
-            $this->callCopy('.env.example', '.env.development'),
-
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer.json')),
@@ -50,20 +58,20 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
-            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -80,20 +88,24 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
             ->assertExitCode(0);
     }
 
-    public function testRunWithoutAdminAndReadmeCreation()
+    public function testRunWithoutAdminAndReadmeCreationWithPushNotification()
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
-            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -103,10 +115,17 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
+            'RonasIT\ProjectInitializator\Generators',
             $this->callFileExists('.env'),
             $this->callFileExists('.env.development'),
+            $this->callFileExists('.env.ci-testing'),
+            $this->callFileExists('.env.testing'),
 
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
@@ -119,24 +138,26 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-exponent-push-notifications --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config" --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
-            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -150,6 +171,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate an admin user?')
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
@@ -161,9 +183,13 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -173,12 +199,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
-            $this->callFileExists('.env', false),
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+
             $this->callFileExists('.env.development'),
+            $this->callFileExists('.env.ci-testing'),
+            $this->callFileExists('.env.testing'),
 
-            $this->callCopy('.env.example', '.env'),
+            $this->callRandomBytes(),
+        );
 
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
@@ -194,21 +226,21 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_add_default_admin.php', 'migration.php'),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
-            $this->mockMigrationFileWrite('2018_11_11_111115_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -224,9 +256,9 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
             ->expectsQuestion('Please enter admin name', 'TestAdmin')
-            ->expectsQuestion('Please enter admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
@@ -237,13 +269,14 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
-            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env', 'env.app_name_not_pascal_case.yml', 'env.clerk_credentials_added.yml'),
-            $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
             $this->changeConfigFileCall('config/auth.php', 'auth.php', 'auth_after_changes.php'),
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.example.yml', 'env.development_from_example_clerk_credentials_added.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -254,12 +287,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+
+            $this->copyEnvFileCall('.env.development'),
+            $this->callFileExists('.env.ci-testing'),
+            $this->callFileExists('.env.testing'),
+
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
-            $this->callFileExists('.env', false),
-            $this->callFileExists('.env.development'),
-
-            $this->callCopy('.env.example', '.env'),
-
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
@@ -278,6 +317,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -287,10 +327,10 @@ class InitCommandTest extends TestCase
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('default_readme.md'),
@@ -344,6 +384,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '123456')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
@@ -361,9 +402,13 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -373,12 +418,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
-            $this->callFileExists('.env', false),
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+
             $this->callFileExists('.env.development'),
+            $this->callFileExists('.env.ci-testing'),
+            $this->callFileExists('.env.testing'),
 
-            $this->callCopy('.env.example', '.env'),
+            $this->callRandomBytes(),
+        );
 
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
@@ -394,21 +445,21 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->mockReadmeFileWrite('partial_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
-            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -468,9 +519,11 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_filesystem_disk_added.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_filesystem_disk_added.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
@@ -481,12 +534,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
-            $this->callFileExists('.env', false),
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+
             $this->callFileExists('.env.development'),
+            $this->callFileExists('.env.ci-testing'),
+            $this->callFileExists('.env.testing'),
 
-            $this->callCopy('.env.example', '.env'),
+            $this->callRandomBytes(),
+        );
 
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
@@ -511,18 +570,17 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'nova_users_table_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_add_default_admin.php', 'migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111114_add_nova_admin.php', 'nova_users_table_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('full_readme.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
-            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111115_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -538,7 +596,6 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email', 'mail@mail.com')
             ->expectsQuestion('Please enter admin password', '123456')
             ->expectsQuestion('Please enter admin name', 'TestAdmin')
-            ->expectsQuestion('Please enter admin role id', 1)
             ->expectsConfirmation('Do you want to generate a README file?', 'yes')
             ->expectsConfirmation('Do you want to generate all README parts?')
             ->expectsConfirmation('Do you need a `Resources & Contacts` part?', 'yes')
@@ -577,10 +634,10 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'nova_mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '654321')
             ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
-            ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
             ->expectsChoice('Which storage will be used for media files?', 's3', ['gcs', 'local', 's3'])
+            ->expectsConfirmation('Will the application use push notifications?')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
@@ -592,9 +649,13 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -604,12 +665,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
-            $this->callFileExists('.env', false),
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+
             $this->callFileExists('.env.development'),
+            $this->callFileExists('.env.ci-testing'),
+            $this->callFileExists('.env.testing'),
 
-            $this->callCopy('.env.example', '.env'),
+            $this->callRandomBytes(),
+        );
 
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
@@ -625,23 +692,23 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'telescope_users_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'nova_users_table_migration.php'),
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_add_telescope_admin.php', 'telescope_users_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111114_add_nova_admin.php', 'nova_users_table_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
             $this->mockReadmeFileWrite('partial_readme_with_telescope.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
-            $this->mockMigrationFileWrite('2018_11_11_111116_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111115_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -690,11 +757,9 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please enter admin email for Laravel Telescope', 'telescope_mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Telescope', '654321')
             ->expectsQuestion('Please enter admin name for Laravel Telescope', 'Telescope Admin')
-            ->expectsQuestion('Please enter admin role id for Laravel Telescope', 1)
             ->expectsQuestion('Please enter admin email for Laravel Nova', 'nova_mail@mail.com')
             ->expectsQuestion('Please enter admin password for Laravel Nova', '654321')
             ->expectsQuestion('Please enter admin name for Laravel Nova', 'Nova Admin')
-            ->expectsQuestion('Please enter admin role id for Laravel Nova', 1)
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsOutput('README generated successfully!')
@@ -709,12 +774,12 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
-            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env', 'env.app_name_not_pascal_case.yml', 'env.clerk_credentials_added_mobile_app.yml'),
+            $this->changeConfigFileCall('config/auth.php', 'auth.php', 'auth_after_changes.php'),
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example_app_name_not_pascal_case.yml', 'env.example_clerk_credentials_added_mobile_app.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added_mobile_app.yml'),
-            $this->changeConfigFileCall('config/auth.php', 'auth.php', 'auth_after_changes.php'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
@@ -726,12 +791,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
-            $this->callFileExists('.env', false),
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+
             $this->callFileExists('.env.development'),
+            $this->callFileExists('.env.ci-testing'),
+            $this->callFileExists('.env.testing'),
 
-            $this->callCopy('.env.example', '.env'),
+            $this->callRandomBytes(),
+        );
 
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
@@ -747,6 +818,8 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-clerk --ansi'),
             $this->callShellExec('php artisan laravel-clerk:install --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-exponent-push-notifications --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config" --ansi'),
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
@@ -759,7 +832,6 @@ class InitCommandTest extends TestCase
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
 
@@ -818,6 +890,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Is Laravel Telescope\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Is Laravel Nova\'s admin the same as default one?', 'yes')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?', 'yes')
             ->expectsConfirmation('Would you use Renovate dependabot?', 'yes')
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsOutput('README generated successfully!')
@@ -835,13 +908,14 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
-            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
-            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.clerk_credentials_added.yml'),
+            $this->changeConfigFileCall('config/auth.php', 'auth.php', 'auth_after_changes.php'),
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_clerk_credentials_added.yml'),
             $this->changeEnvFileCall('.env.development', 'env.development_app_name_not_pascal_case.yml', 'env.development_clerk_credentials_added.yml'),
-            $this->changeConfigFileCall('config/auth.php', 'auth.php', 'auth_after_changes.php'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_not_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -852,12 +926,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
-            'RonasIT\ProjectInitializator\Commands',
-            $this->callFileExists('.env', false),
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+
             $this->callFileExists('.env.development'),
+            $this->callFileExists('.env.ci-testing'),
+            $this->callFileExists('.env.testing'),
 
-            $this->callCopy('.env.example', '.env'),
+            $this->callRandomBytes(),
+        );
 
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
@@ -875,6 +955,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
@@ -884,10 +965,11 @@ class InitCommandTest extends TestCase
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'admins_add_telescope_admin_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111113_admins_create_table.php')]),
 
             $this->mockReadmeFileWrite('partial_readme_clerk_with_credentials.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -954,12 +1036,14 @@ class InitCommandTest extends TestCase
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
-            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_pascal_case.yml'),
-            $this->changeEnvFileCall('.env.development', 'env.development_app_name_pascal_case.yml', 'env.development_storage_gcs.yml'),
             $this->changeConfigFileCall('config/filesystems.php', 'filesystems.php', 'filesystems_after_changes.php'),
-            $this->changeEnvFileCall('.env.development', 'env.development_storage_gcs.yml', 'env.development_storage_gcs.yml'),
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.example.yml', 'env.development_from_example_storage_gcs.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_pascal_case.yml'),
             $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
             $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
         );
 
@@ -969,13 +1053,18 @@ class InitCommandTest extends TestCase
         );
 
         $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+            $this->copyEnvFileCall('.env.development'),
+
+            $this->callFileExists('.env.ci-testing'),
+            $this->callFileExists('.env.testing'),
+
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
-            $this->callFileExists('.env', false),
-            $this->callFileExists('.env.development', false),
-
-            $this->callCopy('.env.example', '.env'),
-            $this->callCopy('.env.example', '.env.development'),
-
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -992,21 +1081,21 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
             $this->callShellExec('php artisan vendor:publish --tag=base-request'),
         );
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->mockMigrationFileWrite('2018_11_11_111112_roles_create_table.php', 'roles_create_table_migration.php'),
-            $this->mockMigrationFileWrite('2018_11_11_111113_users_add_role_id.php', 'users_add_role_id_migration.php'),
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callGlob(base_path('database/migrations/*_roles_create_table.php'), []),
-            $this->callGlob(base_path('database/migrations/*_create_roles_table.php'), []),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
             $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
-            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111113_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -1022,6 +1111,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you want to generate a README file?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)', 'yes')
             ->expectsChoice('Which storage will be used for media files?', 'gcs', ['gcs', 'local', 's3'])
+            ->expectsConfirmation('Will the application use push notifications?')
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
