@@ -397,11 +397,9 @@ class InitCommand extends Command implements Isolatable
         }
 
         foreach ($this->readmeGenerator->getAccessRequiredResources() as $resource) {
-            if (!empty($this->adminCredentials) && confirm("Is {$resource->title}'s admin the same as default one?")) {
-                $adminCredentials = $this->adminCredentials;
-            } else {
-                $adminCredentials = $this->createAdminUser($resource->key, $resource->title);
-            }
+            $adminCredentials = (!empty($this->adminCredentials) && confirm("Is {$resource->title}'s admin the same as default one?"))
+                ? $this->adminCredentials
+                : $this->createAdminUser($resource->key, $resource->title);
 
             $resource->setCredentials($adminCredentials['email'], $adminCredentials['password']);
         }
