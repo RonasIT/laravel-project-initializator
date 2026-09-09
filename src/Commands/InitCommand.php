@@ -108,10 +108,6 @@ class InitCommand extends Command implements Isolatable
         }
 
         if (confirm('Do you want to generate an admin user?')) {
-            if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->publishAdminsTableMigration();
-            }
-
             $this->createAdminUser();
         }
 
@@ -216,6 +212,8 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureClerkAdminAuth(): void
     {
+        $this->migrationPublisher->publish('admins_create_table');
+
         $this->fileSaver->publishClass(
             template: view('initializator::models.admin'),
             fileName: 'Admin',
@@ -402,10 +400,6 @@ class InitCommand extends Command implements Isolatable
             if (!empty($this->adminCredentials) && confirm("Is {$resource->title}'s admin the same as default one?")) {
                 $adminCredentials = $this->adminCredentials;
             } else {
-                if ($this->authType === AuthTypeEnum::Clerk && !$this->migrationPublisher->isMigrationExists('admins_create_table')) {
-                    $this->publishAdminsTableMigration();
-                }
-
                 $adminCredentials = $this->createAdminUser($resource->key, $resource->title);
             }
 
@@ -626,11 +620,6 @@ class InitCommand extends Command implements Isolatable
             : 'add_default_user';
 
         $this->migrationPublisher->publish($templateName, $adminCredentials, $migrationName);
-    }
-
-    protected function publishAdminsTableMigration(): void
-    {
-        $this->migrationPublisher->publish('admins_create_table');
     }
 
     protected function setupPushNotifications(): void
