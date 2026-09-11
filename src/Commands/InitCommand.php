@@ -231,6 +231,8 @@ class InitCommand extends Command implements Isolatable
         $this->envGenerator->configureJwt();
 
         $this->addJwtGuardToConfig();
+
+        $this->emptyResourcesList[] = 'JWT_SECRET';
     }
 
     protected function addJwtGuardToConfig(): void

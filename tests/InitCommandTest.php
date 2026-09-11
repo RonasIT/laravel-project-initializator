@@ -1203,6 +1203,8 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput('Don`t forget to fill the following empty values:')
+            ->expectsOutput('- JWT_SECRET')
             ->assertExitCode(0);
     }
 
