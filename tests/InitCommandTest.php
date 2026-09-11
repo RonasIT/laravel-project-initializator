@@ -1151,7 +1151,7 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-jwt --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -1203,8 +1203,6 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Please complete the following steps manually:')
-            ->expectsOutput('- Implement the `Tymon\JWTAuth\Contracts\JWTSubject` interface in the `App\Models\User` model (add the `getJWTIdentifier()` and `getJWTCustomClaims()` methods)')
             ->assertExitCode(0);
     }
 

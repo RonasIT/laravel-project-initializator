@@ -41,8 +41,6 @@ class InitCommand extends Command implements Isolatable
 
     protected array $emptyResourcesList = [];
 
-    protected array $manualActionsList = [];
-
     protected array $shellCommands = [
         'composer require laravel/ui',
         'composer require ronasit/laravel-helpers',
@@ -168,14 +166,6 @@ class InitCommand extends Command implements Isolatable
                 $this->warn("- {$value}");
             }
         }
-
-        if ($this->manualActionsList) {
-            $this->warn('Please complete the following steps manually:');
-
-            foreach ($this->manualActionsList as $value) {
-                $this->warn("- {$value}");
-            }
-        }
     }
 
     protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
@@ -229,7 +219,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureJwtAuth(): void
     {
-        $this->configureDefaultAuth();
+        $this->configureDefaultAuth('initializator-user-model-with-jwt');
 
         array_push(
             $this->shellCommands,
@@ -241,8 +231,6 @@ class InitCommand extends Command implements Isolatable
         $this->envGenerator->configureJwt();
 
         $this->addJwtGuardToConfig();
-
-        $this->manualActionsList[] = 'Implement the `Tymon\JWTAuth\Contracts\JWTSubject` interface in the `App\Models\User` model (add the `getJWTIdentifier()` and `getJWTCustomClaims()` methods)';
     }
 
     protected function addJwtGuardToConfig(): void
@@ -319,9 +307,9 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
-    protected function configureDefaultAuth(): void
+    protected function configureDefaultAuth(string $userModelTag = 'initializator-user-model-with-role'): void
     {
-        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
+        shell_exec("php artisan vendor:publish --tag={$userModelTag} --force");
 
         $this->fileSaver->publishClass(
             template: view('initializator::enums.role_enum'),

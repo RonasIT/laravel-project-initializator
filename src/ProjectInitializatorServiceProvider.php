@@ -37,6 +37,10 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
         ], 'initializator-user-model-with-role');
 
         $this->publishes([
+            __DIR__ . '/../stubs/models/user_with_jwt.php' => app_path('Models/User.php'),
+        ], 'initializator-user-model-with-jwt');
+
+        $this->publishes([
             __DIR__ . '/../stubs/models/user_with_clerk.php' => app_path('Models/User.php'),
         ], 'initializator-user-model-with-clerk');
     }
