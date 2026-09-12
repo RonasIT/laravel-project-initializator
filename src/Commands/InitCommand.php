@@ -101,11 +101,11 @@ class InitCommand extends Command implements Isolatable
 
         $this->envGenerator->setupEnv($this->appName, $this->appUrl, $this->dbConnection);
 
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->configureClerkAuth();
-        } else {
-            $this->configureDefaultAuth();
-        }
+        match ($this->authType) {
+            AuthTypeEnum::Clerk => $this->configureClerkAuth(),
+            AuthTypeEnum::Jwt => $this->configureJwtAuth(),
+            AuthTypeEnum::None => $this->publishRoleBasedUser(),
+        };
 
         if (confirm('Do you want to generate an admin user?')) {
             if ($this->authType === AuthTypeEnum::Clerk) {
@@ -212,6 +212,35 @@ class InitCommand extends Command implements Isolatable
         $this->envGenerator->configureClerk($this->appType);
     }
 
+    protected function configureJwtAuth(): void
+    {
+        $this->publishRoleBasedUser('initializator-user-model-with-jwt');
+
+        array_push(
+            $this->shellCommands,
+            'composer require tymon/jwt-auth',
+            'php artisan jwt:secret --force',
+            'php artisan vendor:publish --provider="Tymon\\JWTAuth\\Providers\\LaravelServiceProvider"',
+        );
+
+        $this->envGenerator->configureJwt();
+
+        $this->addJwtGuardToConfig();
+
+        $this->emptyResourcesList[] = 'JWT_SECRET';
+    }
+
+    protected function addJwtGuardToConfig(): void
+    {
+        $config = ArrayFile::open(base_path('config/auth.php'));
+
+        $config
+            ->set('guards.api.driver', 'jwt')
+            ->set('guards.api.provider', 'users');
+
+        $config->write();
+    }
+
     protected function enableClerk(): void
     {
         array_push(
@@ -261,7 +290,7 @@ class InitCommand extends Command implements Isolatable
 
         $adminName = when($isServiceAdmin, "{$serviceName} Admin", 'Admin');
 
-        if ($this->authType === AuthTypeEnum::None) {
+        if (in_array($this->authType, [AuthTypeEnum::None, AuthTypeEnum::Jwt], true)) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role'] = RoleEnum::Admin->value;
         }
@@ -275,9 +304,9 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
-    protected function configureDefaultAuth(): void
+    protected function publishRoleBasedUser(string $userModelTag = 'initializator-user-model-with-role'): void
     {
-        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
+        shell_exec("php artisan vendor:publish --tag={$userModelTag} --force");
 
         $this->fileSaver->publishClass(
             template: view('initializator::enums.role_enum'),

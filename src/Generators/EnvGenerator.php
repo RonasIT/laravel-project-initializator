@@ -43,6 +43,17 @@ class EnvGenerator
         ], EnvFileEnum::Local, EnvFileEnum::Example);
     }
 
+    public function configureJwt(): void
+    {
+        $this->setEnvVariables([
+            'AUTH_GUARD' => 'api',
+        ], EnvFileEnum::Local, EnvFileEnum::Example, EnvFileEnum::Development);
+
+        $this->setEnvVariables([
+            'JWT_SECRET' => '',
+        ], EnvFileEnum::Example, EnvFileEnum::Development);
+    }
+
     public function setFilesystemDisk(StorageEnum $storage): void
     {
         $this->setEnvVariables([
