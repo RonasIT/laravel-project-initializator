@@ -101,7 +101,11 @@ class InitCommand extends Command implements Isolatable
 
         $this->envGenerator->setupEnv($this->appName, $this->appUrl, $this->dbConnection);
 
-        $this->configureAuthType();
+        match ($this->authType) {
+            AuthTypeEnum::Clerk => $this->configureClerkAuth(),
+            AuthTypeEnum::Jwt => $this->configureJwtAuth(),
+            AuthTypeEnum::None => $this->publishRoleBasedUser(),
+        };
 
         if (confirm('Do you want to generate an admin user?')) {
             if ($this->authType === AuthTypeEnum::Clerk) {
@@ -208,18 +212,9 @@ class InitCommand extends Command implements Isolatable
         $this->envGenerator->configureClerk($this->appType);
     }
 
-    protected function configureAuthType(): void
-    {
-        match ($this->authType) {
-            AuthTypeEnum::Clerk => $this->configureClerkAuth(),
-            AuthTypeEnum::Jwt => $this->configureJwtAuth(),
-            AuthTypeEnum::None => $this->configureDefaultAuth(),
-        };
-    }
-
     protected function configureJwtAuth(): void
     {
-        $this->configureDefaultAuth('initializator-user-model-with-jwt');
+        $this->publishRoleBasedUser('initializator-user-model-with-jwt');
 
         array_push(
             $this->shellCommands,
@@ -309,7 +304,7 @@ class InitCommand extends Command implements Isolatable
         return $adminCredentials;
     }
 
-    protected function configureDefaultAuth(string $userModelTag = 'initializator-user-model-with-role'): void
+    protected function publishRoleBasedUser(string $userModelTag = 'initializator-user-model-with-role'): void
     {
         shell_exec("php artisan vendor:publish --tag={$userModelTag} --force");
 
