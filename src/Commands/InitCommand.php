@@ -224,7 +224,7 @@ class InitCommand extends Command implements Isolatable
         array_push(
             $this->shellCommands,
             'composer require tymon/jwt-auth',
-            'php artisan jwt:secret',
+            'php artisan jwt:secret --force',
             'php artisan vendor:publish --provider="Tymon\\JWTAuth\\Providers\\LaravelServiceProvider"',
         );
 
