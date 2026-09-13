@@ -16,6 +16,7 @@ use RonasIT\ProjectInitializator\DTO\DBConnectionDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
+use RonasIT\ProjectInitializator\Enums\EnvFileEnum;
 use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
@@ -66,17 +67,15 @@ class InitCommand extends Command implements Isolatable
 
     protected DBConnectionDTO $dbConnection;
 
-    protected EnvGenerator $envGenerator;
-
     public function __construct(
         protected FileSaver $fileSaver,
         protected MigrationPublisher $migrationPublisher,
+        protected EnvGenerator $envGenerator,
         protected TodoReporter $todoReporter,
     ) {
         parent::__construct();
 
         $this->dbConnection = new DBConnectionDTO();
-        $this->envGenerator = new EnvGenerator($this->todoReporter);
     }
 
     public function handle(): void
@@ -130,7 +129,7 @@ class InitCommand extends Command implements Isolatable
             $this->setupPushNotifications();
         }
 
-        $this->envGenerator->apply();
+        $this->writeEnvFiles();
 
         if (confirm('Would you use Renovate dependabot?')) {
             $this->saveRenovateJSON();
@@ -167,6 +166,17 @@ class InitCommand extends Command implements Isolatable
         $this->info('Project initialized successfully!');
 
         $this->renderTodoReport();
+    }
+
+    protected function writeEnvFiles(): void
+    {
+        $this->envGenerator->apply();
+
+        foreach (EnvFileEnum::cases() as $envFile) {
+            foreach ($this->envGenerator->emptyVars[$envFile->value] ?? [] as $name) {
+                $this->todoReporter->addEnvVar($name, $envFile->value);
+            }
+        }
     }
 
     protected function renderTodoReport(): void

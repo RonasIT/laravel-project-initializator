@@ -6,24 +6,16 @@ use RonasIT\ProjectInitializator\DTO\DBConnectionDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\EnvFileEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
-use RonasIT\ProjectInitializator\Support\TodoReporter;
 use Winter\LaravelConfigWriter\EnvFile;
 
 class EnvGenerator
 {
-    protected const array REPORTABLE_ENV_FILES = [
-        EnvFileEnum::Local,
-        EnvFileEnum::Development,
-    ];
-
     protected array $envVariables = [];
 
-    protected array $varsToFill = [];
-
-    public function __construct(
-        protected readonly TodoReporter $todoReporter,
-    ) {
-    }
+    /**
+     * @var array<string, string[]> a list of empty variable names per env file
+     */
+    protected(set) array $emptyVars = [];
 
     public function setupEnv(string $appName, string $appUrl, DBConnectionDTO $dbConnection): void
     {
@@ -33,7 +25,7 @@ class EnvGenerator
                 ...$this->getDBVariables($dbConnection),
             ],
             envFiles: EnvFileEnum::cases(),
-            shouldReport: false,
+            shouldReportEmpty: false,
         );
 
         $this->configureDevelopment($appUrl, $dbConnection);
@@ -83,8 +75,6 @@ class EnvGenerator
         foreach (EnvFileEnum::cases() as $envFile) {
             $this->updateEnvFile($envFile->value, $this->envVariables[$envFile->value]);
         }
-
-        $this->reportVarsToFill();
     }
 
     protected function createMissingEnvFiles(): void
@@ -117,13 +107,17 @@ class EnvGenerator
 
     protected function configureTesting(DBConnectionDTO $dbConnection): void
     {
-        $this->setEnvVariables([
-            'APP_ENV' => 'testing',
-            'APP_KEY' => $this->generateAppKey(),
-            'LOG_CHANNEL' => 'stderr',
-            ...$this->getDBVariables($dbConnection),
-            'DB_HOST' => "{$dbConnection->host}_test",
-        ], [EnvFileEnum::CiTesting, EnvFileEnum::Testing]);
+        $this->setEnvVariables(
+            data: [
+                'APP_ENV' => 'testing',
+                'APP_KEY' => $this->generateAppKey(),
+                'LOG_CHANNEL' => 'stderr',
+                ...$this->getDBVariables($dbConnection),
+                'DB_HOST' => "{$dbConnection->host}_test",
+            ],
+            envFiles: [EnvFileEnum::CiTesting, EnvFileEnum::Testing],
+            shouldReportEmpty: false,
+        );
 
         $this->setEnvVariables([
             'FAIL_EXPORT_JSON' => false,
@@ -145,24 +139,15 @@ class EnvGenerator
     /**
      * @param  EnvFileEnum[]  $envFiles
      */
-    protected function setEnvVariables(array $data, array $envFiles, bool $shouldReport = true): void
+    protected function setEnvVariables(array $data, array $envFiles, bool $shouldReportEmpty = true): void
     {
         foreach ($envFiles as $envFile) {
             foreach ($data as $key => $value) {
                 $this->envVariables[$envFile->value][$key] = $value;
 
-                $this->varsToFill[$envFile->value][$key] = $shouldReport
-                    && ($value === '')
-                    && in_array($envFile, self::REPORTABLE_ENV_FILES);
-            }
-        }
-    }
-
-    protected function reportVarsToFill(): void
-    {
-        foreach ($this->varsToFill as $fileName => $vars) {
-            foreach (array_keys(array_filter($vars)) as $name) {
-                $this->todoReporter->addEnvVar($name, $fileName);
+                if ($shouldReportEmpty && ($value === '') && ($envFile !== EnvFileEnum::Example)) {
+                    $this->emptyVars[$envFile->value][] = $key;
+                }
             }
         }
     }
