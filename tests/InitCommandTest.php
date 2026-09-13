@@ -398,7 +398,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('    - Fill the Manager\'s email')
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - add the Authorize::class middleware (in config/telescope.php)')
+            ->expectsOutput('    - add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -520,7 +520,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('    - Fill the Issue Tracker link')
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - add the Authorize::class middleware (in config/telescope.php)')
+            ->expectsOutput('    - add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -780,7 +780,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('    - Fill the Issue Tracker link')
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - add the Authorize::class middleware (in config/telescope.php)')
+            ->expectsOutput('    - add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -933,7 +933,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('    - CLERK_SECRET_KEY')
             ->expectsOutput('Configuration:')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - add the Authorize::class middleware (in config/telescope.php)')
+            ->expectsOutput('    - add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)')
             ->assertExitCode(0);
     }
 
@@ -1155,7 +1155,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('  GCS:')
             ->expectsOutput('    - provide the service account key (set disks.gcs.key_file_path in config/filesystems.php)')
             ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - add the Authorize::class middleware (in config/telescope.php)')
+            ->expectsOutput('    - add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)')
             ->assertExitCode(0);
     }
 

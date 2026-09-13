@@ -545,7 +545,7 @@ class InitCommand extends Command implements Isolatable
         // TODO: add Authorize::class middleware after implementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
         $this->todoReporter->addConfiguration(
             integration: 'Telescope',
-            label: 'add the Authorize::class middleware',
+            label: 'add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list',
             hint: 'in config/telescope.php',
         );
     }
