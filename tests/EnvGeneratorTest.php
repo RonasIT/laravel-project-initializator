@@ -6,11 +6,23 @@ use RonasIT\ProjectInitializator\DTO\DBConnectionDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
 use RonasIT\ProjectInitializator\Generators\EnvGenerator;
+use RonasIT\ProjectInitializator\Support\TodoReporter;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\EnvMockTrait;
+use RonasIT\ProjectInitializator\Tests\Support\Traits\TodoReporterTrait;
 
 class EnvGeneratorTest extends TestCase
 {
     use EnvMockTrait;
+    use TodoReporterTrait;
+
+    protected TodoReporter $todoReporter;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->todoReporter = new TodoReporter();
+    }
 
     public function testSetupEnv(): void
     {
@@ -33,11 +45,15 @@ class EnvGeneratorTest extends TestCase
             $this->callRandomBytes(),
         );
 
-        $generator = new EnvGenerator();
+        $generator = new EnvGenerator($this->todoReporter);
 
         $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
 
         $generator->apply();
+
+        $this->assertEquals([
+            '.env.development' => ['DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'],
+        ], $this->getReportedEnvVars());
     }
 
     public function testConfigureClerk(): void
@@ -61,12 +77,26 @@ class EnvGeneratorTest extends TestCase
             $this->callRandomBytes(),
         );
 
-        $generator = new EnvGenerator();
+        $generator = new EnvGenerator($this->todoReporter);
 
         $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
         $generator->configureClerk(AppTypeEnum::Multiplatform);
 
         $generator->apply();
+
+        $this->assertEquals([
+            '.env' => ['CLERK_ALLOWED_ISSUER', 'CLERK_SECRET_KEY', 'CLERK_ALLOWED_ORIGINS', 'CLERK_SIGNER_KEY_PATH'],
+            '.env.development' => [
+                'DB_HOST',
+                'DB_PORT',
+                'DB_DATABASE',
+                'DB_USERNAME',
+                'DB_PASSWORD',
+                'CLERK_ALLOWED_ISSUER',
+                'CLERK_SECRET_KEY',
+                'CLERK_ALLOWED_ORIGINS',
+            ],
+        ], $this->getReportedEnvVars());
     }
 
     public function testConfigureClerkMobileApp(): void
@@ -90,12 +120,25 @@ class EnvGeneratorTest extends TestCase
             $this->callRandomBytes(),
         );
 
-        $generator = new EnvGenerator();
+        $generator = new EnvGenerator($this->todoReporter);
 
         $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
         $generator->configureClerk(AppTypeEnum::Mobile);
 
         $generator->apply();
+
+        $this->assertEquals([
+            '.env' => ['CLERK_ALLOWED_ISSUER', 'CLERK_SECRET_KEY', 'CLERK_SIGNER_KEY_PATH'],
+            '.env.development' => [
+                'DB_HOST',
+                'DB_PORT',
+                'DB_DATABASE',
+                'DB_USERNAME',
+                'DB_PASSWORD',
+                'CLERK_ALLOWED_ISSUER',
+                'CLERK_SECRET_KEY',
+            ],
+        ], $this->getReportedEnvVars());
     }
 
     public function testSetFilesystemDisk(): void
@@ -119,7 +162,7 @@ class EnvGeneratorTest extends TestCase
             $this->callRandomBytes(),
         );
 
-        $generator = new EnvGenerator();
+        $generator = new EnvGenerator($this->todoReporter);
 
         $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
         $generator->setFilesystemDisk(StorageEnum::S3);
@@ -148,13 +191,25 @@ class EnvGeneratorTest extends TestCase
             $this->callRandomBytes(),
         );
 
-        $generator = new EnvGenerator();
+        $generator = new EnvGenerator($this->todoReporter);
 
         $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
         $generator->setFilesystemDisk(StorageEnum::GCS);
         $generator->configureGcsStorage();
 
         $generator->apply();
+
+        $this->assertEquals([
+            '.env.development' => [
+                'DB_HOST',
+                'DB_PORT',
+                'DB_DATABASE',
+                'DB_USERNAME',
+                'DB_PASSWORD',
+                'GOOGLE_CLOUD_STORAGE_BUCKET',
+                'GOOGLE_CLOUD_PROJECT_ID',
+            ],
+        ], $this->getReportedEnvVars());
     }
 
     public function testApplyKeepsExistingEnvFiles(): void
@@ -178,7 +233,7 @@ class EnvGeneratorTest extends TestCase
             $this->callRandomBytes(),
         );
 
-        $generator = new EnvGenerator();
+        $generator = new EnvGenerator($this->todoReporter);
 
         $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
 

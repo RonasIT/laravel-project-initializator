@@ -16,7 +16,6 @@ use RonasIT\ProjectInitializator\DTO\DBConnectionDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
-use RonasIT\ProjectInitializator\Enums\EnvFileEnum;
 use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
@@ -67,15 +66,17 @@ class InitCommand extends Command implements Isolatable
 
     protected DBConnectionDTO $dbConnection;
 
+    protected EnvGenerator $envGenerator;
+
     public function __construct(
         protected FileSaver $fileSaver,
         protected MigrationPublisher $migrationPublisher,
-        protected EnvGenerator $envGenerator,
         protected TodoReporter $todoReporter,
     ) {
         parent::__construct();
 
         $this->dbConnection = new DBConnectionDTO();
+        $this->envGenerator = new EnvGenerator($this->todoReporter);
     }
 
     public function handle(): void
@@ -102,11 +103,6 @@ class InitCommand extends Command implements Isolatable
         ));
 
         $this->envGenerator->setupEnv($this->appName, $this->appUrl, $this->dbConnection);
-
-        $this->reportEnvVarsToFill(
-            names: ['DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'],
-            envFiles: [EnvFileEnum::Development],
-        );
 
         if ($this->authType === AuthTypeEnum::Clerk) {
             $this->configureClerkAuth();
@@ -234,19 +230,6 @@ class InitCommand extends Command implements Isolatable
         $this->kebabAppName = Str::kebab($appName);
     }
 
-    /**
-     * @param  string[]  $names
-     * @param  EnvFileEnum[]  $envFiles
-     */
-    protected function reportEnvVarsToFill(array $names, array $envFiles): void
-    {
-        foreach ($envFiles as $envFile) {
-            foreach ($names as $name) {
-                $this->todoReporter->addEnvVar($name, $envFile->value);
-            }
-        }
-    }
-
     protected function configureClerkAuth(): void
     {
         $this->enableClerk();
@@ -254,23 +237,6 @@ class InitCommand extends Command implements Isolatable
         shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force');
 
         $this->envGenerator->configureClerk($this->appType);
-
-        $this->reportEnvVarsToFill(
-            names: ['CLERK_ALLOWED_ISSUER', 'CLERK_SECRET_KEY'],
-            envFiles: [EnvFileEnum::Local, EnvFileEnum::Development],
-        );
-
-        $this->reportEnvVarsToFill(
-            names: ['CLERK_SIGNER_KEY_PATH'],
-            envFiles: [EnvFileEnum::Local],
-        );
-
-        if ($this->appType !== AppTypeEnum::Mobile) {
-            $this->reportEnvVarsToFill(
-                names: ['CLERK_ALLOWED_ORIGINS'],
-                envFiles: [EnvFileEnum::Local, EnvFileEnum::Development],
-            );
-        }
     }
 
     protected function enableClerk(): void
@@ -472,11 +438,6 @@ class InitCommand extends Command implements Isolatable
             $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage';
 
             $this->envGenerator->configureGcsStorage();
-
-            $this->reportEnvVarsToFill(
-                names: ['GOOGLE_CLOUD_STORAGE_BUCKET', 'GOOGLE_CLOUD_PROJECT_ID'],
-                envFiles: [EnvFileEnum::Development],
-            );
 
             $this->addGcsDiskToConfig();
 
