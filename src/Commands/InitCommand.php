@@ -96,7 +96,7 @@ class InitCommand extends Command implements Isolatable
         $this->authType = AuthTypeEnum::from(select(
             label: 'Please choose the authentication type',
             options: AuthTypeEnum::values(),
-            default: AuthTypeEnum::None->value,
+            default: AuthTypeEnum::Default->value,
         ));
 
         $this->envGenerator->setupEnv($this->appName, $this->appUrl, $this->dbConnection);
@@ -261,7 +261,7 @@ class InitCommand extends Command implements Isolatable
 
         $adminName = when($isServiceAdmin, "{$serviceName} Admin", 'Admin');
 
-        if ($this->authType === AuthTypeEnum::None) {
+        if ($this->authType === AuthTypeEnum::Default) {
             $adminCredentials['name'] = $this->ask("Please enter admin name{$serviceLabel}", $adminName);
             $adminCredentials['role'] = RoleEnum::Admin->value;
         }

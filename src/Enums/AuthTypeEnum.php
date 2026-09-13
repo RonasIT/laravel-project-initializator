@@ -9,5 +9,5 @@ enum AuthTypeEnum: string
     use EnumTrait;
 
     case Clerk = 'clerk';
-    case None = 'none';
+    case Default = 'default';
 }
