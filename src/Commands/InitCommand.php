@@ -19,11 +19,13 @@ use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
+use RonasIT\ProjectInitializator\Enums\TodoCategoryEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\EnvGenerator;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 use RonasIT\ProjectInitializator\Support\FileSaver;
 use RonasIT\ProjectInitializator\Support\MigrationPublisher;
+use RonasIT\ProjectInitializator\Support\TodoReporter;
 use Winter\LaravelConfigWriter\ArrayFile;
 
 use function Laravel\Prompts\confirm;
@@ -38,8 +40,6 @@ class InitCommand extends Command implements Isolatable
     protected $description = 'Initialize required project parameters to run DEV environment';
 
     protected array $adminCredentials = [];
-
-    protected array $emptyResourcesList = [];
 
     protected array $shellCommands = [
         'composer require laravel/ui',
@@ -66,14 +66,17 @@ class InitCommand extends Command implements Isolatable
 
     protected DBConnectionDTO $dbConnection;
 
+    protected EnvGenerator $envGenerator;
+
     public function __construct(
         protected FileSaver $fileSaver,
         protected MigrationPublisher $migrationPublisher,
-        protected EnvGenerator $envGenerator,
+        protected TodoReporter $todoReporter,
     ) {
         parent::__construct();
 
         $this->dbConnection = new DBConnectionDTO();
+        $this->envGenerator = new EnvGenerator($this->todoReporter);
     }
 
     public function handle(): void
@@ -163,11 +166,35 @@ class InitCommand extends Command implements Isolatable
 
         $this->info('Project initialized successfully!');
 
-        if ($this->emptyResourcesList) {
-            $this->warn('Don`t forget to fill the following empty values:');
+        $this->renderTodoReport();
+    }
 
-            foreach ($this->emptyResourcesList as $value) {
-                $this->warn("- {$value}");
+    protected function renderTodoReport(): void
+    {
+        if ($this->todoReporter->isEmpty()) {
+            return;
+        }
+
+        $this->newLine();
+        $this->warn("Don't forget to complete the following steps:");
+
+        foreach ($this->todoReporter->getItemsGroupedByCategory() as $categoryValue => $subcategories) {
+            $categoryTitle = TodoCategoryEnum::from($categoryValue)->title();
+
+            $this->newLine();
+            $this->warn("{$categoryTitle}:");
+
+            foreach ($subcategories as $subcategory => $items) {
+                if ($subcategory !== '') {
+                    $this->warn("  {$subcategory}:");
+                }
+
+                foreach ($items as $item) {
+                    $indent = ($subcategory !== '') ? '    ' : '  ';
+                    $line = "{$indent}- {$item->label}" . ($item->hint ? " ({$item->hint})" : '');
+
+                    $this->warn($line);
+                }
             }
         }
     }
@@ -349,7 +376,7 @@ class InitCommand extends Command implements Isolatable
             if (empty($answer)) {
                 $resource->setLink($link);
             } elseif ($answer === UserAnswerEnum::Later) {
-                $this->emptyResourcesList[] = "{$resource->title} link";
+                $this->todoReporter->addReadmeResourceLink($resource->title);
             }
 
             $resource->setActive($answer !== UserAnswerEnum::No);
@@ -363,7 +390,7 @@ class InitCommand extends Command implements Isolatable
         if ($link = $this->ask("Please enter a Manager's email", '')) {
             $this->readmeGenerator->setManagerEmail($link);
         } else {
-            $this->emptyResourcesList[] = "Manager's email";
+            $this->todoReporter->addReadmeContact("Manager's email");
         }
     }
 
@@ -412,10 +439,13 @@ class InitCommand extends Command implements Isolatable
 
             $this->envGenerator->configureGcsStorage();
 
-            $this->emptyResourcesList[] = 'GOOGLE_CLOUD_STORAGE_BUCKET';
-            $this->emptyResourcesList[] = 'GOOGLE_CLOUD_PROJECT_ID';
-
             $this->addGcsDiskToConfig();
+
+            $this->todoReporter->addConfiguration(
+                integration: 'GCS',
+                label: 'provide the service account key',
+                hint: 'set disks.gcs.key_file_path in config/filesystems.php',
+            );
         }
 
         $this->envGenerator->setFilesystemDisk($storage);
@@ -505,13 +535,19 @@ class InitCommand extends Command implements Isolatable
     {
         $config = ArrayFile::open(base_path('config/telescope.php'));
 
-        // TODO: add Authorize::class middleware after implementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
         $config->set('middleware', [
             'web',
             'auth:web',
         ]);
 
         $config->write();
+
+        // TODO: add Authorize::class middleware after implementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
+        $this->todoReporter->addConfiguration(
+            integration: 'Telescope',
+            label: 'add the Authorize::class middleware',
+            hint: 'in config/telescope.php',
+        );
     }
 
     protected function setAutoDocContactEmail(string $email): void
