@@ -2,11 +2,21 @@
 
 namespace RonasIT\ProjectInitializator\Tests\Support\Traits;
 
+use Illuminate\Support\Collection;
 use RonasIT\ProjectInitializator\DTO\TodoItemDTO;
 use RonasIT\ProjectInitializator\Enums\TodoCategoryEnum;
 
 trait TodoReporterTrait
 {
+    protected function getReportedEnvVars(): array
+    {
+        return $this->todoReporter
+            ->getItemsGroupedByCategory()
+            ->get(TodoCategoryEnum::Environment->value, collect())
+            ->map(fn (Collection $items) => $items->pluck('label')->all())
+            ->all();
+    }
+
     protected function assertTodoItem(
         TodoCategoryEnum $category,
         string $label,
