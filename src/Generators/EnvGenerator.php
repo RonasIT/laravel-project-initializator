@@ -12,12 +12,22 @@ class EnvGenerator
 {
     protected array $envVariables = [];
 
+    /**
+     * @var array<string, array<string, true>> empty variable names per env file
+     */
+    protected array $emptyVars = [];
+
     public function setupEnv(string $appName, string $appUrl, DBConnectionDTO $dbConnection): void
     {
-        $this->setEnvVariables([
-            'APP_NAME' => $appName,
-            ...$this->getDBVariables($dbConnection),
-        ], ...EnvFileEnum::cases());
+        $this->setEnvVariables(
+            data: [
+                'APP_NAME' => $appName,
+                ...$this->getDBVariables($dbConnection),
+            ],
+            envFiles: EnvFileEnum::cases(),
+            // blank DB values are the docker trust-auth defaults, not forgotten values
+            shouldReportEmptyVars: false,
+        );
 
         $this->configureDevelopment($appUrl, $dbConnection);
 
@@ -36,18 +46,18 @@ class EnvGenerator
             $data['CLERK_ALLOWED_ORIGINS'] = '';
         }
 
-        $this->setEnvVariables($data, EnvFileEnum::Local, EnvFileEnum::Example, EnvFileEnum::Development);
+        $this->setEnvVariables($data, [EnvFileEnum::Local, EnvFileEnum::Example, EnvFileEnum::Development]);
 
         $this->setEnvVariables([
             'CLERK_SIGNER_KEY_PATH' => '',
-        ], EnvFileEnum::Local, EnvFileEnum::Example);
+        ], [EnvFileEnum::Local, EnvFileEnum::Example]);
     }
 
     public function setFilesystemDisk(StorageEnum $storage): void
     {
         $this->setEnvVariables([
             'FILESYSTEM_DISK' => $storage->value,
-        ], EnvFileEnum::Development);
+        ], [EnvFileEnum::Development]);
     }
 
     public function configureGcsStorage(): void
@@ -56,7 +66,7 @@ class EnvGenerator
             'GOOGLE_CLOUD_STORAGE_PATH_PREFIX' => 'api',
             'GOOGLE_CLOUD_STORAGE_BUCKET' => '',
             'GOOGLE_CLOUD_PROJECT_ID' => '',
-        ], EnvFileEnum::Development);
+        ], [EnvFileEnum::Development]);
     }
 
     public function apply(): void
@@ -66,6 +76,22 @@ class EnvGenerator
         foreach (EnvFileEnum::cases() as $envFile) {
             $this->updateEnvFile($envFile->value, $this->envVariables[$envFile->value]);
         }
+    }
+
+    /**
+     * @return array<string, string[]> a list of empty variable names per env file
+     */
+    public function getEmptyVars(): array
+    {
+        $result = [];
+
+        foreach (EnvFileEnum::cases() as $envFile) {
+            if (!empty($this->emptyVars[$envFile->value])) {
+                $result[$envFile->value] = array_keys($this->emptyVars[$envFile->value]);
+            }
+        }
+
+        return $result;
     }
 
     protected function createMissingEnvFiles(): void
@@ -93,22 +119,27 @@ class EnvGenerator
             'DB_DATABASE' => '',
             'DB_USERNAME' => '',
             'DB_PASSWORD' => '',
-        ], EnvFileEnum::Development);
+        ], [EnvFileEnum::Development]);
     }
 
     protected function configureTesting(DBConnectionDTO $dbConnection): void
     {
-        $this->setEnvVariables([
-            'APP_ENV' => 'testing',
-            'APP_KEY' => $this->generateAppKey(),
-            'LOG_CHANNEL' => 'stderr',
-            ...$this->getDBVariables($dbConnection),
-            'DB_HOST' => "{$dbConnection->host}_test",
-        ], EnvFileEnum::CiTesting, EnvFileEnum::Testing);
+        $this->setEnvVariables(
+            data: [
+                'APP_ENV' => 'testing',
+                'APP_KEY' => $this->generateAppKey(),
+                'LOG_CHANNEL' => 'stderr',
+                ...$this->getDBVariables($dbConnection),
+                'DB_HOST' => "{$dbConnection->host}_test",
+            ],
+            envFiles: [EnvFileEnum::CiTesting, EnvFileEnum::Testing],
+            // blank DB values are derived test defaults, nothing to fill manually
+            shouldReportEmptyVars: false,
+        );
 
         $this->setEnvVariables([
             'FAIL_EXPORT_JSON' => false,
-        ], EnvFileEnum::Testing);
+        ], [EnvFileEnum::Testing]);
     }
 
     protected function getDBVariables(DBConnectionDTO $dbConnection): array
@@ -123,11 +154,24 @@ class EnvGenerator
         ];
     }
 
-    protected function setEnvVariables(array $data, EnvFileEnum ...$envFiles): void
+    /**
+     * @param  EnvFileEnum[]  $envFiles
+     */
+    protected function setEnvVariables(array $data, array $envFiles, bool $shouldReportEmptyVars = true): void
     {
         foreach ($envFiles as $envFile) {
             foreach ($data as $key => $value) {
                 $this->envVariables[$envFile->value][$key] = $value;
+
+                $isVarToFill = $shouldReportEmptyVars
+                    && ($value === '')
+                    && ($envFile !== EnvFileEnum::Example);
+
+                if ($isVarToFill) {
+                    $this->emptyVars[$envFile->value][$key] = true;
+                } else {
+                    unset($this->emptyVars[$envFile->value][$key]);
+                }
             }
         }
     }
