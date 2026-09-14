@@ -13,9 +13,9 @@ class EnvGenerator
     protected array $envVariables = [];
 
     /**
-     * @var array<string, string[]> a list of empty variable names per env file
+     * @var array<string, array<string, true>> empty variable names per env file
      */
-    protected(set) array $emptyVars = [];
+    protected array $emptyVars = [];
 
     public function setupEnv(string $appName, string $appUrl, DBConnectionDTO $dbConnection): void
     {
@@ -25,7 +25,8 @@ class EnvGenerator
                 ...$this->getDBVariables($dbConnection),
             ],
             envFiles: EnvFileEnum::cases(),
-            shouldReportEmpty: false,
+            // blank DB values are the docker trust-auth defaults, not forgotten values
+            shouldReportEmptyVars: false,
         );
 
         $this->configureDevelopment($appUrl, $dbConnection);
@@ -77,6 +78,22 @@ class EnvGenerator
         }
     }
 
+    /**
+     * @return array<string, string[]> a list of empty variable names per env file
+     */
+    public function getEmptyVars(): array
+    {
+        $result = [];
+
+        foreach (EnvFileEnum::cases() as $envFile) {
+            if (!empty($this->emptyVars[$envFile->value])) {
+                $result[$envFile->value] = array_keys($this->emptyVars[$envFile->value]);
+            }
+        }
+
+        return $result;
+    }
+
     protected function createMissingEnvFiles(): void
     {
         foreach (EnvFileEnum::cases() as $envFile) {
@@ -116,7 +133,8 @@ class EnvGenerator
                 'DB_HOST' => "{$dbConnection->host}_test",
             ],
             envFiles: [EnvFileEnum::CiTesting, EnvFileEnum::Testing],
-            shouldReportEmpty: false,
+            // blank DB values are derived test defaults, nothing to fill manually
+            shouldReportEmptyVars: false,
         );
 
         $this->setEnvVariables([
@@ -139,14 +157,20 @@ class EnvGenerator
     /**
      * @param  EnvFileEnum[]  $envFiles
      */
-    protected function setEnvVariables(array $data, array $envFiles, bool $shouldReportEmpty = true): void
+    protected function setEnvVariables(array $data, array $envFiles, bool $shouldReportEmptyVars = true): void
     {
         foreach ($envFiles as $envFile) {
             foreach ($data as $key => $value) {
                 $this->envVariables[$envFile->value][$key] = $value;
 
-                if ($shouldReportEmpty && ($value === '') && ($envFile !== EnvFileEnum::Example)) {
-                    $this->emptyVars[$envFile->value][] = $key;
+                $isVarToFill = $shouldReportEmptyVars
+                    && ($value === '')
+                    && ($envFile !== EnvFileEnum::Example);
+
+                if ($isVarToFill) {
+                    $this->emptyVars[$envFile->value][$key] = true;
+                } else {
+                    unset($this->emptyVars[$envFile->value][$key]);
                 }
             }
         }

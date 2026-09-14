@@ -16,7 +16,6 @@ use RonasIT\ProjectInitializator\DTO\DBConnectionDTO;
 use RonasIT\ProjectInitializator\DTO\ResourceDTO;
 use RonasIT\ProjectInitializator\Enums\AppTypeEnum;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
-use RonasIT\ProjectInitializator\Enums\EnvFileEnum;
 use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
@@ -172,9 +171,9 @@ class InitCommand extends Command implements Isolatable
     {
         $this->envGenerator->apply();
 
-        foreach (EnvFileEnum::cases() as $envFile) {
-            foreach ($this->envGenerator->emptyVars[$envFile->value] ?? [] as $name) {
-                $this->todoReporter->addEnvVar($name, $envFile->value);
+        foreach ($this->envGenerator->getEmptyVars() as $fileName => $varNames) {
+            foreach ($varNames as $varName) {
+                $this->todoReporter->addEnvVar($varName, $fileName);
             }
         }
     }

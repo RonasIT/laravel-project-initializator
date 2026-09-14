@@ -41,7 +41,7 @@ class EnvGeneratorTest extends TestCase
 
         $this->assertEquals([
             '.env.development' => ['DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'],
-        ], $generator->emptyVars);
+        ], $generator->getEmptyVars());
     }
 
     public function testConfigureClerk(): void
@@ -84,7 +84,7 @@ class EnvGeneratorTest extends TestCase
                 'CLERK_SECRET_KEY',
                 'CLERK_ALLOWED_ORIGINS',
             ],
-        ], $generator->emptyVars);
+        ], $generator->getEmptyVars());
     }
 
     public function testConfigureClerkMobileApp(): void
@@ -126,7 +126,7 @@ class EnvGeneratorTest extends TestCase
                 'CLERK_ALLOWED_ISSUER',
                 'CLERK_SECRET_KEY',
             ],
-        ], $generator->emptyVars);
+        ], $generator->getEmptyVars());
     }
 
     public function testSetFilesystemDisk(): void
@@ -197,7 +197,7 @@ class EnvGeneratorTest extends TestCase
                 'GOOGLE_CLOUD_STORAGE_BUCKET',
                 'GOOGLE_CLOUD_PROJECT_ID',
             ],
-        ], $generator->emptyVars);
+        ], $generator->getEmptyVars());
     }
 
     public function testApplyKeepsExistingEnvFiles(): void
