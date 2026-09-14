@@ -67,10 +67,10 @@ class InitCommand extends Command implements Isolatable
     protected DBConnectionDTO $dbConnection;
 
     public function __construct(
-        protected FileSaver $fileSaver,
-        protected MigrationPublisher $migrationPublisher,
-        protected EnvGenerator $envGenerator,
-        protected TodoReporter $todoReporter,
+        protected readonly FileSaver $fileSaver,
+        protected readonly MigrationPublisher $migrationPublisher,
+        protected readonly EnvGenerator $envGenerator,
+        protected readonly TodoReporter $todoReporter,
     ) {
         parent::__construct();
 

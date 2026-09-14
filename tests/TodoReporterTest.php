@@ -28,7 +28,10 @@ class TodoReporterTest extends TestCase
 
     public function testAddReadmeResourceLink(): void
     {
-        $this->todoReporter->addReadmeResourceLink('Issue Tracker', hint: 'ask the project manager for the tracker URL');
+        $this->todoReporter->addReadmeResourceLink(
+            name: 'Issue Tracker',
+            hint: 'ask the project manager for the tracker URL',
+        );
 
         $this->assertTodoItem(
             category: TodoCategoryEnum::Readme,
@@ -40,7 +43,10 @@ class TodoReporterTest extends TestCase
 
     public function testAddReadmeContact(): void
     {
-        $this->todoReporter->addReadmeContact("Manager's email", hint: 'ask the team lead');
+        $this->todoReporter->addReadmeContact(
+            name: "Manager's email",
+            hint: 'ask the team lead',
+        );
 
         $this->assertTodoItem(
             category: TodoCategoryEnum::Readme,
