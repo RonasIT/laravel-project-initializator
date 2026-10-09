@@ -27,6 +27,13 @@ class MigrationPublisher
         $this->fileSaver->publishClass($view, $migrationName, 'database/migrations');
     }
 
+    public function publishIfMissing(string $templateName): void
+    {
+        if (!$this->isMigrationExists($templateName)) {
+            $this->publish($templateName);
+        }
+    }
+
     public function isMigrationExists(string $migrationName): bool
     {
         return !empty(glob(base_path("database/migrations/*_{$migrationName}.php")));

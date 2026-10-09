@@ -39,5 +39,9 @@ class ProjectInitializatorServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../stubs/models/user_with_clerk.php' => app_path('Models/User.php'),
         ], 'initializator-user-model-with-clerk');
+
+        $this->publishes([
+            __DIR__ . '/../stubs/models/admin.php' => app_path('Models/Admin.php'),
+        ], 'initializator-admin-model');
     }
 }
