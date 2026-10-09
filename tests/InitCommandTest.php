@@ -92,6 +92,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput($this->getFixture('todo_reports/default.txt'))
             ->assertExitCode(0);
     }
 
@@ -176,6 +177,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput($this->getFixture('todo_reports/default.txt'))
             ->assertExitCode(0);
     }
 
@@ -262,6 +264,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput($this->getFixture('todo_reports/default.txt'))
             ->assertExitCode(0);
     }
 
@@ -388,17 +391,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don\'t forget to complete the following steps:')
-            ->expectsOutput('README:')
-            ->expectsOutput('  Resources:')
-            ->expectsOutput('    - Fill the Issue Tracker link')
-            ->expectsOutput('    - Fill the Figma link')
-            ->expectsOutput('    - Fill the Sentry link')
-            ->expectsOutput('  Contacts:')
-            ->expectsOutput('    - Fill the Manager\'s email')
-            ->expectsOutput('Configuration:')
-            ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)')
+            ->expectsOutput($this->getFixture('todo_reports/default_readme.txt'))
             ->assertExitCode(0);
     }
 
@@ -514,13 +507,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don\'t forget to complete the following steps:')
-            ->expectsOutput('README:')
-            ->expectsOutput('  Resources:')
-            ->expectsOutput('    - Fill the Issue Tracker link')
-            ->expectsOutput('Configuration:')
-            ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)')
+            ->expectsOutput($this->getFixture('todo_reports/partial_readme.txt'))
             ->assertExitCode(0);
     }
 
@@ -651,6 +638,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput($this->getFixture('todo_reports/default.txt'))
             ->assertExitCode(0);
     }
 
@@ -774,13 +762,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don\'t forget to complete the following steps:')
-            ->expectsOutput('README:')
-            ->expectsOutput('  Resources:')
-            ->expectsOutput('    - Fill the Issue Tracker link')
-            ->expectsOutput('Configuration:')
-            ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)')
+            ->expectsOutput($this->getFixture('todo_reports/telescope.txt'))
             ->assertExitCode(0);
     }
 
@@ -908,32 +890,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don\'t forget to complete the following steps:')
-            ->expectsOutput('README:')
-            ->expectsOutput('  Resources:')
-            ->expectsOutput('    - Fill the Issue Tracker link')
-            ->expectsOutput('    - Fill the Figma link')
-            ->expectsOutput('    - Fill the Sentry link')
-            ->expectsOutput('    - Fill the Laravel Telescope link')
-            ->expectsOutput('    - Fill the Laravel Nova link')
-            ->expectsOutput('  Contacts:')
-            ->expectsOutput('    - Fill the Manager\'s email')
-            ->expectsOutput('Environment variables:')
-            ->expectsOutput('  .env:')
-            ->expectsOutput('    - CLERK_ALLOWED_ISSUER')
-            ->expectsOutput('    - CLERK_SECRET_KEY')
-            ->expectsOutput('    - CLERK_SIGNER_KEY_PATH')
-            ->expectsOutput('  .env.development:')
-            ->expectsOutput('    - DB_HOST')
-            ->expectsOutput('    - DB_PORT')
-            ->expectsOutput('    - DB_DATABASE')
-            ->expectsOutput('    - DB_USERNAME')
-            ->expectsOutput('    - DB_PASSWORD')
-            ->expectsOutput('    - CLERK_ALLOWED_ISSUER')
-            ->expectsOutput('    - CLERK_SECRET_KEY')
-            ->expectsOutput('Configuration:')
-            ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)')
+            ->expectsOutput($this->getFixture('todo_reports/clerk_mobile_app.txt'))
             ->assertExitCode(0);
     }
 
@@ -1060,6 +1017,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput($this->getFixture('todo_reports/clerk_additional_admins.txt'))
             ->assertExitCode(0);
     }
 
@@ -1146,16 +1104,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don\'t forget to complete the following steps:')
-            ->expectsOutput('Environment variables:')
-            ->expectsOutput('  .env.development:')
-            ->expectsOutput('    - GOOGLE_CLOUD_STORAGE_BUCKET')
-            ->expectsOutput('    - GOOGLE_CLOUD_PROJECT_ID')
-            ->expectsOutput('Configuration:')
-            ->expectsOutput('  GCS:')
-            ->expectsOutput('    - provide the service account key (set disks.gcs.key_file_path in config/filesystems.php)')
-            ->expectsOutput('  Telescope:')
-            ->expectsOutput('    - add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)')
+            ->expectsOutput($this->getFixture('todo_reports/gcs_storage.txt'))
             ->assertExitCode(0);
     }
 

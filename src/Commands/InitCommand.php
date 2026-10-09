@@ -19,7 +19,6 @@ use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Enums\ReadmeBlockEnum;
 use RonasIT\ProjectInitializator\Enums\RoleEnum;
 use RonasIT\ProjectInitializator\Enums\StorageEnum;
-use RonasIT\ProjectInitializator\Enums\TodoCategoryEnum;
 use RonasIT\ProjectInitializator\Enums\UserAnswerEnum;
 use RonasIT\ProjectInitializator\Generators\EnvGenerator;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
@@ -185,27 +184,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         $this->newLine();
-        $this->warn("Don't forget to complete the following steps:");
-
-        foreach ($this->todoReporter->getItemsGroupedByCategory() as $categoryValue => $subcategories) {
-            $categoryTitle = TodoCategoryEnum::from($categoryValue)->title();
-
-            $this->newLine();
-            $this->warn("{$categoryTitle}:");
-
-            foreach ($subcategories as $subcategory => $items) {
-                if ($subcategory !== '') {
-                    $this->warn("  {$subcategory}:");
-                }
-
-                foreach ($items as $item) {
-                    $indent = ($subcategory !== '') ? '    ' : '  ';
-                    $line = "{$indent}- {$item->label}" . ($item->hint ? " ({$item->hint})" : '');
-
-                    $this->warn($line);
-                }
-            }
-        }
+        $this->warn($this->todoReporter->getReport());
     }
 
     protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
@@ -452,7 +431,7 @@ class InitCommand extends Command implements Isolatable
 
             $this->todoReporter->addConfiguration(
                 integration: 'GCS',
-                label: 'provide the service account key',
+                label: 'Provide the service account key',
                 hint: 'set disks.gcs.key_file_path in config/filesystems.php',
             );
         }
@@ -554,7 +533,7 @@ class InitCommand extends Command implements Isolatable
         // TODO: add Authorize::class middleware after implementing an ability to modify functions in the https://github.com/RonasIT/larabuilder package
         $this->todoReporter->addConfiguration(
             integration: 'Telescope',
-            label: 'add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list',
+            label: 'Add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list',
             hint: 'in config/telescope.php',
         );
     }

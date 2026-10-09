@@ -9,8 +9,8 @@ readonly class TodoItemDTO
     public function __construct(
         public TodoCategoryEnum $category,
         public string $label,
+        public string $subcategory,
         public ?string $hint = null,
-        public ?string $subcategory = null,
     ) {
     }
 }

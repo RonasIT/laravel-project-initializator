@@ -93,11 +93,11 @@ class TodoReporterTest extends TestCase
 
     public function testAddConfiguration(): void
     {
-        $this->todoReporter->addConfiguration('GCS', 'set the service account key', 'config/filesystems.php');
+        $this->todoReporter->addConfiguration('GCS', 'Provide the service account key', 'config/filesystems.php');
 
         $this->assertTodoItem(
             category: TodoCategoryEnum::Configuration,
-            label: 'set the service account key',
+            label: 'Provide the service account key',
             hint: 'config/filesystems.php',
             subcategory: 'GCS',
         );
@@ -141,5 +141,15 @@ class TodoReporterTest extends TestCase
                 subcategory: '.env.development',
             ),
         ], $groupedItems[TodoCategoryEnum::Environment->value]['.env.development']->all());
+    }
+
+    public function testGetReport(): void
+    {
+        $this->todoReporter->addConfiguration('GCS', 'Provide the service account key', 'config/filesystems.php');
+        $this->todoReporter->addEnvVar('GOOGLE_CLOUD_PROJECT_ID', '.env.development');
+        $this->todoReporter->addReadmeResourceLink('Figma');
+        $this->todoReporter->addReadmeContact("Manager's email");
+
+        $this->assertSame($this->getFixture('report.txt'), $this->todoReporter->getReport());
     }
 }

@@ -10,8 +10,8 @@ trait TodoReporterTrait
     protected function assertTodoItem(
         TodoCategoryEnum $category,
         string $label,
+        string $subcategory,
         ?string $hint = null,
-        string $subcategory = '',
     ): void {
         $groupedItems = $this->todoReporter->getItemsGroupedByCategory();
 

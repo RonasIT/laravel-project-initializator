@@ -8,16 +8,7 @@ enum TodoCategoryEnum: string
 {
     use EnumTrait;
 
-    case Readme = 'readme';
-    case Environment = 'environment';
-    case Configuration = 'configuration';
-
-    public function title(): string
-    {
-        return match ($this) {
-            self::Readme => 'README',
-            self::Environment => 'Environment variables',
-            self::Configuration => 'Configuration',
-        };
-    }
+    case Readme = 'README';
+    case Environment = 'Environment variables';
+    case Configuration = 'Configuration';
 }

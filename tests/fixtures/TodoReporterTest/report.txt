@@ -1,0 +1,15 @@
+Don't forget to complete the following steps:
+
+README:
+  Resources:
+    - Fill the Figma link
+  Contacts:
+    - Fill the Manager's email
+
+Environment variables:
+  .env.development:
+    - GOOGLE_CLOUD_PROJECT_ID
+
+Configuration:
+  GCS:
+    - Provide the service account key (config/filesystems.php)

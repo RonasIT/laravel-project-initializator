@@ -8,9 +8,6 @@ use RonasIT\ProjectInitializator\Enums\TodoCategoryEnum;
 
 class TodoReporter
 {
-    /**
-     * @var Collection<int, TodoItemDTO>
-     */
     protected Collection $items;
 
     public function __construct()
@@ -23,8 +20,8 @@ class TodoReporter
         $this->addItem(
             category: TodoCategoryEnum::Readme,
             label: "Fill the {$name} link",
-            hint: $hint,
             subcategory: 'Resources',
+            hint: $hint,
         );
     }
 
@@ -33,8 +30,8 @@ class TodoReporter
         $this->addItem(
             category: TodoCategoryEnum::Readme,
             label: "Fill the {$name}",
-            hint: $hint,
             subcategory: 'Contacts',
+            hint: $hint,
         );
     }
 
@@ -43,8 +40,8 @@ class TodoReporter
         $this->addItem(
             category: TodoCategoryEnum::Environment,
             label: $name,
-            hint: $hint,
             subcategory: $file,
+            hint: $hint,
         );
     }
 
@@ -53,8 +50,8 @@ class TodoReporter
         $this->addItem(
             category: TodoCategoryEnum::Configuration,
             label: $label,
-            hint: $hint,
             subcategory: $integration,
+            hint: $hint,
         );
     }
 
@@ -63,28 +60,45 @@ class TodoReporter
         return $this->items->isEmpty();
     }
 
-    /**
-     * @return Collection<string, Collection<string, Collection<int, TodoItemDTO>>>
-     */
     public function getItemsGroupedByCategory(): Collection
     {
         return collect(TodoCategoryEnum::cases())
             ->mapWithKeys(fn (TodoCategoryEnum $category) => [
                 $category->value => $this->items
                     ->filter(fn (TodoItemDTO $item) => $item->category === $category)
-                    ->groupBy(fn (TodoItemDTO $item) => $item->subcategory ?? '')
+                    ->groupBy(fn (TodoItemDTO $item) => $item->subcategory)
                     ->map(fn (Collection $items) => $items->values()),
             ])
             ->filter(fn (Collection $subcategories) => $subcategories->isNotEmpty());
     }
 
+    public function getReport(): string
+    {
+        $lines = ["Don't forget to complete the following steps:"];
+
+        foreach ($this->getItemsGroupedByCategory() as $category => $subcategories) {
+            $lines[] = '';
+            $lines[] = "{$category}:";
+
+            foreach ($subcategories as $subcategory => $items) {
+                $lines[] = "  {$subcategory}:";
+
+                foreach ($items as $item) {
+                    $lines[] = "    - {$item->label}" . ($item->hint ? " ({$item->hint})" : '');
+                }
+            }
+        }
+
+        return implode("\n", $lines);
+    }
+
     protected function addItem(
         TodoCategoryEnum $category,
         string $label,
+        string $subcategory,
         ?string $hint = null,
-        ?string $subcategory = null,
     ): void {
-        $item = new TodoItemDTO($category, $label, $hint, $subcategory);
+        $item = new TodoItemDTO($category, $label, $subcategory, $hint);
 
         if ($this->items->doesntContain($item)) {
             $this->items->push($item);
