@@ -212,15 +212,9 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureClerkAdminAuth(): void
     {
-        if (!$this->migrationPublisher->isMigrationExists('admins_create_table')) {
-            $this->migrationPublisher->publish('admins_create_table');
-        }
+        $this->migrationPublisher->publishIfMissing('admins_create_table');
 
-        $this->fileSaver->publishClass(
-            template: view('initializator::models.admin'),
-            fileName: 'Admin',
-            fileDirectory: 'app/Models',
-        );
+        shell_exec('php artisan vendor:publish --tag=initializator-admin-model --force');
 
         $this->registerAdminAuthProvider();
     }
@@ -310,9 +304,7 @@ class InitCommand extends Command implements Isolatable
             fileDirectory: 'app/Enums/User',
         );
 
-        if (!$this->migrationPublisher->isMigrationExists('users_add_role')) {
-            $this->migrationPublisher->publish('users_add_role');
-        }
+        $this->migrationPublisher->publishIfMissing('users_add_role');
     }
 
     protected function configureReadme(): void
@@ -553,9 +545,7 @@ class InitCommand extends Command implements Isolatable
         $this->configureBootstrap();
         $this->publishBaseRequest();
 
-        if (!$this->migrationPublisher->isMigrationExists('drop_jobs_table')) {
-            $this->migrationPublisher->publish('drop_jobs_table');
-        }
+        $this->migrationPublisher->publishIfMissing('drop_jobs_table');
     }
 
     protected function configureCors(): void

@@ -302,6 +302,7 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-admin-model --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -328,7 +329,6 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
-            $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
 
@@ -806,6 +806,7 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-admin-model --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -831,16 +832,14 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
-            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
-            $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
-            $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
-            $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
+            $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), [base_path('database/migrations/2018_11_11_111111_admins_create_table.php')]),
+            $this->mockMigrationFileWrite('2018_11_11_111113_add_default_admin.php', 'admins_add_default_admin.php'),
 
             $this->callFilePutContent('renovate.json', $this->getFixture('renovate.json')),
             $this->mockReadmeFileWrite('default_readme_with_mobile_app.md'),
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
             $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
-            $this->mockMigrationFileWrite('2018_11_11_111115_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
+            $this->mockMigrationFileWrite('2018_11_11_111114_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
         );
 
         $this->mockArtisanMigrateCall();
@@ -942,6 +941,7 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-admin-model --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -967,7 +967,6 @@ class InitCommandTest extends TestCase
             $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->callGlob(base_path('database/migrations/*_admins_create_table.php'), []),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
-            $this->callFilePutContent('app/Models/Admin.php', $this->getFixture('models/admin.php')),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'admins_add_telescope_admin_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
 
