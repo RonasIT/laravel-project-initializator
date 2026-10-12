@@ -179,12 +179,10 @@ class InitCommand extends Command implements Isolatable
 
     protected function renderTodoReport(): void
     {
-        if ($this->todoReporter->isEmpty()) {
-            return;
+        if (!$this->todoReporter->isEmpty()) {
+            $this->newLine();
+            $this->warn($this->todoReporter->getReport());
         }
-
-        $this->newLine();
-        $this->warn($this->todoReporter->getReport());
     }
 
     protected function askWithValidation(string $parameter, string|array $rules, ?string $default = null): string
