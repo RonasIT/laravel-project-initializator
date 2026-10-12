@@ -92,6 +92,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput($this->getFixture('todo_reports/default.txt'))
             ->assertExitCode(0);
     }
 
@@ -176,6 +177,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput($this->getFixture('todo_reports/default.txt'))
             ->assertExitCode(0);
     }
 
@@ -262,6 +264,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput($this->getFixture('todo_reports/default.txt'))
             ->assertExitCode(0);
     }
 
@@ -388,11 +391,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
-            ->expectsOutput('- Figma link')
-            ->expectsOutput('- Sentry link')
-            ->expectsOutput('- Manager\'s email')
+            ->expectsOutput($this->getFixture('todo_reports/default_readme.txt'))
             ->assertExitCode(0);
     }
 
@@ -508,8 +507,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
+            ->expectsOutput($this->getFixture('todo_reports/partial_readme.txt'))
             ->assertExitCode(0);
     }
 
@@ -640,6 +638,7 @@ class InitCommandTest extends TestCase
             ->expectsQuestion('Please specify: username of the project reviewer', 'reviewer')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?', 'yes')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput($this->getFixture('todo_reports/default.txt'))
             ->assertExitCode(0);
     }
 
@@ -763,8 +762,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
+            ->expectsOutput($this->getFixture('todo_reports/telescope.txt'))
             ->assertExitCode(0);
     }
 
@@ -892,11 +890,7 @@ class InitCommandTest extends TestCase
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- Issue Tracker link')
-            ->expectsOutput('- Figma link')
-            ->expectsOutput('- Sentry link')
-            ->expectsOutput('- Manager\'s email')
+            ->expectsOutput($this->getFixture('todo_reports/clerk_mobile_app.txt'))
             ->assertExitCode(0);
     }
 
@@ -1023,6 +1017,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutput($this->getFixture('todo_reports/clerk_additional_admins.txt'))
             ->assertExitCode(0);
     }
 
@@ -1109,9 +1104,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
-            ->expectsOutput('Don`t forget to fill the following empty values:')
-            ->expectsOutput('- GOOGLE_CLOUD_STORAGE_BUCKET')
-            ->expectsOutput('- GOOGLE_CLOUD_PROJECT_ID')
+            ->expectsOutput($this->getFixture('todo_reports/gcs_storage.txt'))
             ->assertExitCode(0);
     }
 

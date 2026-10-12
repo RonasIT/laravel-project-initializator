@@ -12,9 +12,11 @@ class EnvGenerator
 {
     protected array $envVariables = [];
 
+    protected array $emptyVars = [];
+
     public function setupEnv(string $appName, string $appUrl, DBConnectionDTO $dbConnection): void
     {
-        $this->setEnvVariables([
+        $this->setEnvVariablesAllowingEmpty([
             'APP_NAME' => $appName,
             ...$this->getDBVariables($dbConnection),
         ], ...EnvFileEnum::cases());
@@ -68,6 +70,19 @@ class EnvGenerator
         }
     }
 
+    public function getEmptyVars(): array
+    {
+        $result = [];
+
+        foreach (EnvFileEnum::cases() as $envFile) {
+            if (!empty($this->emptyVars[$envFile->value])) {
+                $result[$envFile->value] = array_keys($this->emptyVars[$envFile->value]);
+            }
+        }
+
+        return $result;
+    }
+
     protected function createMissingEnvFiles(): void
     {
         foreach (EnvFileEnum::cases() as $envFile) {
@@ -98,7 +113,7 @@ class EnvGenerator
 
     protected function configureTesting(DBConnectionDTO $dbConnection): void
     {
-        $this->setEnvVariables([
+        $this->setEnvVariablesAllowingEmpty([
             'APP_ENV' => 'testing',
             'APP_KEY' => $this->generateAppKey(),
             'LOG_CHANNEL' => 'stderr',
@@ -128,6 +143,23 @@ class EnvGenerator
         foreach ($envFiles as $envFile) {
             foreach ($data as $key => $value) {
                 $this->envVariables[$envFile->value][$key] = $value;
+
+                if (($value === '') && ($envFile !== EnvFileEnum::Example)) {
+                    $this->emptyVars[$envFile->value][$key] = true;
+                } else {
+                    unset($this->emptyVars[$envFile->value][$key]);
+                }
+            }
+        }
+    }
+
+    protected function setEnvVariablesAllowingEmpty(array $data, EnvFileEnum ...$envFiles): void
+    {
+        $this->setEnvVariables($data, ...$envFiles);
+
+        foreach ($envFiles as $envFile) {
+            foreach (array_keys($data) as $key) {
+                unset($this->emptyVars[$envFile->value][$key]);
             }
         }
     }

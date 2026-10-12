@@ -1,0 +1,17 @@
+Don't forget to complete the following steps:
+
+README:
+  Resources:
+    - Fill the Issue Tracker link
+
+Environment variables:
+  .env.development:
+    - DB_HOST
+    - DB_PORT
+    - DB_DATABASE
+    - DB_USERNAME
+    - DB_PASSWORD
+
+Configuration:
+  Telescope:
+    - Add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)

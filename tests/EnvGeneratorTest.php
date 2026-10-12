@@ -38,6 +38,10 @@ class EnvGeneratorTest extends TestCase
         $generator->setupEnv('MyApp', 'https://mysite.com', new DBConnectionDTO());
 
         $generator->apply();
+
+        $this->assertEquals([
+            '.env.development' => ['DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'],
+        ], $generator->getEmptyVars());
     }
 
     public function testConfigureClerk(): void
@@ -67,6 +71,20 @@ class EnvGeneratorTest extends TestCase
         $generator->configureClerk(AppTypeEnum::Multiplatform);
 
         $generator->apply();
+
+        $this->assertEquals([
+            '.env' => ['CLERK_ALLOWED_ISSUER', 'CLERK_SECRET_KEY', 'CLERK_ALLOWED_ORIGINS', 'CLERK_SIGNER_KEY_PATH'],
+            '.env.development' => [
+                'DB_HOST',
+                'DB_PORT',
+                'DB_DATABASE',
+                'DB_USERNAME',
+                'DB_PASSWORD',
+                'CLERK_ALLOWED_ISSUER',
+                'CLERK_SECRET_KEY',
+                'CLERK_ALLOWED_ORIGINS',
+            ],
+        ], $generator->getEmptyVars());
     }
 
     public function testConfigureClerkMobileApp(): void
@@ -96,6 +114,19 @@ class EnvGeneratorTest extends TestCase
         $generator->configureClerk(AppTypeEnum::Mobile);
 
         $generator->apply();
+
+        $this->assertEquals([
+            '.env' => ['CLERK_ALLOWED_ISSUER', 'CLERK_SECRET_KEY', 'CLERK_SIGNER_KEY_PATH'],
+            '.env.development' => [
+                'DB_HOST',
+                'DB_PORT',
+                'DB_DATABASE',
+                'DB_USERNAME',
+                'DB_PASSWORD',
+                'CLERK_ALLOWED_ISSUER',
+                'CLERK_SECRET_KEY',
+            ],
+        ], $generator->getEmptyVars());
     }
 
     public function testSetFilesystemDisk(): void
@@ -155,6 +186,18 @@ class EnvGeneratorTest extends TestCase
         $generator->configureGcsStorage();
 
         $generator->apply();
+
+        $this->assertEquals([
+            '.env.development' => [
+                'DB_HOST',
+                'DB_PORT',
+                'DB_DATABASE',
+                'DB_USERNAME',
+                'DB_PASSWORD',
+                'GOOGLE_CLOUD_STORAGE_BUCKET',
+                'GOOGLE_CLOUD_PROJECT_ID',
+            ],
+        ], $generator->getEmptyVars());
     }
 
     public function testApplyKeepsExistingEnvFiles(): void

@@ -1,0 +1,26 @@
+Don't forget to complete the following steps:
+
+README:
+  Resources:
+    - Fill the Laravel Telescope link
+    - Fill the Laravel Nova link
+
+Environment variables:
+  .env:
+    - CLERK_ALLOWED_ISSUER
+    - CLERK_SECRET_KEY
+    - CLERK_ALLOWED_ORIGINS
+    - CLERK_SIGNER_KEY_PATH
+  .env.development:
+    - DB_HOST
+    - DB_PORT
+    - DB_DATABASE
+    - DB_USERNAME
+    - DB_PASSWORD
+    - CLERK_ALLOWED_ISSUER
+    - CLERK_SECRET_KEY
+    - CLERK_ALLOWED_ORIGINS
+
+Configuration:
+  Telescope:
+    - Add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)

@@ -1,0 +1,17 @@
+Don't forget to complete the following steps:
+
+Environment variables:
+  .env.development:
+    - DB_HOST
+    - DB_PORT
+    - DB_DATABASE
+    - DB_USERNAME
+    - DB_PASSWORD
+    - GOOGLE_CLOUD_STORAGE_BUCKET
+    - GOOGLE_CLOUD_PROJECT_ID
+
+Configuration:
+  GCS:
+    - Provide the service account key (set disks.gcs.key_file_path in config/filesystems.php)
+  Telescope:
+    - Add \Laravel\Telescope\Http\Middleware\Authorize::class to the middleware list (in config/telescope.php)
