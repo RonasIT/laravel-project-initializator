@@ -2,6 +2,7 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use Illuminate\Console\OutputStyle;
 use Illuminate\Process\Exceptions\ProcessFailedException;
 use Mockery;
 use ReflectionMethod;
@@ -9,6 +10,8 @@ use ReflectionProperty;
 use RonasIT\ProjectInitializator\Commands\InitCommand;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class InitCommandTest extends TestCase
 {
@@ -1213,6 +1216,19 @@ class InitCommandTest extends TestCase
         $credentials = $createAdminMethod->invoke($commandMock);
 
         $this->assertEquals('Admin', $credentials['name']);
+    }
+
+    public function testWriteProcessOutputStreamsBufferToConsole(): void
+    {
+        $consoleOutput = new BufferedOutput();
+
+        $commandMock = Mockery::mock(InitCommand::class)->shouldAllowMockingProtectedMethods();
+        $this->setReflectionProperty($commandMock, InitCommand::class, 'output', new OutputStyle(new ArrayInput([]), $consoleOutput));
+
+        $writeProcessOutputMethod = ReflectionMethod::createFromMethodName(InitCommand::class . '::writeProcessOutput');
+        $writeProcessOutputMethod->invoke($commandMock, 'out', 'Migrating: 2018_11_11_111111_create_users_table');
+
+        $this->assertStringContainsString('Migrating: 2018_11_11_111111_create_users_table', $consoleOutput->fetch());
     }
 
     protected function setReflectionProperty(object $object, string $class, string $property, mixed $value): void

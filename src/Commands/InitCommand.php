@@ -592,9 +592,16 @@ class InitCommand extends Command implements Isolatable
             ->timeout(0)
             ->run(
                 'php artisan migrate --force --ansi',
-                fn ($type, $buffer) => $this->output->write($buffer),
+                $this->writeProcessOutput(...),
             )
             ->throw();
+    }
+
+    protected function writeProcessOutput(string $type, string $buffer): void
+    {
+        // $type (STDOUT/STDERR) is part of the Process output callback contract and is kept
+        // for that reason, even though the migration output is streamed to the console as-is.
+        $this->output->write($buffer);
     }
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void
