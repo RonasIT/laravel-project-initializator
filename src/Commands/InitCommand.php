@@ -589,6 +589,7 @@ class InitCommand extends Command implements Isolatable
             'DB_USERNAME' => $this->dbConnection->username,
             'DB_PASSWORD' => $this->dbConnection->password,
         ])
+            ->timeout(0)
             ->run(
                 'php artisan migrate --force --ansi',
                 fn ($type, $buffer) => $this->output->write($buffer),

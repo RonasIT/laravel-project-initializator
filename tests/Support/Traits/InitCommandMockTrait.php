@@ -80,6 +80,8 @@ trait InitCommandMockTrait
             '*' => function (PendingProcess $process) use ($exitCode) {
                 $this->assertEquals('php artisan migrate --force --ansi', $process->command);
 
+                $this->assertEquals(0, $process->timeout);
+
                 $this->assertEquals([
                     'DB_CONNECTION' => 'pgsql',
                     'DB_HOST' => 'pgsql',
