@@ -5,8 +5,7 @@ namespace RonasIT\ProjectInitializator\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Telescope\TelescopeServiceProvider;
@@ -577,19 +576,24 @@ class InitCommand extends Command implements Isolatable
 
     protected function runMigrations(): void
     {
-        $driver = $this->dbConnection->driver;
-
-        config([
-            'database.default' => $driver,
-            "database.connections.{$driver}" => $this->dbConnection->toArray(),
-        ]);
-
-        DB::purge($driver);
-
-        Artisan::call('migrate', [
-            '--force' => true,
-            '--ansi' => true,
-        ]);
+        // Migrations run in a fresh external process started after the packages have been installed.
+        // The in-process Artisan kernel was bootstrapped before installation and therefore does not
+        // see the vendor migrations the installed packages register via loadMigrationsFrom().
+        // DB settings are passed as OS environment variables, which override the .env values resolved
+        // by the sub-process regardless of the APP_ENV it picks up.
+        Process::env([
+            'DB_CONNECTION' => $this->dbConnection->driver,
+            'DB_HOST' => $this->dbConnection->host,
+            'DB_PORT' => $this->dbConnection->port,
+            'DB_DATABASE' => $this->dbConnection->database,
+            'DB_USERNAME' => $this->dbConnection->username,
+            'DB_PASSWORD' => $this->dbConnection->password,
+        ])
+            ->run(
+                'php artisan migrate --force --ansi',
+                fn ($type, $buffer) => $this->output->write($buffer),
+            )
+            ->throw();
     }
 
     protected function publishAdminMigration(array $adminCredentials, ?string $serviceKey): void

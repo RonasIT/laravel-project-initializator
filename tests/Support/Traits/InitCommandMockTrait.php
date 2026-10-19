@@ -2,9 +2,8 @@
 
 namespace RonasIT\ProjectInitializator\Tests\Support\Traits;
 
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Support\Facades\Artisan;
-use Mockery;
+use Illuminate\Process\PendingProcess;
+use Illuminate\Support\Facades\Process;
 use RonasIT\Support\Traits\MockTrait;
 
 trait InitCommandMockTrait
@@ -72,24 +71,26 @@ trait InitCommandMockTrait
         return $this->callFilePutContent('README.md', $this->getFixture("readme/{$fixture}"));
     }
 
-    protected function mockArtisanMigrateCall(): void
+    protected function mockArtisanMigrateCall(int $exitCode = 0): void
     {
-        $kernel = app(Kernel::class);
+        // Migrations run in an external process, so the facade is faked instead of the Artisan kernel.
+        // The handler asserts both the command and the DB settings passed as environment variables, and
+        // the exit code lets a caller model a failing migration.
+        Process::fake([
+            '*' => function (PendingProcess $process) use ($exitCode) {
+                $this->assertEquals('php artisan migrate --force --ansi', $process->command);
 
-        $mock = Mockery::mock($kernel)->makePartial();
+                $this->assertEquals([
+                    'DB_CONNECTION' => 'pgsql',
+                    'DB_HOST' => 'pgsql',
+                    'DB_PORT' => '5432',
+                    'DB_DATABASE' => 'postgres',
+                    'DB_USERNAME' => 'postgres',
+                    'DB_PASSWORD' => '',
+                ], $process->environment);
 
-        $mock
-            ->shouldReceive('call')
-            ->with('migrate', ['--force' => true, '--ansi' => true])
-            ->once()
-            ->andReturn(0);
-
-        // As Kernel is final, the Artisan facade can not be mocked, so we need to create a partial mock from the resolved instance and swap the 'migrate' call via the Artisan facade.
-        $mock
-            ->shouldReceive('call')
-            ->withAnyArgs()
-            ->andReturnUsing(fn (...$args) => $kernel->call(...$args));
-
-        Artisan::swap($mock);
+                return Process::result(exitCode: $exitCode);
+            },
+        ]);
     }
 }
