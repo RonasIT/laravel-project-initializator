@@ -3,7 +3,10 @@
 namespace RonasIT\ProjectInitializator\Tests\Support\Traits;
 
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Process\PendingProcess;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Process;
 use Mockery;
 use RonasIT\Support\Traits\MockTrait;
 
@@ -29,7 +32,31 @@ trait InitCommandMockTrait
 
     protected function callShellExec(string $command, string $result = 'success'): array
     {
-        return $this->functionCall('shell_exec', [$command], $result);
+        return [
+            'command' => $command,
+            'result' => $result,
+        ];
+    }
+
+    protected function mockShellExec(array ...$calls): void
+    {
+        $executedCommands = [];
+        $fakes = [];
+
+        foreach ($calls as $call) {
+            $fakes[$call['command']] = function (PendingProcess $process) use ($call, &$executedCommands) {
+                $executedCommands[] = $process->command;
+
+                return $call['result'];
+            };
+        }
+
+        Process::preventStrayProcesses();
+        Process::fake($fakes);
+
+        $this->beforeApplicationDestroyed(function () use ($calls, &$executedCommands) {
+            $this->assertSame(Arr::pluck($calls, 'command'), $executedCommands, 'Shell commands were not executed as expected.');
+        });
     }
 
     protected function callGlob(string $pattern, array $result): array
