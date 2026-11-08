@@ -2,11 +2,13 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
+use Illuminate\Support\ServiceProvider;
 use Mockery;
 use ReflectionMethod;
 use ReflectionProperty;
 use RonasIT\ProjectInitializator\Commands\InitCommand;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
+use RonasIT\ProjectInitializator\ProjectInitializatorServiceProvider;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
@@ -49,6 +51,7 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-role-enum --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -65,7 +68,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
             $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
             $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
@@ -129,6 +131,7 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-role-enum --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -150,7 +153,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
             $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
             $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
@@ -214,6 +216,7 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-role-enum --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -233,7 +236,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
             $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_add_default_admin.php', 'migration.php'),
             $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
@@ -300,6 +302,7 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-clerk-user-repository --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
@@ -324,7 +327,6 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
-            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
@@ -431,6 +433,7 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-role-enum --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -450,7 +453,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
             $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
             $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
 
@@ -547,6 +549,7 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-role-enum --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -568,7 +571,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
             $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_add_default_admin.php', 'migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_nova_admin.php', 'nova_users_table_migration.php'),
@@ -678,6 +680,7 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-role-enum --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -697,7 +700,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
             $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111113_add_telescope_admin.php', 'telescope_users_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_nova_admin.php', 'nova_users_table_migration.php'),
@@ -802,6 +804,7 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-clerk-user-repository --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
@@ -827,7 +830,6 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
-            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_default_admin.php', 'admins_add_default_admin.php'),
 
@@ -935,6 +937,7 @@ class InitCommandTest extends TestCase
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-clerk-user-repository --force'),
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -958,7 +961,6 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
             $this->mockMigrationFileWrite('2018_11_11_111112_users_format_to_clerk.php', 'users_format_to_clerk_migration.php'),
-            $this->callFilePutContent('app/Support/Clerk/ClerkUserRepository.php', $this->getFixture('clerk_user_repository.php')),
             $this->mockMigrationFileWrite('2018_11_11_111113_admins_create_table.php', 'admins_table_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111114_add_telescope_admin.php', 'admins_add_telescope_admin_migration.php'),
             $this->mockMigrationFileWrite('2018_11_11_111115_add_nova_admin.php', 'admins_add_nova_admin_migration.php'),
@@ -1064,6 +1066,7 @@ class InitCommandTest extends TestCase
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
 
             $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-role-enum --force'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -1082,7 +1085,6 @@ class InitCommandTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Support',
-            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
             $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
 
             $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
@@ -1130,6 +1132,20 @@ class InitCommandTest extends TestCase
         $credentials = $createAdminMethod->invoke($commandMock);
 
         $this->assertEquals('Admin', $credentials['name']);
+    }
+
+    public function testPublishableClassStubs(): void
+    {
+        $this->assertPublishedStub('initializator-role-enum', app_path('Enums/User/RoleEnum.php'), 'role_enum.php');
+        $this->assertPublishedStub('initializator-clerk-user-repository', app_path('Support/Clerk/ClerkUserRepository.php'), 'clerk_user_repository.php');
+    }
+
+    protected function assertPublishedStub(string $tag, string $destination, string $fixture): void
+    {
+        $paths = ServiceProvider::pathsToPublish(ProjectInitializatorServiceProvider::class, $tag);
+
+        $this->assertEquals([$destination], array_values($paths));
+        $this->assertEquals($this->getFixture($fixture), file_get_contents(array_key_first($paths)));
     }
 
     protected function setReflectionProperty(object $object, string $class, string $property, mixed $value): void

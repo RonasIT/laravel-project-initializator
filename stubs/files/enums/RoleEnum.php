@@ -1,3 +1,5 @@
+<?php
+
 namespace App\Enums\User;
 
 use RonasIT\Support\Traits\EnumTrait;

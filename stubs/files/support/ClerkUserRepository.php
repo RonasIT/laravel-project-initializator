@@ -1,3 +1,5 @@
+<?php
+
 namespace App\Support\Clerk;
 
 use App\Models\User;
