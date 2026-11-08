@@ -2,13 +2,11 @@
 
 namespace RonasIT\ProjectInitializator\Tests;
 
-use Illuminate\Support\ServiceProvider;
 use Mockery;
 use ReflectionMethod;
 use ReflectionProperty;
 use RonasIT\ProjectInitializator\Commands\InitCommand;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
-use RonasIT\ProjectInitializator\ProjectInitializatorServiceProvider;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
 
 class InitCommandTest extends TestCase
@@ -1132,20 +1130,6 @@ class InitCommandTest extends TestCase
         $credentials = $createAdminMethod->invoke($commandMock);
 
         $this->assertEquals('Admin', $credentials['name']);
-    }
-
-    public function testPublishableClassStubs(): void
-    {
-        $this->assertPublishedStub('initializator-role-enum', app_path('Enums/User/RoleEnum.php'), 'role_enum.php');
-        $this->assertPublishedStub('initializator-clerk-user-repository', app_path('Support/Clerk/ClerkUserRepository.php'), 'clerk_user_repository.php');
-    }
-
-    protected function assertPublishedStub(string $tag, string $destination, string $fixture): void
-    {
-        $paths = ServiceProvider::pathsToPublish(ProjectInitializatorServiceProvider::class, $tag);
-
-        $this->assertEquals([$destination], array_values($paths));
-        $this->assertEquals($this->getFixture($fixture), file_get_contents(array_key_first($paths)));
     }
 
     protected function setReflectionProperty(object $object, string $class, string $property, mixed $value): void

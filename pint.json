@@ -1,7 +1,6 @@
 {
   "preset": "laravel",
   "exclude": [
-      "resources",
       "stubs",
       "tests/fixtures",
       "vendor"
