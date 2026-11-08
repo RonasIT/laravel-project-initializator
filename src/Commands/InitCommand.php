@@ -227,11 +227,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function addClerkUserRepository(): void
     {
-        $this->fileSaver->publishClass(
-            template: view('initializator::clerk_user_repository'),
-            fileName: 'ClerkUserRepository',
-            fileDirectory: 'app/Support/Clerk',
-        );
+        shell_exec('php artisan vendor:publish --tag=initializator-clerk-user-repository --force');
 
         new PHPFileBuilder(app_path('Providers/AppServiceProvider.php'))
             ->addImports([
@@ -279,11 +275,7 @@ class InitCommand extends Command implements Isolatable
     {
         shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
 
-        $this->fileSaver->publishClass(
-            template: view('initializator::enums.role_enum'),
-            fileName: 'RoleEnum',
-            fileDirectory: 'app/Enums/User',
-        );
+        shell_exec('php artisan vendor:publish --tag=initializator-role-enum --force');
 
         if (!$this->migrationPublisher->isMigrationExists('users_add_role')) {
             $this->migrationPublisher->publish('users_add_role');
