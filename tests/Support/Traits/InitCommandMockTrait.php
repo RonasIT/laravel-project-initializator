@@ -30,11 +30,11 @@ trait InitCommandMockTrait
         return $this->functionCall('file_put_contents', [$fileName, $result, $flags]);
     }
 
-    protected function callShellExec(string $command, string $result = 'success'): array
+    protected function callShellExec(string $command, string $result = 'success', int $exitCode = 0): array
     {
         return [
             'command' => $command,
-            'result' => $result,
+            'result' => Process::result($result, exitCode: $exitCode),
         ];
     }
 
