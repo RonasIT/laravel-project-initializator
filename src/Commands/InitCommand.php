@@ -87,107 +87,116 @@ class InitCommand extends Command implements Isolatable
 
     public function handle(): void
     {
-        $this->prepareAppName();
+        try {
+            $this->prepareAppName();
 
-        $this->codeOwnerEmail = $this->askWithValidation(
-            parameter: 'email of code owner / team lead',
-            rules: 'required|email',
-        );
+            $this->codeOwnerEmail = $this->askWithValidation(
+                parameter: 'email of code owner / team lead',
+                rules: 'required|email',
+            );
 
-        $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabAppName}.com");
+            $this->appUrl = $this->ask('Please enter an application URL', "https://api.dev.{$this->kebabAppName}.com");
 
-        $this->appType = AppTypeEnum::from(select(
-            label: 'What type of application will your API serve?',
-            options: AppTypeEnum::values(),
-            default: AppTypeEnum::Multiplatform->value,
-        ));
+            $this->appType = AppTypeEnum::from(select(
+                label: 'What type of application will your API serve?',
+                options: AppTypeEnum::values(),
+                default: AppTypeEnum::Multiplatform->value,
+            ));
 
-        $this->authType = AuthTypeEnum::from(select(
-            label: 'Please choose the authentication type',
-            options: AuthTypeEnum::values(),
-            default: AuthTypeEnum::None->value,
-        ));
+            $this->authType = AuthTypeEnum::from(select(
+                label: 'Please choose the authentication type',
+                options: AuthTypeEnum::values(),
+                default: AuthTypeEnum::None->value,
+            ));
 
-        $this->envGenerator->setupEnv($this->appName, $this->appUrl, $this->dbConnection);
+            $this->envGenerator->setupEnv($this->appName, $this->appUrl, $this->dbConnection);
 
-        if ($this->authType === AuthTypeEnum::Clerk) {
-            $this->configureClerkAuth();
-        } else {
-            $this->configureDefaultAuth();
-        }
-
-        if (confirm('Do you want to generate an admin user?')) {
             if ($this->authType === AuthTypeEnum::Clerk) {
-                $this->publishAdminsTableMigration();
+                $this->configureClerkAuth();
+            } else {
+                $this->configureDefaultAuth();
             }
 
-            $this->createAdminUser();
-        }
+            if (confirm('Do you want to generate an admin user?')) {
+                if ($this->authType === AuthTypeEnum::Clerk) {
+                    $this->publishAdminsTableMigration();
+                }
 
-        if (confirm('Do you want to generate a README file?')) {
-            $this->configureReadme();
-        }
-
-        if (confirm('Will project work with media files? (upload, store and return content)', false)) {
-            $this->setupMediaStorage();
-        }
-
-        if ($this->appType !== AppTypeEnum::Web && confirm('Will the application use push notifications?', false)) {
-            $this->setupPushNotifications();
-        }
-
-        $this->envGenerator->apply();
-
-        if (confirm('Would you use Renovate dependabot?')) {
-            $this->saveRenovateJSON();
-
-            $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Renovate);
-        }
-
-        if (!empty($this->readmeGenerator)) {
-            $this->readmeGenerator->save();
-
-            $this->info('README generated successfully!');
-        }
-
-        $this->installLaravelTelescope();
-
-        $this->shouldUninstallPackage = confirm('Do you want to uninstall project-initializator package?');
-
-        $this->setupComposerHooks();
-
-        foreach ($this->shellCommands as $command) {
-            $command();
-        }
-
-        $this->changeMiddlewareForTelescopeAuthorization();
-
-        $this->patchApplication();
-
-        if ($this->shouldUninstallPackage) {
-            $this->shellExecutor->composerRemove('ronasit/laravel-project-initializator', dev: true);
-        }
-
-        $this->runMigrations();
-
-        $this->info('Project initialized successfully!');
-
-        if ($this->emptyResourcesList) {
-            $this->warn('Don`t forget to fill the following empty values:');
-
-            foreach ($this->emptyResourcesList as $value) {
-                $this->warn("- {$value}");
+                $this->createAdminUser();
             }
+
+            if (confirm('Do you want to generate a README file?')) {
+                $this->configureReadme();
+            }
+
+            if (confirm('Will project work with media files? (upload, store and return content)', false)) {
+                $this->setupMediaStorage();
+            }
+
+            if ($this->appType !== AppTypeEnum::Web && confirm('Will the application use push notifications?', false)) {
+                $this->setupPushNotifications();
+            }
+
+            $this->envGenerator->apply();
+
+            if (confirm('Would you use Renovate dependabot?')) {
+                $this->saveRenovateJSON();
+
+                $this->readmeGenerator?->addBlock(ReadmeBlockEnum::Renovate);
+            }
+
+            if (!empty($this->readmeGenerator)) {
+                $this->readmeGenerator->save();
+
+                $this->info('README generated successfully!');
+            }
+
+            $this->installLaravelTelescope();
+
+            $this->shouldUninstallPackage = confirm('Do you want to uninstall project-initializator package?');
+
+            $this->setupComposerHooks();
+
+            foreach ($this->shellCommands as $command) {
+                $command();
+            }
+
+            $this->changeMiddlewareForTelescopeAuthorization();
+
+            $this->patchApplication();
+
+            if ($this->shouldUninstallPackage) {
+                $this->shellExecutor->composerRemove('ronasit/laravel-project-initializator', dev: true);
+            }
+
+            $this->runMigrations();
+
+            $this->info('Project initialized successfully!');
+
+            if ($this->emptyResourcesList) {
+                $this->warn('Don`t forget to fill the following empty values:');
+
+                foreach ($this->emptyResourcesList as $value) {
+                    $this->warn("- {$value}");
+                }
+            }
+        } finally {
+            $this->printFailedShellCommandsSummary();
+        }
+    }
+
+    protected function printFailedShellCommandsSummary(): void
+    {
+        if (empty($this->failedShellCommands)) {
+            return;
         }
 
-        if (!empty($this->failedShellCommands)) {
-            $count = count($this->failedShellCommands);
+        $count = count($this->failedShellCommands);
 
-            $this->components->warn("{$count} " . Str::plural('command', $count) . ' failed. Run them manually:');
+        $this->components->warn("{$count} " . Str::plural('command', $count) . ' failed. Run them manually:');
 
-            foreach ($this->failedShellCommands as $command) {
-                $this->line("  - {$command}");
-            }
+        foreach ($this->failedShellCommands as $command) {
+            $this->line("  - {$command}");
         }
     }
 
@@ -198,8 +207,10 @@ class InitCommand extends Command implements Isolatable
         $this->components->error("Command failed with exit code {$result->exitCode()}:");
         $this->line("  {$command}");
 
-        if (empty($result->errorOutput())) {
-            $this->line(trim($result->output()));
+        $output = trim($result->output());
+
+        if (empty($result->errorOutput()) && !empty($output)) {
+            $this->line($output);
         }
     }
 
