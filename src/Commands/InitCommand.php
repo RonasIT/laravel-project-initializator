@@ -4,6 +4,7 @@ namespace RonasIT\ProjectInitializator\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -44,6 +45,8 @@ class InitCommand extends Command implements Isolatable
 
     protected array $shellCommands;
 
+    protected array $failedShellCommands = [];
+
     protected bool $shouldUninstallPackage = false;
 
     protected string $appName;
@@ -66,6 +69,8 @@ class InitCommand extends Command implements Isolatable
         parent::__construct();
 
         $this->dbConnection = new DBConnectionDTO();
+
+        $this->shellExecutor->onFailure($this->reportFailedShellCommand(...));
 
         $this->shellCommands = [
             fn () => $this->shellExecutor->composerRequire('laravel/ui'),
@@ -173,6 +178,28 @@ class InitCommand extends Command implements Isolatable
             foreach ($this->emptyResourcesList as $value) {
                 $this->warn("- {$value}");
             }
+        }
+
+        if (!empty($this->failedShellCommands)) {
+            $count = count($this->failedShellCommands);
+
+            $this->components->warn("{$count} " . Str::plural('command', $count) . ' failed. Run them manually:');
+
+            foreach ($this->failedShellCommands as $command) {
+                $this->line("  - {$command}");
+            }
+        }
+    }
+
+    protected function reportFailedShellCommand(string $command, ProcessResult $result): void
+    {
+        $this->failedShellCommands[] = $command;
+
+        $this->components->error("Command failed with exit code {$result->exitCode()}:");
+        $this->line("  {$command}");
+
+        if (empty($result->errorOutput())) {
+            $this->line(trim($result->output()));
         }
     }
 

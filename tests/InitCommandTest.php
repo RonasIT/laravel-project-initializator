@@ -94,6 +94,7 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->doesntExpectOutputToContain('failed')
             ->assertExitCode(0);
     }
 
@@ -523,7 +524,7 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function testRunWithReadmeGettingStartedWhenGitRemoteFails()
+    public function testRunWithFailedShellCommands()
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
@@ -563,7 +564,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('git ls-remote --get-url origin', 'fatal: not a git repository', 1),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
-            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi', 'Could not find package ronasit/laravel-swagger', 2),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
             $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
             $this->callShellExec('composer require --dev laravel/pint --ansi'),
@@ -609,9 +610,18 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Credentials and Access` part?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsOutputToContain('Command failed with exit code 1:')
+            ->expectsOutput('  git ls-remote --get-url origin')
+            ->expectsOutput('fatal: not a git repository')
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutputToContain('Command failed with exit code 2:')
+            ->expectsOutput('  composer require ronasit/laravel-swagger --ansi')
+            ->expectsOutput('Could not find package ronasit/laravel-swagger')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutputToContain('2 commands failed. Run them manually:')
+            ->expectsOutput('  - git ls-remote --get-url origin')
+            ->expectsOutput('  - composer require ronasit/laravel-swagger --ansi')
             ->assertExitCode(0);
     }
 
