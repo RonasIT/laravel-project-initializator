@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Process;
 use Mockery;
 use RonasIT\Support\Traits\MockTrait;
+use Throwable;
 
 trait InitCommandMockTrait
 {
@@ -99,7 +100,7 @@ trait InitCommandMockTrait
         return $this->callFilePutContent('README.md', $this->getFixture("readme/{$fixture}"));
     }
 
-    protected function mockArtisanMigrateCall(): void
+    protected function mockArtisanMigrateCall(?Throwable $exception = null): void
     {
         $kernel = app(Kernel::class);
 
@@ -109,7 +110,7 @@ trait InitCommandMockTrait
             ->shouldReceive('call')
             ->with('migrate', ['--force' => true, '--ansi' => true])
             ->once()
-            ->andReturn(0);
+            ->andReturnUsing(fn () => (empty($exception)) ? 0 : throw $exception);
 
         // As Kernel is final, the Artisan facade can not be mocked, so we need to create a partial mock from the resolved instance and swap the 'migrate' call via the Artisan facade.
         $mock

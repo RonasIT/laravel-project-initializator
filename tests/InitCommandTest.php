@@ -8,6 +8,7 @@ use ReflectionProperty;
 use RonasIT\ProjectInitializator\Commands\InitCommand;
 use RonasIT\ProjectInitializator\Enums\AuthTypeEnum;
 use RonasIT\ProjectInitializator\Tests\Support\Traits\InitCommandMockTrait;
+use RuntimeException;
 
 class InitCommandTest extends TestCase
 {
@@ -94,7 +95,108 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Would you use Renovate dependabot?')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
             ->expectsOutput('Project initialized successfully!')
+            ->doesntExpectOutputToContain('failed')
             ->assertExitCode(0);
+    }
+
+    public function testRunPrintsFailedCommandsSummaryWhenMigrationFails()
+    {
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.example.yml', 'env.development_from_example_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_pascal_case.yml'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+            $this->copyEnvFileCall('.env.development'),
+            $this->copyEnvFileCall('.env.ci-testing'),
+            $this->copyEnvFileCall('.env.testing'),
+
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
+
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer.json')),
+        );
+
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force --ansi'),
+            $this->callShellExec('composer require laravel/ui --ansi', '', 1),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
+
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111113_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
+        );
+
+        $this->mockArtisanMigrateCall(new RuntimeException('Connection refused'));
+
+        $command = $this
+            ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp', 'yes')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'not-an-email')
+            ->expectsOutput('The email of code owner/ team lead field must be a valid email address.')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
+            ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsChoice('What type of application will your API serve?', 'Multiplatform', ['Mobile', 'Web', 'Multiplatform'])
+            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsConfirmation('Do you want to generate an admin user?')
+            ->expectsConfirmation('Do you want to generate a README file?')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Will the application use push notifications?')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutputToContain('Command failed with exit code 1:')
+            ->expectsOutput('  composer require laravel/ui --ansi')
+            ->doesntExpectOutput('')
+            ->expectsOutputToContain('1 command failed. Run them manually:')
+            ->expectsOutput('  - composer require laravel/ui --ansi');
+
+        try {
+            $command->run();
+
+            $this->fail('Migration exception was not thrown.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Connection refused', $exception->getMessage());
+        }
+
+        // PendingCommand skips output verification when the command throws, so check the remaining expectations here.
+        $this->assertEmpty($this->expectedOutput, 'Expected output was not printed: ' . implode(', ', $this->expectedOutput));
+        $this->assertEmpty($this->expectedOutputSubstrings, 'Expected output was not printed: ' . implode(', ', $this->expectedOutputSubstrings));
+        $this->assertNotContains(true, $this->unexpectedOutput, 'Unexpected output was printed.');
     }
 
     public function testRunWithoutAdminAndReadmeCreationWithPushNotification()
@@ -523,7 +625,7 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function testRunWithReadmeGettingStartedWhenGitRemoteFails()
+    public function testRunWithFailedShellCommands()
     {
         $this->mockNativeFunction(
             '\Winter\LaravelConfigWriter',
@@ -563,7 +665,7 @@ class InitCommandTest extends TestCase
             $this->callShellExec('git ls-remote --get-url origin', 'fatal: not a git repository', 1),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
-            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi', 'Could not find package ronasit/laravel-swagger', 2),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
             $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
             $this->callShellExec('composer require --dev laravel/pint --ansi'),
@@ -609,9 +711,18 @@ class InitCommandTest extends TestCase
             ->expectsConfirmation('Do you need a `Credentials and Access` part?')
             ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
             ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsOutputToContain('Command failed with exit code 1:')
+            ->expectsOutput('  git ls-remote --get-url origin')
+            ->expectsOutput('fatal: not a git repository')
             ->expectsOutput('README generated successfully!')
             ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutputToContain('Command failed with exit code 2:')
+            ->expectsOutput('  composer require ronasit/laravel-swagger --ansi')
+            ->expectsOutput('Could not find package ronasit/laravel-swagger')
             ->expectsOutput('Project initialized successfully!')
+            ->expectsOutputToContain('2 commands failed. Run them manually:')
+            ->expectsOutput('  - git ls-remote --get-url origin')
+            ->expectsOutput('  - composer require ronasit/laravel-swagger --ansi')
             ->assertExitCode(0);
     }
 

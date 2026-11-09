@@ -2,12 +2,20 @@
 
 namespace RonasIT\ProjectInitializator\Support;
 
+use Closure;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Process\Process as SymfonyProcess;
 
 class ShellExecutor
 {
+    protected ?Closure $onFailure = null;
+
+    public function onFailure(Closure $callback): void
+    {
+        $this->onFailure = $callback;
+    }
+
     public function composerRequire(string $package, bool $dev = false): void
     {
         $this->composer('require', $package, $dev);
@@ -39,10 +47,16 @@ class ShellExecutor
 
     protected function run(string $command): ProcessResult
     {
-        return Process::forever()->run($command, function (string $type, string $output) {
+        $result = Process::forever()->run($command, function (string $type, string $output) {
             if ($type === SymfonyProcess::ERR) {
                 fwrite(STDERR, $output);
             }
         });
+
+        if ($result->failed() && !empty($this->onFailure)) {
+            ($this->onFailure)($command, $result);
+        }
+
+        return $result;
     }
 }
