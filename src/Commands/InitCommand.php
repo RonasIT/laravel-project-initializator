@@ -24,6 +24,7 @@ use RonasIT\ProjectInitializator\Generators\EnvGenerator;
 use RonasIT\ProjectInitializator\Generators\ReadmeGenerator;
 use RonasIT\ProjectInitializator\Support\FileSaver;
 use RonasIT\ProjectInitializator\Support\MigrationPublisher;
+use RonasIT\ProjectInitializator\Support\ShellExecutor;
 use Winter\LaravelConfigWriter\ArrayFile;
 
 use function Laravel\Prompts\confirm;
@@ -41,17 +42,7 @@ class InitCommand extends Command implements Isolatable
 
     protected array $emptyResourcesList = [];
 
-    protected array $shellCommands = [
-        'composer require laravel/ui',
-        'composer require ronasit/laravel-helpers',
-        'composer require ronasit/laravel-swagger',
-        'php artisan vendor:publish --provider="RonasIT\\AutoDoc\\AutoDocServiceProvider"',
-        'composer require --dev ronasit/laravel-entity-generator',
-        'composer require --dev laravel/pint',
-        'php artisan vendor:publish --tag=pint-config',
-        'php artisan lang:publish',
-        'php artisan key:generate',
-    ];
+    protected array $shellCommands;
 
     protected bool $shouldUninstallPackage = false;
 
@@ -70,10 +61,23 @@ class InitCommand extends Command implements Isolatable
         protected FileSaver $fileSaver,
         protected MigrationPublisher $migrationPublisher,
         protected EnvGenerator $envGenerator,
+        protected ShellExecutor $shellExecutor,
     ) {
         parent::__construct();
 
         $this->dbConnection = new DBConnectionDTO();
+
+        $this->shellCommands = [
+            fn () => $this->shellExecutor->composerRequire('laravel/ui'),
+            fn () => $this->shellExecutor->composerRequire('ronasit/laravel-helpers'),
+            fn () => $this->shellExecutor->composerRequire('ronasit/laravel-swagger'),
+            fn () => $this->shellExecutor->artisan('vendor:publish --provider="RonasIT\\AutoDoc\\AutoDocServiceProvider"'),
+            fn () => $this->shellExecutor->composerRequire('ronasit/laravel-entity-generator', dev: true),
+            fn () => $this->shellExecutor->composerRequire('laravel/pint', dev: true),
+            fn () => $this->shellExecutor->artisan('vendor:publish --tag=pint-config'),
+            fn () => $this->shellExecutor->artisan('lang:publish'),
+            fn () => $this->shellExecutor->artisan('key:generate'),
+        ];
     }
 
     public function handle(): void
@@ -147,8 +151,8 @@ class InitCommand extends Command implements Isolatable
 
         $this->setupComposerHooks();
 
-        foreach ($this->shellCommands as $shellCommand) {
-            shell_exec("{$shellCommand} --ansi");
+        foreach ($this->shellCommands as $command) {
+            $command();
         }
 
         $this->changeMiddlewareForTelescopeAuthorization();
@@ -156,7 +160,7 @@ class InitCommand extends Command implements Isolatable
         $this->patchApplication();
 
         if ($this->shouldUninstallPackage) {
-            shell_exec('composer remove --dev ronasit/laravel-project-initializator --ansi');
+            $this->shellExecutor->composerRemove('ronasit/laravel-project-initializator', dev: true);
         }
 
         $this->runMigrations();
@@ -207,7 +211,7 @@ class InitCommand extends Command implements Isolatable
     {
         $this->enableClerk();
 
-        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force');
+        $this->shellExecutor->artisan('vendor:publish --tag=initializator-user-model-with-clerk --force');
 
         $this->envGenerator->configureClerk($this->appType);
     }
@@ -216,8 +220,8 @@ class InitCommand extends Command implements Isolatable
     {
         array_push(
             $this->shellCommands,
-            'composer require ronasit/laravel-clerk',
-            'php artisan laravel-clerk:install',
+            fn () => $this->shellExecutor->composerRequire('ronasit/laravel-clerk'),
+            fn () => $this->shellExecutor->artisan('laravel-clerk:install'),
         );
 
         $this->migrationPublisher->publish('users_format_to_clerk');
@@ -277,7 +281,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureDefaultAuth(): void
     {
-        shell_exec('php artisan vendor:publish --tag=initializator-user-model-with-role --force');
+        $this->shellExecutor->artisan('vendor:publish --tag=initializator-user-model-with-role --force');
 
         $this->fileSaver->publishClass(
             template: view('initializator::enums.role_enum'),
@@ -311,7 +315,7 @@ class InitCommand extends Command implements Isolatable
         }
 
         if ($shouldGenerateAllParts || confirm('Do you need a `Getting Started` part?')) {
-            $gitProjectPath = shell_exec('git ls-remote --get-url origin');
+            $gitProjectPath = $this->shellExecutor->getGitRemoteUrl();
 
             $this->readmeGenerator->setGitProjectPath($gitProjectPath);
 
@@ -399,7 +403,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function setupMediaStorage(): void
     {
-        $this->shellCommands[] = 'composer require ronasit/laravel-media';
+        $this->shellCommands[] = fn () => $this->shellExecutor->composerRequire('ronasit/laravel-media');
 
         $storage = StorageEnum::from(select(
             label: 'Which storage will be used for media files?',
@@ -408,7 +412,7 @@ class InitCommand extends Command implements Isolatable
         ));
 
         if ($storage === StorageEnum::GCS) {
-            $this->shellCommands[] = 'composer require spatie/laravel-google-cloud-storage';
+            $this->shellCommands[] = fn () => $this->shellExecutor->composerRequire('spatie/laravel-google-cloud-storage');
 
             $this->envGenerator->configureGcsStorage();
 
@@ -465,9 +469,9 @@ class InitCommand extends Command implements Isolatable
         if (!class_exists(TelescopeServiceProvider::class)) {
             array_push(
                 $this->shellCommands,
-                'composer require ronasit/laravel-telescope-extension',
-                'php artisan telescope:install',
-                'php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force',
+                fn () => $this->shellExecutor->composerRequire('ronasit/laravel-telescope-extension'),
+                fn () => $this->shellExecutor->artisan('telescope:install'),
+                fn () => $this->shellExecutor->artisan('vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force'),
             );
         }
     }
@@ -541,7 +545,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function configureCors(): void
     {
-        shell_exec('php artisan config:publish cors --force');
+        $this->shellExecutor->artisan('config:publish cors --force');
 
         $config = ArrayFile::open(base_path('config/cors.php'));
 
@@ -552,7 +556,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function publishWebLogin(): void
     {
-        shell_exec('php artisan vendor:publish --tag=initializator-web-login --force');
+        $this->shellExecutor->artisan('vendor:publish --tag=initializator-web-login --force');
     }
 
     protected function configureBootstrap(): void
@@ -572,7 +576,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function publishBaseRequest(): void
     {
-        shell_exec('php artisan vendor:publish --tag=base-request');
+        $this->shellExecutor->artisan('vendor:publish --tag=base-request');
     }
 
     protected function runMigrations(): void
@@ -610,7 +614,7 @@ class InitCommand extends Command implements Isolatable
 
     protected function setupPushNotifications(): void
     {
-        $this->shellCommands[] = 'composer require ronasit/laravel-exponent-push-notifications';
-        $this->shellCommands[] = 'php artisan vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config"';
+        $this->shellCommands[] = fn () => $this->shellExecutor->composerRequire('ronasit/laravel-exponent-push-notifications');
+        $this->shellCommands[] = fn () => $this->shellExecutor->artisan('vendor:publish --provider="NotificationChannels\ExpoPushNotifications\ExpoPushNotificationsServiceProvider" --tag="config"');
     }
 }

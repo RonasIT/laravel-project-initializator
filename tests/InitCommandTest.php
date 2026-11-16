@@ -47,8 +47,10 @@ class InitCommandTest extends TestCase
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer.json')),
+        );
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force --ansi'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -58,9 +60,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
             $this->callShellExec('php artisan lang:publish --ansi'),
             $this->callShellExec('php artisan key:generate --ansi'),
-            $this->callShellExec('php artisan config:publish cors --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
+            $this->callShellExec('php artisan config:publish cors --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
         );
 
         $this->mockNativeFunction(
@@ -127,8 +129,10 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+        );
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force --ansi'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -143,9 +147,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
-            $this->callShellExec('php artisan config:publish cors --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
+            $this->callShellExec('php artisan config:publish cors --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
         );
 
         $this->mockNativeFunction(
@@ -212,8 +216,10 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+        );
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force --ansi'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -226,9 +232,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
-            $this->callShellExec('php artisan config:publish cors --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
+            $this->callShellExec('php artisan config:publish cors --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
         );
 
         $this->mockNativeFunction(
@@ -299,8 +305,10 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+        );
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force --ansi'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -316,9 +324,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
-            $this->callShellExec('php artisan config:publish cors --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
+            $this->callShellExec('php artisan config:publish cors --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
         );
 
         $this->mockNativeFunction(
@@ -429,8 +437,10 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+        );
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force --ansi'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -443,9 +453,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
-            $this->callShellExec('php artisan config:publish cors --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
+            $this->callShellExec('php artisan config:publish cors --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
         );
 
         $this->mockNativeFunction(
@@ -513,6 +523,98 @@ class InitCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
+    public function testRunWithReadmeGettingStartedWhenGitRemoteFails()
+    {
+        $this->mockNativeFunction(
+            '\Winter\LaravelConfigWriter',
+            $this->changeEnvFileCall('.env', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.example', 'env.example.yml', 'env.example_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.development', 'env.development.yml', 'env.development_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.ci-testing', 'env.ci-testing.yml', 'env.ci-testing_app_name_not_pascal_case.yml'),
+            $this->changeEnvFileCall('.env.testing', 'env.testing.yml', 'env.testing_app_name_not_pascal_case.yml'),
+            $this->changeConfigFileCall('config/telescope.php', 'telescope.php', 'telescope_after_initialization.php'),
+            $this->changeConfigFileCall('config/cors.php', 'cors.php', 'cors_after_changes.php'),
+            $this->changeConfigFileCall('config/auto-doc.php', 'auto_doc.php', 'auto_doc_after_changes.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->changeBootstrapAppCall('app.php', 'app_after_changes.php'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Generators',
+            $this->copyEnvFileCall('.env'),
+
+            $this->callFileExists('.env.development'),
+            $this->callFileExists('.env.ci-testing'),
+            $this->callFileExists('.env.testing'),
+
+            $this->callRandomBytes(),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Commands',
+            $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+        );
+
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force --ansi'),
+            $this->callShellExec('git ls-remote --get-url origin', 'fatal: not a git repository', 1),
+            $this->callShellExec('composer require laravel/ui --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\AutoDoc\AutoDocServiceProvider" --ansi'),
+            $this->callShellExec('composer require --dev ronasit/laravel-entity-generator --ansi'),
+            $this->callShellExec('composer require --dev laravel/pint --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=pint-config --ansi'),
+            $this->callShellExec('php artisan lang:publish --ansi'),
+            $this->callShellExec('php artisan key:generate --ansi'),
+            $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
+            $this->callShellExec('php artisan telescope:install --ansi'),
+            $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
+            $this->callShellExec('php artisan config:publish cors --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
+        );
+
+        $this->mockNativeFunction(
+            'RonasIT\ProjectInitializator\Support',
+            $this->callFilePutContent('app/Enums/User/RoleEnum.php', $this->getFixture('role_enum.php')),
+            $this->mockMigrationFileWrite('2018_11_11_111112_users_add_role.php', 'users_add_role_migration.php'),
+            $this->callGlob(base_path('database/migrations/*_users_add_role.php'), []),
+
+            $this->mockReadmeFileWrite('getting_started_readme_without_git_remote.md'),
+            $this->callFilePutContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+            $this->callGlob(base_path('database/migrations/*_drop_jobs_table.php'), []),
+            $this->mockMigrationFileWrite('2018_11_11_111113_drop_jobs_table.php', 'drop_jobs_table_migration.php'),
+        );
+
+        $this->mockArtisanMigrateCall();
+
+        $this
+            ->artisan('init "My App"')
+            ->expectsConfirmation('The application name is not in PascalCase, would you like to use MyApp')
+            ->expectsQuestion('Please specify: email of code owner / team lead', 'test@example.com')
+            ->expectsQuestion('Please enter an application URL', 'https://mysite.com')
+            ->expectsChoice('What type of application will your API serve?', 'Web', ['Mobile', 'Web', 'Multiplatform'])
+            ->expectsChoice('Please choose the authentication type', 'none', ['clerk', 'none'])
+            ->expectsConfirmation('Do you want to generate an admin user?')
+            ->expectsConfirmation('Do you want to generate a README file?', 'yes')
+            ->expectsConfirmation('Do you want to generate all README parts?')
+            ->expectsConfirmation('Do you need a `Resources & Contacts` part?')
+            ->expectsConfirmation('Do you need a `Prerequisites` part?')
+            ->expectsConfirmation('Do you need a `Getting Started` part?', 'yes')
+            ->expectsConfirmation('Do you need an `Environments` part?')
+            ->expectsConfirmation('Do you need a `Credentials and Access` part?')
+            ->expectsConfirmation('Will project work with media files? (upload, store and return content)')
+            ->expectsConfirmation('Would you use Renovate dependabot?')
+            ->expectsOutput('README generated successfully!')
+            ->expectsConfirmation('Do you want to uninstall project-initializator package?')
+            ->expectsOutput('Project initialized successfully!')
+            ->assertExitCode(0);
+    }
+
     public function testRunWithAdminAndFullReadmeCreationAndRemovingInitializatorInstallationMedia()
     {
         $this->mockNativeFunction(
@@ -545,9 +647,11 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+        );
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
-            $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force --ansi'),
+            $this->callShellExec('git ls-remote --get-url origin', "https://github.com/ronasit/laravel-helpers.git\n"),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -561,8 +665,8 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
             $this->callShellExec('composer remove --dev ronasit/laravel-project-initializator --ansi'),
         );
 
@@ -676,8 +780,10 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+        );
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force --ansi'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -690,9 +796,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
-            $this->callShellExec('php artisan config:publish cors --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
+            $this->callShellExec('php artisan config:publish cors --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
         );
 
         $this->mockNativeFunction(
@@ -801,8 +907,10 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+        );
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force --ansi'),
             $this->callShellExec('git ls-remote --get-url origin', 'https://github.com/ronasit/laravel-helpers.git'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
@@ -820,8 +928,8 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
         );
 
         $this->mockNativeFunction(
@@ -934,8 +1042,10 @@ class InitCommandTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\ProjectInitializator\Commands',
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+        );
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force'),
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-clerk --force --ansi'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -950,9 +1060,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('composer require ronasit/laravel-telescope-extension --ansi'),
             $this->callShellExec('php artisan telescope:install --ansi'),
             $this->callShellExec('php artisan vendor:publish --provider="RonasIT\TelescopeExtension\TelescopeExtensionServiceProvider" --force --ansi'),
-            $this->callShellExec('php artisan config:publish cors --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
+            $this->callShellExec('php artisan config:publish cors --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
         );
 
         $this->mockNativeFunction(
@@ -1062,8 +1172,10 @@ class InitCommandTest extends TestCase
             $this->callClassExists('Laravel\Telescope\TelescopeServiceProvider'),
 
             $this->callFileGetContent(base_path('composer.json'), $this->getFixture('composer_with_pint_settings.json')),
+        );
 
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force'),
+        $this->mockShellExec(
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-user-model-with-role --force --ansi'),
             $this->callShellExec('composer require laravel/ui --ansi'),
             $this->callShellExec('composer require ronasit/laravel-helpers --ansi'),
             $this->callShellExec('composer require ronasit/laravel-swagger --ansi'),
@@ -1075,9 +1187,9 @@ class InitCommandTest extends TestCase
             $this->callShellExec('php artisan key:generate --ansi'),
             $this->callShellExec('composer require ronasit/laravel-media --ansi'),
             $this->callShellExec('composer require spatie/laravel-google-cloud-storage --ansi'),
-            $this->callShellExec('php artisan config:publish cors --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force'),
-            $this->callShellExec('php artisan vendor:publish --tag=base-request'),
+            $this->callShellExec('php artisan config:publish cors --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=initializator-web-login --force --ansi'),
+            $this->callShellExec('php artisan vendor:publish --tag=base-request --ansi'),
         );
 
         $this->mockNativeFunction(
